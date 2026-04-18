@@ -1,0 +1,78 @@
+<div class="overflow-x-auto w-full">
+    <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Product</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Code</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Type</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Unit</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for product in products %}
+            <tr class="hover:bg-slate-50/80 transition">
+                <td class="px-4 py-3">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">{{ product.product_name }}</p>
+                        <p class="text-xs text-slate-500">{{ product.description|truncatechars:50|default:"—" }}</p>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ product.product_code }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-700">{{ product.get_product_type_display }}</span>
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ product.unit_of_measure }}</td>
+                <td class="px-4 py-3 text-sm">
+                    {% if product.status == 'active' %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">Inactive</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-600">
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="product-details-toggle rounded-lg border border-[#0f7ea6] px-3 py-1.5 text-xs font-semibold text-[#0f7ea6] hover:bg-[#0f7ea6]/10" data-target="#product-details-{{ product.pk }}">View</button>
+                        <button data-edit-url="{% url 'products:update' product.pk %}" class="product-edit-btn rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+                        <button data-toggle-url="{% url 'products:toggle' product.pk %}" class="product-toggle-btn rounded-lg border {% if product.status == 'active' %}border-amber-200 text-amber-700 hover:bg-amber-50{% else %}border-emerald-200 text-emerald-700 hover:bg-emerald-50{% endif %} px-3 py-1.5 text-xs font-semibold">{% if product.status == 'active' %}Deactivate{% else %}Activate{% endif %}</button>
+                    </div>
+                </td>
+            </tr>
+            <tr id="product-details-{{ product.pk }}" class="hidden bg-slate-50">
+                <td colspan="6" class="px-6 py-4">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 mb-2">Product Details</p>
+                            <div class="space-y-2 text-sm text-slate-700">
+                                <p><span class="font-semibold text-slate-900">Name:</span> {{ product.product_name }}</p>
+                                <p><span class="font-semibold text-slate-900">Code:</span> {{ product.product_code }}</p>
+                                <p><span class="font-semibold text-slate-900">Type:</span> {{ product.get_product_type_display }}</p>
+                                <p><span class="font-semibold text-slate-900">Unit:</span> {{ product.unit_of_measure }}</p>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 mb-2">Fuel Properties</p>
+                            <div class="space-y-2 text-sm text-slate-700">
+                                <p><span class="font-semibold text-slate-900">Status:</span> {{ product.get_status_display }}</p>
+                                <p><span class="font-semibold text-slate-900">Density:</span> {{ product.density|default:"—" }}</p>
+                                <p><span class="font-semibold text-slate-900">Temp Factor:</span> {{ product.temperature_factor|default:"—" }}</p>
+                                <p><span class="font-semibold text-slate-900">Color:</span> {{ product.color_marker|default:"—" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500">
+                    No products found. Add your first fuel product to get started.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if paginate_by %}
+{% include "components/pagination.html" %}
+{% endif %}

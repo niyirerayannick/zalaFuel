@@ -1,0 +1,82 @@
+<div class="grid gap-5 md:grid-cols-2">
+    <div class="md:col-span-2">
+        <label for="id_name" class="driver-label">Terminal Name</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">warehouse</span>
+            <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}" class="driver-modal-field" placeholder="e.g. Lagos Depot" required />
+        </div>
+        <p data-error-for="name" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_code" class="driver-label">Terminal Code</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">qr_code</span>
+            <input type="text" name="code" id="id_code" value="{{ form.code.value|default:'' }}" class="driver-modal-field" placeholder="e.g. LGS001" required />
+        </div>
+        <p data-error-for="code" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_location" class="driver-label">Location</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">place</span>
+            <input type="text" name="location" id="id_location" value="{{ form.location.value|default:'' }}" class="driver-modal-field" placeholder="e.g. Lagos, Nigeria" required />
+        </div>
+        <p data-error-for="location" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_status" class="driver-label">Operational Status</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">settings</span>
+            <select name="status" id="id_status" class="driver-modal-field">
+                {% for value, label in form.status.field.choices %}
+                    <option value="{{ value }}" {% if form.status.value == value or form.initial.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="status" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_capacity_liters" class="driver-label">Capacity (Liters)</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">straighten</span>
+            <input type="number" name="capacity_liters" id="id_capacity_liters" value="{{ form.capacity_liters.value|default:'0' }}" step="0.01" class="driver-modal-field" placeholder="0.00" />
+        </div>
+        <p data-error-for="capacity_liters" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_manager" class="driver-label">Manager</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">person</span>
+            <select name="manager" id="id_manager" class="driver-modal-field">
+                <option value="">Select manager (optional)</option>
+                {% for user in form.manager.field.queryset %}
+                    <option value="{{ user.pk }}" {% if form.manager.value == user.pk or form.initial.manager == user.pk %}selected{% endif %}>{{ user.full_name }} ({{ user.email }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="manager" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_is_active" class="driver-label">Status</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">toggle_on</span>
+            <select name="is_active" id="id_is_active" class="driver-modal-field">
+                <option value="True" {% if form.is_active.value == True or form.is_active.value == 'True' %}selected{% endif %}>Active</option>
+                <option value="False" {% if form.is_active.value == False or form.is_active.value == 'False' %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+        <p data-error-for="is_active" class="driver-error"></p>
+    </div>
+
+    <div class="md:col-span-2">
+        <label for="id_notes" class="driver-label">Notes</label>
+        <textarea name="notes" id="id_notes" rows="3" class="driver-modal-field" style="padding-left: 0.95rem; min-height: 5rem;" placeholder="Optional notes">{{ form.notes.value|default:'' }}</textarea>
+        <p data-error-for="notes" class="driver-error"></p>
+    </div>
+</div>

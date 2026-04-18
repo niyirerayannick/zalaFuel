@@ -7,5 +7,5 @@ from .models import MarketShareSnapshot
 class MarketShareSnapshotAdmin(admin.ModelAdmin):
     list_display = ("snapshot_date", "omc", "product", "volume_liters", "revenue_amount", "market_share_percent")
     list_filter = ("snapshot_date", "product", "omc")
-    search_fields = ("omc__name", "product__name")
+    search_fields = ("omc__name", "product__product_name")
 

@@ -1,0 +1,5 @@
+<form id="omc-modal-form" method="post" action="{{ action|default:request.path }}" class="space-y-5" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    <div id="omc-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"></div>
+    {% include "omcs/_form_fields.html" %}
+</form>

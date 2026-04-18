@@ -1,0 +1,86 @@
+<div class="grid gap-5 md:grid-cols-2">
+    <div class="md:col-span-2">
+        <label for="id_terminal" class="driver-label">Terminal</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">warehouse</span>
+            <select name="terminal" id="id_terminal" class="driver-modal-field">
+                <option value="">Select terminal</option>
+                {% for terminal in form.terminal.field.queryset %}
+                    <option value="{{ terminal.pk }}" {% if form.terminal.value == terminal.pk or form.initial.terminal == terminal.pk %}selected{% endif %}>{{ terminal.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="terminal" class="driver-error"></p>
+    </div>
+
+    <div class="md:col-span-2">
+        <label for="id_product" class="driver-label">Product</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">inventory_2</span>
+            <select name="product" id="id_product" class="driver-modal-field">
+                <option value="">Select product</option>
+                {% for product in form.product.field.queryset %}
+                    <option value="{{ product.pk }}" {% if form.product.value == product.pk or form.initial.product == product.pk %}selected{% endif %}>{{ product.product_name }} ({{ product.product_code }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="product" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_name" class="driver-label">Tank Name</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">oil_barrel</span>
+            <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}" class="driver-modal-field" placeholder="e.g. Tank 1" required />
+        </div>
+        <p data-error-for="name" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_code" class="driver-label">Tank Code</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">qr_code</span>
+            <input type="text" name="code" id="id_code" value="{{ form.code.value|default:'' }}" class="driver-modal-field" placeholder="e.g. T001" required />
+        </div>
+        <p data-error-for="code" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_capacity_liters" class="driver-label">Capacity (Liters)</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">straighten</span>
+            <input type="number" name="capacity_liters" id="id_capacity_liters" value="{{ form.capacity_liters.value|default:'' }}" step="0.01" class="driver-modal-field" placeholder="0.00" required />
+        </div>
+        <p data-error-for="capacity_liters" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_minimum_threshold" class="driver-label">Low Level Threshold</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">warning</span>
+            <input type="number" name="minimum_threshold" id="id_minimum_threshold" value="{{ form.minimum_threshold.value|default:'' }}" step="0.01" class="driver-modal-field" placeholder="0.00" />
+        </div>
+        <p data-error-for="minimum_threshold" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_current_stock_liters" class="driver-label">Current Stock</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">local_gas_station</span>
+            <input type="number" name="current_stock_liters" id="id_current_stock_liters" value="{{ form.current_stock_liters.value|default:'0' }}" step="0.01" class="driver-modal-field" placeholder="0.00" />
+        </div>
+        <p data-error-for="current_stock_liters" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_is_active" class="driver-label">Status</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">toggle_on</span>
+            <select name="is_active" id="id_is_active" class="driver-modal-field">
+                <option value="True" {% if form.is_active.value == True or form.is_active.value == 'True' %}selected{% endif %}>Active</option>
+                <option value="False" {% if form.is_active.value == False or form.is_active.value == 'False' %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+        <p data-error-for="is_active" class="driver-error"></p>
+    </div>
+</div>

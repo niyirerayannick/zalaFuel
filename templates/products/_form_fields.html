@@ -1,0 +1,96 @@
+<div class="grid gap-5 md:grid-cols-2">
+    <div class="md:col-span-2">
+        <label for="id_product_name" class="driver-label">Product Name</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">inventory_2</span>
+            <input type="text" name="product_name" id="id_product_name" value="{{ form.product_name.value|default:'' }}" class="driver-modal-field" placeholder="e.g. Premium Motor Spirit" required />
+        </div>
+        <p data-error-for="product_name" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_product_code" class="driver-label">Product Code</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">qr_code</span>
+            <input type="text" name="product_code" id="id_product_code" value="{{ form.product_code.value|default:'' }}" class="driver-modal-field" placeholder="e.g. PMS" required />
+        </div>
+        <p data-error-for="product_code" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_product_type" class="driver-label">Product Type</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">category</span>
+            <select name="product_type" id="id_product_type" class="driver-modal-field">
+                {% for value, label in form.product_type.field.choices %}
+                    <option value="{{ value }}" {% if form.product_type.value == value or form.initial.product_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="product_type" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_unit_of_measure" class="driver-label">Unit of Measure</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">straighten</span>
+            <input type="text" name="unit_of_measure" id="id_unit_of_measure" value="{{ form.unit_of_measure.value|default:'Liters' }}" class="driver-modal-field" placeholder="e.g. Liters" />
+        </div>
+        <p data-error-for="unit_of_measure" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_status" class="driver-label">Status</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">toggle_on</span>
+            <select name="status" id="id_status" class="driver-modal-field">
+                {% for value, label in form.status.field.choices %}
+                    <option value="{{ value }}" {% if form.status.value == value or form.initial.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="status" class="driver-error"></p>
+    </div>
+
+    <div class="md:col-span-2">
+        <label for="id_description" class="driver-label">Description</label>
+        <textarea name="description" id="id_description" rows="3" class="driver-modal-field" style="padding-left: 0.95rem; min-height: 5rem;" placeholder="Optional description for the product">{{ form.description.value|default:'' }}</textarea>
+        <p data-error-for="description" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_density" class="driver-label">Density (kg/m³)</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">scale</span>
+            <input type="number" name="density" id="id_density" value="{{ form.density.value|default:'' }}" step="0.001" class="driver-modal-field" placeholder="e.g. 750.000" />
+        </div>
+        <p data-error-for="density" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_temperature_factor" class="driver-label">Temperature Factor</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">thermostat</span>
+            <input type="number" name="temperature_factor" id="id_temperature_factor" value="{{ form.temperature_factor.value|default:'' }}" step="0.000001" class="driver-modal-field" placeholder="e.g. 0.000800" />
+        </div>
+        <p data-error-for="temperature_factor" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_color_marker" class="driver-label">Color Marker</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">palette</span>
+            <input type="text" name="color_marker" id="id_color_marker" value="{{ form.color_marker.value|default:'' }}" class="driver-modal-field" placeholder="e.g. Green" />
+        </div>
+        <p data-error-for="color_marker" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_display_order" class="driver-label">Display Order</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">sort</span>
+            <input type="number" name="display_order" id="id_display_order" value="{{ form.display_order.value|default:'0' }}" class="driver-modal-field" placeholder="0" />
+        </div>
+        <p data-error-for="display_order" class="driver-error"></p>
+    </div>
+</div>

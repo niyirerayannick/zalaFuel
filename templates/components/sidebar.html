@@ -29,6 +29,22 @@
             <a href="{% url 'tanks:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/tank-stocks/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
                 <span class="font-medium">Tank Stocks</span>
             </a>
+
+            <div class="sidebar-group">
+                <button type="button" class="sidebar-group-toggle group flex w-full items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 {% if '/products/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <span class="font-medium">Products</span>
+                    <span class="material-symbols-outlined text-base transition-transform duration-200 {% if '/products/' in path %}rotate-180{% endif %}">expand_more</span>
+                </button>
+                <div class="sidebar-group-content overflow-hidden transition-all duration-300 ml-2 pl-2 border-l border-white/10 {% if '/products/' not in path %}hidden{% endif %}">
+                    <a href="{% url 'products:list' %}" class="group flex items-center rounded-lg px-4 py-1.5 text-sm transition-all duration-200 {% if path == '/products/' or '/products/' in path and '/products/suppliers/' not in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                        Products
+                    </a>
+                    <a href="{% url 'products:suppliers' %}" class="group flex items-center rounded-lg px-4 py-1.5 text-sm transition-all duration-200 {% if '/products/suppliers/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                        Suppliers
+                    </a>
+                </div>
+            </div>
+
             <a href="{% url 'receipts:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/product-receipts/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
                 <span class="font-medium">Product Receipts</span>
             </a>
@@ -37,6 +53,9 @@
             </a>
             <a href="{% url 'sales:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/omc-sales/' in path or '/sales/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
                 <span class="font-medium">OMC Sales</span>
+            </a>
+            <a href="{% url 'omcs:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/omcs/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">OMCs</span>
             </a>
             <a href="{% url 'revenue:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/revenue-analysis/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
                 <span class="font-medium">Revenue Analysis</span>
@@ -204,6 +223,19 @@
         confirmButton.addEventListener("click", function () {
             saveCurrentAccount();
             form.submit();
+        });
+    })();
+
+    (function () {
+        document.querySelectorAll('.sidebar-group-toggle').forEach(function(toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                var group = this.closest('.sidebar-group');
+                var content = group.querySelector('.sidebar-group-content');
+                var icon = this.querySelector('.material-symbols-outlined');
+                content.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            });
         });
     })();
 </script>

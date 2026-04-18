@@ -82,13 +82,13 @@ def dashboard_snapshot():
         ][::-1]
         product_flow = [
             {
-                "label": row["product__name"],
+                "label": row["product__product_name"],
                 "receipts": float(row["receipts_total"] or 0),
                 "dispatches": float(row["dispatches_total"] or 0),
             }
-            for row in ProductReceipt.objects.values("product__name")
+            for row in ProductReceipt.objects.values("product__product_name")
             .annotate(receipts_total=Sum("quantity_received"), dispatches_total=Sum("product__dispatches__quantity_dispatched"))
-            .order_by("-receipts_total", "product__name")[:5]
+            .order_by("-receipts_total", "product__product_name")[:5]
         ]
         alert_breakdown = [
             {
@@ -106,9 +106,9 @@ def dashboard_snapshot():
         )
 
         latest_activity = (
-            [{"type": "Receipt", "date": item.receipt_date, "description": f"{item.product.name} receipt at {item.terminal.name}", "quantity": item.quantity_received}
+            [{"type": "Receipt", "date": item.receipt_date, "description": f"{item.product.product_name} receipt at {item.terminal.name}", "quantity": item.quantity_received}
              for item in latest_receipts[:4]]
-            + [{"type": "Dispatch", "date": item.dispatch_date, "description": f"{item.product.name} dispatch to {item.omc.name}", "quantity": item.quantity_dispatched}
+            + [{"type": "Dispatch", "date": item.dispatch_date, "description": f"{item.product.product_name} dispatch to {item.omc.name}", "quantity": item.quantity_dispatched}
                for item in latest_dispatches[:4]]
             + [{"type": "Sales", "date": item.sale_date, "description": f"{item.omc.name} sales submission", "quantity": item.volume_liters}
                for item in latest_sales[:4]]

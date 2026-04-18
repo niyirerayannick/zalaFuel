@@ -1,0 +1,85 @@
+<div class="grid gap-5 md:grid-cols-2">
+    <div class="md:col-span-2">
+        <label for="id_submission_reference" class="driver-label">Submission Reference</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">tag</span>
+            <input type="text" name="submission_reference" id="id_submission_reference" value="{{ form.submission_reference.value|default:'' }}" class="driver-modal-field" placeholder="e.g. OMC/2024/001" required />
+        </div>
+        <p data-error-for="submission_reference" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_sale_date" class="driver-label">Sale Date</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">calendar_today</span>
+            <input type="date" name="sale_date" id="id_sale_date" value="{{ form.sale_date.value|default:'' }}" class="driver-modal-field" required />
+        </div>
+        <p data-error-for="sale_date" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_terminal" class="driver-label">Terminal</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">warehouse</span>
+            <select name="terminal" id="id_terminal" class="driver-modal-field">
+                <option value="">Select terminal</option>
+                {% for terminal in form.terminal.field.queryset %}
+                    <option value="{{ terminal.pk }}" {% if form.terminal.value == terminal.pk or form.initial.terminal == terminal.pk %}selected{% endif %}>{{ terminal.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="terminal" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_omc" class="driver-label">OMC</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">business</span>
+            <select name="omc" id="id_omc" class="driver-modal-field">
+                <option value="">Select OMC</option>
+                {% for omc in form.omc.field.queryset %}
+                    <option value="{{ omc.pk }}" {% if form.omc.value == omc.pk or form.initial.omc == omc.pk %}selected{% endif %}>{{ omc.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="omc" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_product" class="driver-label">Product</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">inventory_2</span>
+            <select name="product" id="id_product" class="driver-modal-field">
+                <option value="">Select product</option>
+                {% for product in form.product.field.queryset %}
+                    <option value="{{ product.pk }}" {% if form.product.value == product.pk or form.initial.product == product.pk %}selected{% endif %}>{{ product.product_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="product" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_volume_liters" class="driver-label">Volume (Liters)</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">speed</span>
+            <input type="number" name="volume_liters" id="id_volume_liters" value="{{ form.volume_liters.value|default:'' }}" step="0.01" class="driver-modal-field" placeholder="0.00" required />
+        </div>
+        <p data-error-for="volume_liters" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_unit_price" class="driver-label">Unit Price</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">attach_money</span>
+            <input type="number" name="unit_price" id="id_unit_price" value="{{ form.unit_price.value|default:'' }}" step="0.01" class="driver-modal-field" placeholder="0.00" required />
+        </div>
+        <p data-error-for="unit_price" class="driver-error"></p>
+    </div>
+
+    <div class="md:col-span-2">
+        <label for="id_remarks" class="driver-label">Remarks</label>
+        <textarea name="remarks" id="id_remarks" rows="3" class="driver-modal-field" style="padding-left: 0.95rem; min-height: 5rem;" placeholder="Optional remarks">{{ form.remarks.value|default:'' }}</textarea>
+        <p data-error-for="remarks" class="driver-error"></p>
+    </div>
+</div>

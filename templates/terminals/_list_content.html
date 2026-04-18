@@ -1,0 +1,50 @@
+<div class="overflow-x-auto w-full">
+    <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Terminal</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Location</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Manager</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Tanks</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for terminal in terminals %}
+            <tr class="hover:bg-slate-50/80 transition">
+                <td class="px-4 py-3">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900"><a href="{% url 'terminals:detail' terminal.pk %}" class="text-[#0f7ea6] hover:underline">{{ terminal.name }}</a></p>
+                        <p class="text-xs text-slate-500">{{ terminal.code }}</p>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ terminal.location }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ terminal.manager.full_name|default:terminal.manager_name|default:"—" }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ terminal.tank_count|default:0 }}</td>
+                <td class="px-4 py-3 text-sm">
+                    {% if terminal.is_active %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">Inactive</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-600">
+                    <div class="flex flex-wrap gap-2">
+                        <button data-edit-url="{% url 'terminals:update' terminal.pk %}" class="terminal-edit-btn rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500">
+                    No terminals yet. Add your first terminal to get started.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if paginate_by %}
+{% include "components/pagination.html" %}
+{% endif %}

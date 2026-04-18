@@ -1,0 +1,76 @@
+<div class="overflow-x-auto w-full">
+    <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Supplier</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Code</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Contact Person</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Phone</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for supplier in suppliers %}
+            <tr class="hover:bg-slate-50/80 transition">
+                <td class="px-4 py-3">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">{{ supplier.supplier_name }}</p>
+                        <p class="text-xs text-slate-500">{{ supplier.address|truncatechars:40|default:"—" }}</p>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ supplier.supplier_code }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ supplier.contact_person|default:"—" }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ supplier.phone|default:"—" }}</td>
+                <td class="px-4 py-3 text-sm">
+                    {% if supplier.status == 'active' %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">Inactive</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-600">
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="supplier-details-toggle rounded-lg border border-[#0f7ea6] px-3 py-1.5 text-xs font-semibold text-[#0f7ea6] hover:bg-[#0f7ea6]/10" data-target="#supplier-details-{{ supplier.pk }}">View</button>
+                        <button data-edit-url="{% url 'products:supplier_update' supplier.pk %}" class="supplier-edit-btn rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+                        <button data-toggle-url="{% url 'products:supplier_toggle' supplier.pk %}" class="supplier-toggle-btn rounded-lg border {% if supplier.status == 'active' %}border-amber-200 text-amber-700 hover:bg-amber-50{% else %}border-emerald-200 text-emerald-700 hover:bg-emerald-50{% endif %} px-3 py-1.5 text-xs font-semibold">{% if supplier.status == 'active' %}Deactivate{% else %}Activate{% endif %}</button>
+                    </div>
+                </td>
+            </tr>
+            <tr id="supplier-details-{{ supplier.pk }}" class="hidden bg-slate-50">
+                <td colspan="6" class="px-6 py-4">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 mb-2">Supplier Details</p>
+                            <div class="space-y-2 text-sm text-slate-700">
+                                <p><span class="font-semibold text-slate-900">Name:</span> {{ supplier.supplier_name }}</p>
+                                <p><span class="font-semibold text-slate-900">Code:</span> {{ supplier.supplier_code }}</p>
+                                <p><span class="font-semibold text-slate-900">Contact:</span> {{ supplier.contact_person|default:"—" }}</p>
+                                <p><span class="font-semibold text-slate-900">Phone:</span> {{ supplier.phone|default:"—" }}</p>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 mb-2">Location & Contact</p>
+                            <div class="space-y-2 text-sm text-slate-700">
+                                <p><span class="font-semibold text-slate-900">Email:</span> {{ supplier.email|default:"—" }}</p>
+                                <p><span class="font-semibold text-slate-900">Country:</span> {{ supplier.country|default:"—" }}</p>
+                                <p><span class="font-semibold text-slate-900">Status:</span> {{ supplier.get_status_display }}</p>
+                                <p><span class="font-semibold text-slate-900">Address:</span> {{ supplier.address|truncatechars:60|default:"—" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500">
+                    No suppliers found. Add your first supplier to get started.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if paginate_by %}
+{% include "components/pagination.html" %}
+{% endif %}

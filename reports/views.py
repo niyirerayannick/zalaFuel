@@ -125,7 +125,7 @@ class AnnualVolumeReportView(ReportsRoleMixin, TemplateView):
             {
                 "page_title": "Annual Volume Analysis Report",
                 "active_menu": "reports",
-                "rows": OMCSalesEntry.objects.values("sale_date__year", "omc__name", "product__name").order_by("-sale_date__year", "omc__name", "product__name"),
+                "rows": OMCSalesEntry.objects.values("sale_date__year", "omc__name", "product__product_name").order_by("-sale_date__year", "omc__name", "product__product_name"),
             }
         )
         return context
@@ -137,20 +137,20 @@ class SimpleCsvExportView(ReportsRoleMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         if self.report_type == "daily_tank_stock":
             rows = TankStockEntry.objects.select_related("tank", "tank__terminal", "tank__product").values_list(
-                "entry_date", "tank__terminal__name", "tank__name", "tank__product__name", "opening_stock", "stock_in", "stock_out", "closing_stock", "computed_stock", "variance"
+                "entry_date", "tank__terminal__name", "tank__name", "tank__product__product_name", "opening_stock", "stock_in", "stock_out", "closing_stock", "computed_stock", "variance"
             )
             return csv_response("daily_tank_stock.csv", ["Date", "Terminal", "Tank", "Product", "Opening", "Stock In", "Stock Out", "Closing", "Computed", "Variance"], rows)
         if self.report_type == "receipts":
             rows = ProductReceipt.objects.select_related("supplier", "terminal", "tank", "product").values_list(
-                "receipt_date", "reference_number", "supplier__name", "product__name", "quantity_received", "terminal__name", "tank__name"
+                "receipt_date", "reference_number", "supplier__name", "product__product_name", "quantity_received", "terminal__name", "tank__name"
             )
             return csv_response("product_receipts.csv", ["Date", "Reference", "Supplier", "Product", "Quantity", "Terminal", "Tank"], rows)
         if self.report_type == "dispatches":
             rows = Dispatch.objects.select_related("omc", "terminal", "tank", "product").values_list(
-                "dispatch_date", "reference_number", "omc__name", "product__name", "quantity_dispatched", "terminal__name", "destination"
+                "dispatch_date", "reference_number", "omc__name", "product__product_name", "quantity_dispatched", "terminal__name", "destination"
             )
             return csv_response("dispatches.csv", ["Date", "Reference", "OMC", "Product", "Quantity", "Terminal", "Destination"], rows)
         rows = RevenueEntry.objects.select_related("omc", "terminal", "product").values_list(
-            "revenue_date", "omc__name", "product__name", "volume_liters", "amount", "terminal__name"
+            "revenue_date", "omc__name", "product__product_name", "volume_liters", "amount", "terminal__name"
         )
         return csv_response("revenue.csv", ["Date", "OMC", "Product", "Volume", "Amount", "Terminal"], rows)

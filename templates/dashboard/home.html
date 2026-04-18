@@ -226,7 +226,7 @@
                     <thead><tr class="text-left text-slate-500"><th class="pb-2">Terminal</th><th class="pb-2">Tank</th><th class="pb-2">Product</th><th class="pb-2">Current Stock</th></tr></thead>
                     <tbody class="divide-y divide-slate-100">
                         {% for tank in terminal_summary %}
-                        <tr><td class="py-2">{{ tank.terminal.name }}</td><td class="py-2">{{ tank.name }}</td><td class="py-2">{{ tank.product.name }}</td><td class="py-2">{{ tank.current_stock_liters|floatformat:2 }} L</td></tr>
+                        <tr><td class="py-2">{{ tank.terminal.name }}</td><td class="py-2">{{ tank.name }}</td><td class="py-2">{{ tank.product.product_name }}</td><td class="py-2">{{ tank.current_stock_liters|floatformat:2 }} L</td></tr>
                         {% empty %}<tr><td colspan="4" class="py-4 text-slate-500">No terminal stock available.</td></tr>{% endfor %}
                     </tbody>
                 </table>

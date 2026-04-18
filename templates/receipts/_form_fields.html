@@ -1,0 +1,99 @@
+<div class="grid gap-5 md:grid-cols-2">
+    <div class="md:col-span-2">
+        <label for="id_reference_number" class="driver-label">Reference Number</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">tag</span>
+            <input type="text" name="reference_number" id="id_reference_number" value="{{ form.reference_number.value|default:'' }}" class="driver-modal-field" placeholder="e.g. REC/2024/001" required />
+        </div>
+        <p data-error-for="reference_number" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_receipt_date" class="driver-label">Receipt Date</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">calendar_today</span>
+            <input type="date" name="receipt_date" id="id_receipt_date" value="{{ form.receipt_date.value|default:'' }}" class="driver-modal-field" required />
+        </div>
+        <p data-error-for="receipt_date" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_supplier" class="driver-label">Supplier</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">local_shipping</span>
+            <select name="supplier" id="id_supplier" class="driver-modal-field">
+                <option value="">Select supplier</option>
+                {% for supplier in form.supplier.field.queryset %}
+                    <option value="{{ supplier.pk }}" {% if form.supplier.value == supplier.pk or form.initial.supplier == supplier.pk %}selected{% endif %}>{{ supplier.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="supplier" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_product" class="driver-label">Product</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">inventory_2</span>
+            <select name="product" id="id_product" class="driver-modal-field">
+                <option value="">Select product</option>
+                {% for product in form.product.field.queryset %}
+                    <option value="{{ product.pk }}" {% if form.product.value == product.pk or form.initial.product == product.pk %}selected{% endif %}>{{ product.product_name }} ({{ product.product_code }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="product" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_terminal" class="driver-label">Terminal</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">warehouse</span>
+            <select name="terminal" id="id_terminal" class="driver-modal-field">
+                <option value="">Select terminal</option>
+                {% for terminal in form.terminal.field.queryset %}
+                    <option value="{{ terminal.pk }}" {% if form.terminal.value == terminal.pk or form.initial.terminal == terminal.pk %}selected{% endif %}>{{ terminal.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="terminal" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_tank" class="driver-label">Tank</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">oil_barrel</span>
+            <select name="tank" id="id_tank" class="driver-modal-field">
+                <option value="">Select tank</option>
+                {% for tank in form.tank.field.queryset %}
+                    <option value="{{ tank.pk }}" {% if form.tank.value == tank.pk or form.initial.tank == tank.pk %}selected{% endif %}>{{ tank.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="tank" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_quantity_received" class="driver-label">Quantity (Liters)</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">speed</span>
+            <input type="number" name="quantity_received" id="id_quantity_received" value="{{ form.quantity_received.value|default:'' }}" step="0.01" class="driver-modal-field" placeholder="0.00" required />
+        </div>
+        <p data-error-for="quantity_received" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_waybill_number" class="driver-label">Waybill Number</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">receipt_long</span>
+            <input type="text" name="waybill_number" id="id_waybill_number" value="{{ form.waybill_number.value|default:'' }}" class="driver-modal-field" placeholder="Optional waybill" />
+        </div>
+        <p data-error-for="waybill_number" class="driver-error"></p>
+    </div>
+
+    <div class="md:col-span-2">
+        <label for="id_remarks" class="driver-label">Remarks</label>
+        <textarea name="remarks" id="id_remarks" rows="3" class="driver-modal-field" style="padding-left: 0.95rem; min-height: 5rem;" placeholder="Optional remarks">{{ form.remarks.value|default:'' }}</textarea>
+        <p data-error-for="remarks" class="driver-error"></p>
+    </div>
+</div>

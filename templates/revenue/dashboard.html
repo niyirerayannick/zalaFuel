@@ -1,2 +1,280 @@
-{% extends "base.html" %}{% block title %}Revenue Analysis | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}{% block content %}<div class="space-y-6"><div class="flex items-center justify-between"><div><h1 class="text-3xl font-bold text-slate-900">Revenue Analysis</h1><p class="mt-2 text-sm text-slate-600">Review revenue by OMC, product, and yearly performance using the same dashboard layout patterns.</p></div><a href="{% url 'revenue:create' %}" class="rounded-lg bg-[#0f7ea6] px-4 py-2.5 text-sm font-semibold text-white">New Revenue Entry</a></div><section class="grid gap-4 md:grid-cols-2"><div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">Revenue</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ revenue_total|floatformat:2 }}</p></div><div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">Volume</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ volume_total|floatformat:2 }} L</p></div></section><section class="grid gap-6 xl:grid-cols-3"><div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2"><h2 class="text-lg font-bold text-slate-900">Revenue Entries</h2><table class="mt-4 min-w-full text-sm"><thead class="text-left text-slate-500"><tr><th class="pb-2">Date</th><th class="pb-2">OMC</th><th class="pb-2">Product</th><th class="pb-2">Amount</th></tr></thead><tbody class="divide-y divide-slate-100">{% for row in entries %}<tr><td class="py-2">{{ row.revenue_date }}</td><td class="py-2">{{ row.omc.name }}</td><td class="py-2">{{ row.product.name }}</td><td class="py-2">{{ row.amount|floatformat:2 }}</td></tr>{% empty %}<tr><td colspan="4" class="py-4 text-slate-500">No revenue entries yet.</td></tr>{% endfor %}</tbody></table></div><div class="space-y-6"><div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 class="text-lg font-bold text-slate-900">Revenue by OMC</h2><div class="mt-4 space-y-3">{% for row in by_omc %}<div class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3"><span>{{ row.omc__name }}</span><span>{{ row.total|floatformat:2 }}</span></div>{% endfor %}</div></div><div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 class="text-lg font-bold text-slate-900">Yearly Summary</h2><div class="mt-4 space-y-3">{% for row in yearly_summary %}<div class="rounded-xl bg-slate-50 px-4 py-3"><p class="font-semibold text-slate-900">{{ row.revenue_date__year }}</p><p class="text-sm text-slate-600">{{ row.total|floatformat:2 }} · {{ row.volume|floatformat:2 }} L</p></div>{% endfor %}</div></div></div></section></div>{% endblock %}
+{% extends "base.html" %}
 
+{% block title %}Revenue Analysis | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .driver-panel { background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); }
+    .driver-modal-field, .driver-modal-file {
+        width: 100%; min-height: 2.8rem; border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225); background: rgb(248 250 252); color: rgb(15 23 42);
+        transition: all 0.2s ease;
+    }
+    .driver-modal-field { padding: 0.78rem 0.95rem 0.78rem 2.75rem; }
+    .driver-modal-file { padding: 0.7rem 0.95rem 0.7rem 2.75rem; }
+    .driver-modal-field:focus, .driver-modal-file:focus {
+        outline: none; background: white; border-color: rgb(21 128 61);
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+    .driver-modal-error { border-color: rgb(239 68 68) !important; background: rgb(254 242 242) !important; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important; }
+    .driver-label { display:block; margin-bottom:0.45rem; font-size:0.74rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:rgb(51 65 85); }
+    .driver-error { min-height:1rem; margin-top:0.45rem; font-size:0.75rem; color:rgb(220 38 38); }
+    .driver-input-shell { position: relative; }
+    .driver-field-icon { position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); color:rgb(100 116 139); font-size:1.05rem; pointer-events:none; transition: color 0.2s ease; }
+    .driver-input-shell:focus-within .driver-field-icon { color: rgb(21 128 61); }
+    .chart-container { position: relative; height: 280px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <form class="hidden">{% csrf_token %}</form>
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fuel Analytics</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Revenue Analysis</h1>
+                <p class="mt-1 text-sm text-slate-600">Review revenue by OMC, product, and period performance.</p>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" id="revenue-add-btn" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                    <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                    Revenue Entry
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Revenue</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">₦{{ kpi_total_revenue|floatformat:2 }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Volume</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ kpi_total_volume|floatformat:2 }} L</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Active OMCs</p>
+            <h3 class="mt-1 text-2xl font-bold text-green-700">{{ kpi_active_omcs }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Records</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ kpi_total_records }}</h3>
+        </div>
+    </div>
+
+    <div class="mb-6 grid gap-6 lg:grid-cols-3">
+        <div class="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">Revenue Trend</h2>
+            <div class="chart-container mt-4 flex items-center justify-center bg-slate-50 rounded-xl">
+                <div class="text-center text-slate-500">
+                    <span class="material-symbols-outlined text-4xl">show_chart</span>
+                    <p class="mt-2 text-sm">Monthly revenue trend</p>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">Key Insights</h2>
+            <div class="mt-4 space-y-3">
+                <div class="rounded-xl bg-emerald-50 px-4 py-3">
+                    <p class="text-xs font-semibold text-emerald-700">Top Revenue OMC</p>
+                    <p class="mt-1 text-sm font-bold text-emerald-900">{{ kpi_top_revenue_omc }}</p>
+                </div>
+                <div class="rounded-xl bg-blue-50 px-4 py-3">
+                    <p class="text-xs font-semibold text-blue-700">Top Volume Product</p>
+                    <p class="mt-1 text-sm font-bold text-blue-900">{{ kpi_top_volume_product }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 px-4 py-3">
+                    <p class="text-xs font-semibold text-slate-700">Active OMCs</p>
+                    <p class="mt-1 text-sm font-bold text-slate-900">{{ kpi_active_omcs }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
+            <form method="get" class="flex w-full flex-wrap gap-2">
+                <select name="year" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All years</option>
+                </select>
+                <select name="omc" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All OMCs</option>
+                </select>
+                <select name="product" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All products</option>
+                </select>
+                <select name="terminal" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All terminals</option>
+                </select>
+                <input type="text" name="search" value="{{ filters.search }}" placeholder="Search OMC or product" class="flex-1 min-w-[220px] rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]" />
+                <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">Filter</button>
+            </form>
+        </div>
+        <div id="revenue-list-content">
+            {% include "revenue/_list_content.html" %}
+        </div>
+    </div>
+</div>
+
+<div id="revenue-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="revenue-panel" class="driver-panel fixed inset-y-0 right-0 z-50 hidden w-full max-w-2xl translate-x-full transform shadow-2xl transition-transform duration-300">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                    <span class="material-symbols-outlined text-[20px] leading-none">payments</span>
+                </div>
+                <div>
+                    <h2 class="text-base font-semibold text-slate-900" id="revenue-panel-title">Add Revenue Entry</h2>
+                    <p class="text-xs text-slate-500">Record revenue.</p>
+                </div>
+            </div>
+            <button type="button" id="revenue-close-btn" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+        <div id="revenue-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+        <div class="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-3 backdrop-blur">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="revenue-cancel-btn" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</button>
+                <button type="button" id="revenue-save-btn" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">Save Entry</button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('revenue-add-btn');
+    const overlay = document.getElementById('revenue-overlay');
+    const panel = document.getElementById('revenue-panel');
+    const panelBody = document.getElementById('revenue-panel-body');
+    const closeBtn = document.getElementById('revenue-close-btn');
+    const cancelBtn = document.getElementById('revenue-cancel-btn');
+    const saveBtn = document.getElementById('revenue-save-btn');
+    const listContainer = document.getElementById('revenue-list-content');
+    const titleEl = document.getElementById('revenue-panel-title');
+    let currentForm = null;
+
+    if (!addBtn || !overlay || !panel || !panelBody || !saveBtn || !listContainer) return;
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(() => panel.classList.remove('translate-x-full'));
+        document.body.classList.add('overflow-hidden');
+    }
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            panel.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            currentForm = null;
+        }, 220);
+    }
+    function styleModalFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden' || el.type === 'checkbox') return;
+            if (el.type === 'file') { el.classList.add('driver-modal-file'); }
+            else { el.classList.add('driver-modal-field'); }
+        });
+    }
+    function clearErrors() {
+        const formError = panelBody.querySelector('#revenue-form-error');
+        if (formError) { formError.classList.add('hidden'); formError.textContent = ''; }
+        panelBody.querySelectorAll('.driver-error').forEach(el => el.textContent = '');
+        panelBody.querySelectorAll('.driver-modal-error').forEach(el => el.classList.remove('driver-modal-error'));
+    }
+    function showErrors(payload) {
+        const formError = panelBody.querySelector('#revenue-form-error');
+        if (payload.non_field_errors && payload.non_field_errors.length && formError) {
+            formError.classList.remove('hidden');
+            formError.textContent = payload.non_field_errors.join(' ');
+        }
+        if (payload.errors) {
+            Object.keys(payload.errors).forEach(field => {
+                const input = panelBody.querySelector('#id_' + field);
+                const error = panelBody.querySelector('[data-error-for="' + field + '"]');
+                if (input) input.classList.add('driver-modal-error');
+                if (error) error.textContent = payload.errors[field].join(' ');
+            });
+        }
+    }
+    async function refreshList() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('partial', 'list');
+        const response = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        listContainer.innerHTML = await response.text();
+    }
+    async function loadForm(url, title) {
+        openPanel();
+        titleEl.textContent = title;
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        const separator = url.includes('?') ? '&' : '?';
+        const response = await fetch(url + separator + 'partial=form', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        panelBody.innerHTML = await response.text();
+        currentForm = panelBody.querySelector('#revenue-modal-form');
+        styleModalFields();
+    }
+
+    addBtn.addEventListener('click', function () {
+        clearErrors();
+        loadForm("{% url 'revenue:create' %}", 'Add Revenue Entry');
+    });
+
+    listContainer.addEventListener('click', function (event) {
+        const editBtn = event.target.closest('.revenue-edit-btn');
+        if (editBtn) {
+            event.preventDefault();
+            clearErrors();
+            loadForm(editBtn.dataset.editUrl, 'Edit Revenue Entry');
+        }
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !panel.classList.contains('hidden')) closePanel();
+    });
+
+    saveBtn.addEventListener('click', async function () {
+        if (!currentForm) return;
+        clearErrors();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        try {
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+            closePanel();
+            await refreshList();
+        } catch (error) {
+            const formError = panelBody.querySelector('#revenue-form-error');
+            if (formError) {
+                formError.classList.remove('hidden');
+                formError.textContent = 'Unable to save the entry right now. Please try again.';
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Entry';
+        }
+    });
+});
+</script>
+{% endblock %}

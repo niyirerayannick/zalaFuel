@@ -1,0 +1,58 @@
+<div class="grid gap-5 md:grid-cols-2">
+    <div class="md:col-span-2">
+        <label for="id_name" class="driver-label">OMC Name</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">business</span>
+            <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}" class="driver-modal-field" placeholder="e.g. Oando" required />
+        </div>
+        <p data-error-for="name" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_code" class="driver-label">OMC Code</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">qr_code</span>
+            <input type="text" name="code" id="id_code" value="{{ form.code.value|default:'' }}" class="driver-modal-field" placeholder="e.g. OAN" required />
+        </div>
+        <p data-error-for="code" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_is_active" class="driver-label">Status</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">toggle_on</span>
+            <select name="is_active" id="id_is_active" class="driver-modal-field">
+                <option value="True" {% if form.is_active.value == True or form.is_active.value == 'True' %}selected{% endif %}>Active</option>
+                <option value="False" {% if form.is_active.value == False or form.is_active.value == 'False' %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+        <p data-error-for="is_active" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_contact_person" class="driver-label">Contact Person</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">person</span>
+            <input type="text" name="contact_person" id="id_contact_person" value="{{ form.contact_person.value|default:'' }}" class="driver-modal-field" placeholder="Contact name" />
+        </div>
+        <p data-error-for="contact_person" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_phone" class="driver-label">Phone</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">phone</span>
+            <input type="text" name="phone" id="id_phone" value="{{ form.phone.value|default:'' }}" class="driver-modal-field" placeholder="Phone number" />
+        </div>
+        <p data-error-for="phone" class="driver-error"></p>
+    </div>
+
+    <div class="md:col-span-2">
+        <label for="id_email" class="driver-label">Email</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">email</span>
+            <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" class="driver-modal-field" placeholder="email@example.com" />
+        </div>
+        <p data-error-for="email" class="driver-error"></p>
+    </div>
+</div>

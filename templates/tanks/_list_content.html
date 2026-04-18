@@ -1,0 +1,49 @@
+<div class="overflow-x-auto w-full">
+    <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Terminal</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Tank</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Product</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Current Stock</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Capacity</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Utilization</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for tank in tanks %}
+            <tr class="hover:bg-slate-50/80 transition">
+                <td class="px-4 py-3 text-sm text-slate-700">{{ tank.terminal.name }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ tank.name }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ tank.product.product_name }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ tank.current_stock_liters|floatformat:2 }} L</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ tank.capacity_liters|floatformat:2 }} L</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ tank.utilization_percent|floatformat:1 }}%</td>
+                <td class="px-4 py-3 text-sm">
+                    {% if tank.current_stock_liters < tank.minimum_threshold %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">Low</span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Normal</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-600">
+                    <div class="flex flex-wrap gap-2">
+                        <button data-edit-url="{% url 'tanks:update' tank.pk %}" class="tank-edit-btn rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="px-6 py-8 text-center text-sm text-slate-500">
+                    No tanks configured. Add your first tank to get started.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if paginate_by %}
+{% include "components/pagination.html" %}
+{% endif %}

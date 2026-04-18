@@ -63,4 +63,4 @@ class CreditPaymentAdmin(admin.ModelAdmin):
 class OMCSalesEntryAdmin(admin.ModelAdmin):
     list_display = ("sale_date", "omc", "product", "terminal", "volume_liters", "unit_price", "total_amount")
     list_filter = ("sale_date", "omc", "product", "terminal")
-    search_fields = ("submission_reference", "omc__name", "terminal__name", "product__name")
+    search_fields = ("submission_reference", "omc__name", "terminal__name", "product__product_name")

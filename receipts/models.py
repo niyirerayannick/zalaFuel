@@ -25,5 +25,5 @@ class ProductReceipt(TimeStampedModel):
         ordering = ["-receipt_date", "-created_at"]
 
     def __str__(self):
-        return f"{self.reference_number} - {self.product.name}"
+        return f"{self.reference_number} - {self.product.product_name}"
 

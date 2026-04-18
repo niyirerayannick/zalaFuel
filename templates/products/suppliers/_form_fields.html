@@ -1,0 +1,74 @@
+<div class="grid gap-5 md:grid-cols-2">
+    <div>
+        <label for="id_supplier_name" class="driver-label">Supplier Name</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">factory</span>
+            <input type="text" name="supplier_name" id="id_supplier_name" value="{{ form.supplier_name.value|default:'' }}" class="driver-modal-field" placeholder="e.g. TotalEnergies Nigeria" required />
+        </div>
+        <p data-error-for="supplier_name" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_supplier_code" class="driver-label">Supplier Code</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">qr_code</span>
+            <input type="text" name="supplier_code" id="id_supplier_code" value="{{ form.supplier_code.value|default:'' }}" class="driver-modal-field" placeholder="e.g. TOTAL" required />
+        </div>
+        <p data-error-for="supplier_code" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_contact_person" class="driver-label">Contact Person</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">person</span>
+            <input type="text" name="contact_person" id="id_contact_person" value="{{ form.contact_person.value|default:'' }}" class="driver-modal-field" placeholder="e.g. John Doe" />
+        </div>
+        <p data-error-for="contact_person" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_phone" class="driver-label">Phone</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">phone</span>
+            <input type="text" name="phone" id="id_phone" value="{{ form.phone.value|default:'' }}" class="driver-modal-field" placeholder="e.g. +2348012345678" />
+        </div>
+        <p data-error-for="phone" class="driver-error"></p>
+    </div>
+
+    <div class="md:col-span-2">
+        <label for="id_email" class="driver-label">Email</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">email</span>
+            <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" class="driver-modal-field" placeholder="e.g. contact@supplier.com" />
+        </div>
+        <p data-error-for="email" class="driver-error"></p>
+    </div>
+
+    <div class="md:col-span-2">
+        <label for="id_address" class="driver-label">Address</label>
+        <textarea name="address" id="id_address" rows="3" class="driver-modal-field" style="padding-left: 0.95rem; min-height: 5rem;" placeholder="Supplier address">{{ form.address.value|default:'' }}</textarea>
+        <p data-error-for="address" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_country" class="driver-label">Country</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">public</span>
+            <input type="text" name="country" id="id_country" value="{{ form.country.value|default:'' }}" class="driver-modal-field" placeholder="e.g. Nigeria" />
+        </div>
+        <p data-error-for="country" class="driver-error"></p>
+    </div>
+
+    <div>
+        <label for="id_status" class="driver-label">Status</label>
+        <div class="driver-input-shell">
+            <span class="driver-field-icon material-symbols-outlined">toggle_on</span>
+            <select name="status" id="id_status" class="driver-modal-field">
+                {% for value, label in form.status.field.choices %}
+                    <option value="{{ value }}" {% if form.status.value == value or form.initial.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p data-error-for="status" class="driver-error"></p>
+    </div>
+</div>

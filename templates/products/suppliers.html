@@ -1,6 +1,263 @@
 {% extends "base.html" %}
+
 {% block title %}Suppliers | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
-{% block content %}
-<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"><div class="px-5 py-4 border-b border-slate-200"><h1 class="text-2xl font-bold text-slate-900">Suppliers</h1></div><table class="min-w-full text-sm"><thead class="bg-slate-50"><tr class="text-left text-slate-500"><th class="px-5 py-3">Supplier</th><th class="px-5 py-3">Contact</th><th class="px-5 py-3">Phone</th><th class="px-5 py-3">Source</th></tr></thead><tbody class="divide-y divide-slate-100">{% for supplier in suppliers %}<tr><td class="px-5 py-4">{{ supplier.name }}</td><td class="px-5 py-4">{{ supplier.contact_person }}</td><td class="px-5 py-4">{{ supplier.phone }}</td><td class="px-5 py-4">{{ supplier.source_location }}</td></tr>{% empty %}<tr><td colspan="4" class="px-5 py-6 text-slate-500">No suppliers added.</td></tr>{% endfor %}</tbody></table></div>
+
+{% block extra_head %}
+<style>
+    .driver-panel { background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); }
+    .driver-modal-field, .driver-modal-file {
+        width: 100%; min-height: 2.8rem; border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225); background: rgb(248 250 252); color: rgb(15 23 42);
+        transition: all 0.2s ease;
+    }
+    .driver-modal-field { padding: 0.78rem 0.95rem 0.78rem 2.75rem; }
+    .driver-modal-file { padding: 0.7rem 0.95rem 0.7rem 2.75rem; }
+    .driver-modal-field:focus, .driver-modal-file:focus {
+        outline: none; background: white; border-color: rgb(21 128 61);
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+    .driver-modal-error { border-color: rgb(239 68 68) !important; background: rgb(254 242 242) !important; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important; }
+    .driver-label { display:block; margin-bottom:0.45rem; font-size:0.74rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:rgb(51 65 85); }
+    .driver-help { margin-top:0.35rem; font-size:0.72rem; color:rgb(100 116 139); }
+    .driver-error { min-height:1rem; margin-top:0.45rem; font-size:0.75rem; color:rgb(220 38 38); }
+    .driver-input-shell, .driver-file-shell { position: relative; }
+    .driver-field-icon { position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); color:rgb(100 116 139); font-size:1.05rem; pointer-events:none; transition: color 0.2s ease; }
+    .driver-input-shell:focus-within .driver-field-icon { color: rgb(21 128 61); }
+</style>
 {% endblock %}
 
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <form class="hidden">{% csrf_token %}</form>
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fuel Operations</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Suppliers</h1>
+                <p class="mt-1 text-sm text-slate-600">Manage fuel suppliers and vendors.</p>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" id="supplier-add-btn" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                    <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                    Add Supplier
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Suppliers</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ total_suppliers }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Active Suppliers</p>
+            <h3 class="mt-1 text-2xl font-bold text-green-700">{{ active_suppliers }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Inactive Suppliers</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ inactive_suppliers }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Countries</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ countries|default:"0" }}</h3>
+        </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
+            <form method="get" class="flex w-full flex-wrap gap-2">
+                <select name="status" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All status</option>
+                    <option value="active" {% if filters.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if filters.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+                <input type="text" name="search" value="{{ filters.search }}" placeholder="Search supplier name or code" class="flex-1 min-w-[220px] rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]" />
+                <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">Filter</button>
+            </form>
+        </div>
+        <div id="supplier-list-content">
+            {% include "products/suppliers/_list_content.html" %}
+        </div>
+    </div>
+</div>
+
+<div id="supplier-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="supplier-panel" class="driver-panel fixed inset-y-0 right-0 z-50 hidden w-full max-w-2xl translate-x-full transform shadow-2xl transition-transform duration-300">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                    <span class="material-symbols-outlined text-[20px] leading-none">local_shipping</span>
+                </div>
+                <div>
+                    <h2 class="text-base font-semibold text-slate-900" id="supplier-panel-title">Add Supplier</h2>
+                    <p class="text-xs text-slate-500">Manage fuel supplier.</p>
+                </div>
+            </div>
+            <button type="button" id="supplier-close-btn" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+        <div id="supplier-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+        <div class="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-3 backdrop-blur">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="supplier-cancel-btn" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</button>
+                <button type="button" id="supplier-save-btn" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">Save Supplier</button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('supplier-add-btn');
+    const overlay = document.getElementById('supplier-overlay');
+    const panel = document.getElementById('supplier-panel');
+    const panelBody = document.getElementById('supplier-panel-body');
+    const closeBtn = document.getElementById('supplier-close-btn');
+    const cancelBtn = document.getElementById('supplier-cancel-btn');
+    const saveBtn = document.getElementById('supplier-save-btn');
+    const listContainer = document.getElementById('supplier-list-content');
+    const titleEl = document.getElementById('supplier-panel-title');
+    let currentForm = null;
+
+    if (!addBtn || !overlay || !panel || !panelBody || !saveBtn || !listContainer) return;
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(() => panel.classList.remove('translate-x-full'));
+        document.body.classList.add('overflow-hidden');
+    }
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            panel.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            currentForm = null;
+        }, 220);
+    }
+    function styleModalFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden' || el.type === 'checkbox') return;
+            if (el.type === 'file') { el.classList.add('driver-modal-file'); }
+            else { el.classList.add('driver-modal-field'); }
+        });
+    }
+    function clearErrors() {
+        const formError = panelBody.querySelector('#supplier-form-error');
+        if (formError) { formError.classList.add('hidden'); formError.textContent = ''; }
+        panelBody.querySelectorAll('.driver-error').forEach(el => el.textContent = '');
+        panelBody.querySelectorAll('.driver-modal-error').forEach(el => el.classList.remove('driver-modal-error'));
+    }
+    function showErrors(payload) {
+        const formError = panelBody.querySelector('#supplier-form-error');
+        if (payload.non_field_errors && payload.non_field_errors.length && formError) {
+            formError.classList.remove('hidden');
+            formError.textContent = payload.non_field_errors.join(' ');
+        }
+        if (payload.errors) {
+            Object.keys(payload.errors).forEach(field => {
+                const input = panelBody.querySelector('#id_' + field);
+                const error = panelBody.querySelector('[data-error-for="' + field + '"]');
+                if (input) input.classList.add('driver-modal-error');
+                if (error) error.textContent = payload.errors[field].join(' ');
+            });
+        }
+    }
+    async function refreshList() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('partial', 'list');
+        const response = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        listContainer.innerHTML = await response.text();
+    }
+    async function loadForm(url, title) {
+        openPanel();
+        titleEl.textContent = title;
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        const separator = url.includes('?') ? '&' : '?';
+        const response = await fetch(url + separator + 'partial=form', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        panelBody.innerHTML = await response.text();
+        currentForm = panelBody.querySelector('#supplier-modal-form');
+        styleModalFields();
+    }
+
+    addBtn.addEventListener('click', function () {
+        clearErrors();
+        loadForm("{% url 'products:supplier_create' %}", 'Add Supplier');
+    });
+
+    listContainer.addEventListener('click', function (event) {
+        const editBtn = event.target.closest('.supplier-edit-btn');
+        const detailsToggle = event.target.closest('.supplier-details-toggle');
+        const toggleBtn = event.target.closest('.supplier-toggle-btn');
+        if (editBtn) {
+            event.preventDefault();
+            clearErrors();
+            loadForm(editBtn.dataset.editUrl, 'Edit Supplier');
+        }
+        if (detailsToggle) {
+            const targetSel = detailsToggle.dataset.target;
+            const row = document.querySelector(targetSel);
+            if (row) row.classList.toggle('hidden');
+        }
+        if (toggleBtn) {
+            event.preventDefault();
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]')?.value || '');
+            fetch(toggleBtn.dataset.toggleUrl, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(() => refreshList()).catch(() => {
+                alert('Unable to update supplier status right now.');
+            });
+        }
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !panel.classList.contains('hidden')) closePanel();
+    });
+
+    saveBtn.addEventListener('click', async function () {
+        if (!currentForm) return;
+        clearErrors();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        try {
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+            closePanel();
+            await refreshList();
+        } catch (error) {
+            const formError = panelBody.querySelector('#supplier-form-error');
+            if (formError) {
+                formError.classList.remove('hidden');
+                formError.textContent = 'Unable to save the supplier right now. Please try again.';
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Supplier';
+        }
+    });
+});
+</script>
+{% endblock %}

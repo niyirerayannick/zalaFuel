@@ -26,5 +26,5 @@ class Dispatch(TimeStampedModel):
         ordering = ["-dispatch_date", "-created_at"]
 
     def __str__(self):
-        return f"{self.reference_number} - {self.omc.name}"
+        return f"{self.reference_number} - {self.product.product_name}"
 

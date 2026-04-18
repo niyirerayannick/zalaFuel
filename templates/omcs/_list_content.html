@@ -1,0 +1,47 @@
+<div class="overflow-x-auto w-full">
+    <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">OMC</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Code</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Contact</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for omc in omcs %}
+            <tr class="hover:bg-slate-50/80 transition">
+                <td class="px-4 py-3">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">{{ omc.name }}</p>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ omc.code }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ omc.contact_person }}</td>
+                <td class="px-4 py-3 text-sm">
+                    {% if omc.is_active %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">Inactive</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-600">
+                    <div class="flex flex-wrap gap-2">
+                        <button data-edit-url="{% url 'omcs:update' omc.pk %}" class="omc-edit-btn rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-sm text-slate-500">
+                    No OMC records yet. Add your first oil marketing company to get started.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if paginate_by %}
+{% include "components/pagination.html" %}
+{% endif %}

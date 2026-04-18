@@ -1,6 +1,9 @@
 from django.db.models import Count, Sum
-from django.views.generic import CreateView, DetailView, ListView, TemplateView
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.views import View
+from django.views.generic import CreateView, DetailView, ListView, TemplateView, UpdateView
 
 from accounts.mixins import OperationsManageMixin
 from dispatches.models import Dispatch
@@ -15,17 +18,48 @@ class TerminalListView(OperationsManageMixin, ListView):
     model = Terminal
     template_name = "terminals/list.html"
     context_object_name = "terminals"
+    paginate_by = 25
 
     def get_queryset(self):
-        return Terminal.objects.select_related("manager").annotate(
+        search = (self.request.GET.get("search") or "").strip().lower()
+        status = (self.request.GET.get("status") or "").strip().lower()
+
+        terminals = Terminal.objects.select_related("manager").annotate(
             tank_count=Count("tanks", distinct=True),
             stock_total=Sum("tanks__current_stock_liters"),
         ).order_by("name")
 
+        if search:
+            terminals = terminals.filter(name__icontains=search) | terminals.filter(location__icontains=search)
+        if status:
+            is_active = status == "active"
+            terminals = terminals.filter(is_active=is_active)
+
+        return terminals
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({"page_title": "Terminal Operations", "active_menu": "terminal_operations"})
+        all_terminals = Terminal.objects.select_related("manager")
+
+        context.update(
+            {
+                "page_title": "Terminal Operations",
+                "active_menu": "terminal_operations",
+                "kpi_total": all_terminals.count(),
+                "kpi_active": all_terminals.filter(is_active=True).count(),
+                "kpi_tanks": all_terminals.aggregate(total=Count("tanks", distinct=True))["total"] or 0,
+                "filters": {
+                    "search": self.request.GET.get("search", ""),
+                    "status": self.request.GET.get("status", ""),
+                },
+            }
+        )
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.GET.get("partial") == "list":
+            return render(self.request, "terminals/_list_content.html", context)
+        return super().render_to_response(context, **response_kwargs)
 
 
 class TerminalCreateView(OperationsManageMixin, CreateView):
@@ -34,9 +68,55 @@ class TerminalCreateView(OperationsManageMixin, CreateView):
     template_name = "terminals/form.html"
     success_url = reverse_lazy("terminals:list")
 
+    def get_template_names(self):
+        if self.request.GET.get("partial") == "form":
+            return ["terminals/_modal_form.html"]
+        return [self.template_name]
+
+    def form_valid(self, form):
+        self.object = form.save()
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"success": True})
+        return redirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"success": False, "errors": form.errors}, status=400)
+        return super().form_invalid(form)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({"page_title": "New Terminal", "active_menu": "terminal_operations"})
+        context["title"] = "Add Terminal"
+        context["action"] = self.request.path
+        return context
+
+
+class TerminalUpdateView(OperationsManageMixin, UpdateView):
+    model = Terminal
+    form_class = TerminalForm
+    template_name = "terminals/form.html"
+    success_url = reverse_lazy("terminals:list")
+
+    def get_template_names(self):
+        if self.request.GET.get("partial") == "form":
+            return ["terminals/_modal_form.html"]
+        return [self.template_name]
+
+    def form_valid(self, form):
+        self.object = form.save()
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"success": True})
+        return redirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"success": False, "errors": form.errors}, status=400)
+        return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Edit Terminal"
+        context["action"] = self.request.path
         return context
 
 

@@ -23,8 +23,8 @@ urlpatterns = [
     path("omc-sales/", include("sales.urls")),
     path("revenue-analysis/", include("revenue.urls")),
     path("market-share/", include("analytics.urls")),
-    path("administration/products/", include("products.urls")),
-    path("administration/omcs/", include("omcs.urls")),
+path("products/", include("products.urls")),
+    path("omcs/", include("omcs.urls")),
     path("reports/", include("reports.urls")),
     path("monitoring/", include("monitoring.urls")),
 ]

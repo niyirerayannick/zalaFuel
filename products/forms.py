@@ -17,11 +17,11 @@ class StyledModelForm(forms.ModelForm):
 class ProductForm(StyledModelForm):
     class Meta:
         model = Product
-        fields = ["name", "code", "category", "unit", "default_price", "is_active"]
+        fields = ["product_name", "product_code", "product_type", "unit_of_measure", "description", "status", "density", "temperature_factor", "color_marker", "display_order"]
 
 
 class SupplierForm(StyledModelForm):
     class Meta:
         model = Supplier
-        fields = ["name", "contact_person", "phone", "email", "source_location"]
+        fields = ["supplier_name", "supplier_code", "contact_person", "phone", "email", "address", "country", "status"]
 

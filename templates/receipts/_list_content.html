@@ -1,0 +1,43 @@
+<div class="overflow-x-auto w-full">
+    <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Date</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Reference</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Supplier</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Product</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Terminal</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Tank</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Quantity</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for receipt in receipts %}
+            <tr class="hover:bg-slate-50/80 transition">
+                <td class="px-4 py-3 text-sm text-slate-700">{{ receipt.receipt_date|date:"M j, Y" }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ receipt.reference_number }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ receipt.supplier.name }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ receipt.product.product_name }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ receipt.terminal.name }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ receipt.tank.name }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ receipt.quantity_received|floatformat:2 }} L</td>
+                <td class="px-4 py-3 text-sm text-slate-600">
+                    <div class="flex flex-wrap gap-2">
+                        <button data-edit-url="{% url 'receipts:update' receipt.pk %}" class="receipt-edit-btn rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="px-6 py-8 text-center text-sm text-slate-500">
+                    No receipts yet. Record your first fuel receipt to get started.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if paginate_by %}
+{% include "components/pagination.html" %}
+{% endif %}
