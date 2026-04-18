@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}OMCs | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
+{% block content %}
+<div class="space-y-6"><div class="flex items-center justify-between"><div><h1 class="text-3xl font-bold text-slate-900">OMCs</h1><p class="mt-2 text-sm text-slate-600">Maintain oil marketing company master data and participation status.</p></div><a href="{% url 'omcs:create' %}" class="rounded-lg bg-[#0f7ea6] px-4 py-2.5 text-sm font-semibold text-white">New OMC</a></div><div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"><table class="min-w-full text-sm"><thead class="bg-slate-50"><tr class="text-left text-slate-500"><th class="px-5 py-3">OMC</th><th class="px-5 py-3">Code</th><th class="px-5 py-3">Contact</th><th class="px-5 py-3">Status</th></tr></thead><tbody class="divide-y divide-slate-100">{% for omc in omcs %}<tr><td class="px-5 py-4">{{ omc.name }}</td><td class="px-5 py-4">{{ omc.code }}</td><td class="px-5 py-4">{{ omc.contact_person }}</td><td class="px-5 py-4">{{ omc.is_active|yesno:"Active,Inactive" }}</td></tr>{% empty %}<tr><td colspan="4" class="px-5 py-6 text-slate-500">No OMC records yet.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}
+

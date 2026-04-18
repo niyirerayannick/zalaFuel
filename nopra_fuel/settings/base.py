@@ -64,13 +64,23 @@ LOCAL_APPS = [
     "theme",
     "accounts",
     "core",
+    "dashboard",
+    "terminals",
+    "products",
+    "tanks",
+    "receipts",
+    "dispatches",
+    "omcs",
     "stations",
     "inventory",
     "sales",
     "finance",
+    "revenue",
+    "analytics",
     "suppliers",
     "reports",
     "notifications",
+    "monitoring",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

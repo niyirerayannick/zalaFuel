@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 
 from accounts.station_access import require_station_access, visible_stations
 
-from .models import ShiftSession, PumpReading, FuelSale, Customer
+from .models import ShiftSession, PumpReading, FuelSale, Customer, OMCSalesEntry
 from .selectors import station_attendants
 from .services import open_shift_conflicts, shift_sales_summary
 from stations.models import Station, Pump, Nozzle
@@ -403,3 +403,28 @@ class PumpReadingForm(forms.ModelForm):
         if self.shift and nozzle and nozzle.pump.station_id != self.shift.station_id:
             raise forms.ValidationError("Nozzle must belong to the shift station.")
         return cleaned
+
+
+class OMCSalesEntryForm(forms.ModelForm):
+    class Meta:
+        model = OMCSalesEntry
+        fields = [
+            "terminal",
+            "omc",
+            "product",
+            "volume_liters",
+            "unit_price",
+            "sale_date",
+            "submission_reference",
+            "remarks",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update(
+                {
+                    "class": "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-600"
+                }
+            )
+        self.fields["remarks"].widget.attrs["rows"] = 3

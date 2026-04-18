@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-7xl space-y-6">
+    {% if not database_ready %}
+    <section class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900 shadow-sm">
+        {{ database_message }}
+    </section>
+    {% endif %}
+
+    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#0f7ea6]">ZALA Terminal</p>
+                <h1 class="mt-2 text-3xl font-bold text-slate-900">Terminal Tank Stock Control Dashboard</h1>
+                <p class="mt-2 max-w-3xl text-sm text-slate-600">Monitor current stock, receipts, dispatches, OMC sales, revenue, and operational alerts from one control surface.</p>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+                <a href="{% url 'receipts:create' %}" class="inline-flex items-center justify-center rounded-lg bg-[#0f7ea6] px-4 py-3 text-sm font-semibold text-white">New Receipt</a>
+                <a href="{% url 'dispatches:create' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700">New Dispatch</a>
+                <a href="{% url 'sales:create' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700">Record OMC Sale</a>
+                <a href="{% url 'tanks:entry-create' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700">Daily Tank Entry</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">Current Stock</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ kpis.current_stock|floatformat:2 }} L</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">Total Receipts</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ kpis.total_receipts|floatformat:2 }} L</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">Total Dispatches</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ kpis.total_dispatches|floatformat:2 }} L</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">OMC Sales Volume</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ kpis.omc_sales_volume|floatformat:2 }} L</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">Revenue</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ kpis.revenue|floatformat:2 }}</p></div>
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm"><p class="text-xs uppercase text-amber-700">Alerts</p><p class="mt-2 text-3xl font-bold text-amber-900">{{ kpis.alerts }}</p></div>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">Stock Trends</h2>
+            <div class="mt-4 space-y-3">
+                {% for row in stock_trends %}
+                <div>
+                    <div class="flex items-center justify-between text-sm text-slate-600"><span>{{ row.label }} · {{ row.terminal }}</span><span>{{ row.value|floatformat:2 }} L</span></div>
+                    <div class="mt-1 h-2 rounded-full bg-slate-100"><div class="h-2 rounded-full bg-[#0f7ea6]" style="width:{% widthratio row.value kpis.current_stock|default:1 100 %}%"></div></div>
+                </div>
+                {% empty %}<p class="text-sm text-slate-500">No stock trend data yet.</p>{% endfor %}
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">Revenue vs Volume</h2>
+            <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead><tr class="text-left text-slate-500"><th class="pb-2">Period</th><th class="pb-2">Revenue</th><th class="pb-2">Volume</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for row in revenue_vs_volume %}
+                        <tr><td class="py-2">{{ row.label }}</td><td class="py-2">{{ row.revenue|floatformat:2 }}</td><td class="py-2">{{ row.volume|floatformat:2 }} L</td></tr>
+                        {% empty %}<tr><td colspan="3" class="py-4 text-slate-500">No revenue data yet.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-3">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-900">Latest Activity</h2>
+                <a href="{% url 'reports:dashboard' %}" class="text-sm font-semibold text-[#0f7ea6]">Open reports</a>
+            </div>
+            <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead><tr class="text-left text-slate-500"><th class="pb-2">Type</th><th class="pb-2">Description</th><th class="pb-2">Date</th><th class="pb-2">Quantity</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for row in latest_activity %}
+                        <tr><td class="py-3 font-semibold text-slate-900">{{ row.type }}</td><td class="py-3 text-slate-600">{{ row.description }}</td><td class="py-3 text-slate-600">{{ row.date }}</td><td class="py-3 text-slate-600">{{ row.quantity|floatformat:2 }}</td></tr>
+                        {% empty %}<tr><td colspan="4" class="py-4 text-slate-500">No activity recorded.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">OMC Ranking</h2>
+            <div class="mt-4 space-y-3">
+                {% for omc in omc_ranking %}
+                <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-3">
+                    <span class="text-sm font-semibold text-slate-900">{{ omc.name }}</span>
+                    <span class="text-sm text-slate-600">{{ omc.total_volume|default:0|floatformat:2 }} L</span>
+                </div>
+                {% empty %}<p class="text-sm text-slate-500">No OMC ranking yet.</p>{% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">Terminal Stock Summary</h2>
+            <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead><tr class="text-left text-slate-500"><th class="pb-2">Terminal</th><th class="pb-2">Tank</th><th class="pb-2">Product</th><th class="pb-2">Current Stock</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for tank in terminal_summary %}
+                        <tr><td class="py-2">{{ tank.terminal.name }}</td><td class="py-2">{{ tank.name }}</td><td class="py-2">{{ tank.product.name }}</td><td class="py-2">{{ tank.current_stock_liters|floatformat:2 }} L</td></tr>
+                        {% empty %}<tr><td colspan="4" class="py-4 text-slate-500">No terminal stock available.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">Alerts</h2>
+            <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead><tr class="text-left text-slate-500"><th class="pb-2">Alert</th><th class="pb-2">Severity</th><th class="pb-2">Status</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for alert in alerts %}
+                        <tr><td class="py-2">{{ alert.title }}</td><td class="py-2">{{ alert.get_severity_display }}</td><td class="py-2">{{ alert.get_status_display }}</td></tr>
+                        {% empty %}<tr><td colspan="3" class="py-4 text-slate-500">No active alerts.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

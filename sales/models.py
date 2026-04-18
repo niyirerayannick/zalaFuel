@@ -7,6 +7,9 @@ from django.utils import timezone
 
 from core.models import TimeStampedModel
 from stations.models import Nozzle, Station
+from omcs.models import OMC
+from products.models import Product
+from terminals.models import Terminal
 
 
 DECIMAL_2 = Decimal("0.01")
@@ -348,3 +351,29 @@ class CreditPayment(TimeStampedModel):
 
     def __str__(self):
         return f"Credit payment {self.amount} for {self.customer}"
+
+
+class OMCSalesEntry(TimeStampedModel):
+    terminal = models.ForeignKey(Terminal, related_name="sales_entries", on_delete=models.PROTECT)
+    omc = models.ForeignKey(OMC, related_name="sales_entries", on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, related_name="sales_entries", on_delete=models.PROTECT)
+    volume_liters = models.DecimalField(max_digits=14, decimal_places=2)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    sale_date = models.DateField()
+    submission_reference = models.CharField(max_length=80, unique=True)
+    remarks = models.TextField(blank=True)
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="omc_sales_entries",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    class Meta:
+        ordering = ["-sale_date", "-created_at"]
+
+    def save(self, *args, **kwargs):
+        self.total_amount = quantize_2(Decimal(self.volume_liters or 0) * Decimal(self.unit_price or 0))
+        super().save(*args, **kwargs)

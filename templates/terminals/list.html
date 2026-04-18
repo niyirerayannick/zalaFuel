@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Terminal Operations | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div><h1 class="text-3xl font-bold text-slate-900">Terminal Operations</h1><p class="mt-2 text-sm text-slate-600">Manage terminal list, status, capacity, and activity visibility.</p></div>
+        <div class="flex gap-3"><a href="{% url 'terminals:create' %}" class="rounded-lg bg-[#0f7ea6] px-4 py-2.5 text-sm font-semibold text-white">New Terminal</a><a href="{% url 'terminals:status' %}" class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700">Status Board</a></div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <table class="min-w-full text-sm">
+            <thead class="bg-slate-50"><tr class="text-left text-slate-500"><th class="px-5 py-3">Terminal</th><th class="px-5 py-3">Location</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Capacity</th><th class="px-5 py-3">Tanks</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for terminal in terminals %}
+                <tr class="hover:bg-slate-50"><td class="px-5 py-4 font-semibold"><a href="{% url 'terminals:detail' terminal.pk %}" class="text-[#0f7ea6]">{{ terminal.name }}</a></td><td class="px-5 py-4">{{ terminal.location }}</td><td class="px-5 py-4">{{ terminal.get_status_display }}</td><td class="px-5 py-4">{{ terminal.capacity_liters|floatformat:2 }} L</td><td class="px-5 py-4">{{ terminal.tank_count|default:0 }}</td></tr>
+                {% empty %}<tr><td colspan="5" class="px-5 py-6 text-slate-500">No terminals yet.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

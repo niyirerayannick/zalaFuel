@@ -248,14 +248,16 @@ def current_system_role(user):
 def legacy_request_role_for(user):
     system_role = current_system_role(user)
     compatibility_map = {
+        "superadmin": "admin",
+        "admin": "admin",
+        "station_manager": "station_manager",
+        "supervisor": "supervisor",
+        "pump_attendant": "pump_attendant",
+        "accountant": "accountant",
+        "client": "client",
         SystemGroup.ADMIN: "admin",
-        SystemGroup.STATION_MANAGER: "station_manager",
-        SystemGroup.SUPERVISOR: "supervisor",
-        SystemGroup.PUMP_ATTENDANT: "pump_attendant",
-        SystemGroup.ACCOUNTANT: "accountant",
-        SystemGroup.CUSTOMER: "client",
     }
-    return compatibility_map[system_role]
+    return compatibility_map.get(system_role, "admin")
 
 
 def sync_user_to_system_role(user, system_role):

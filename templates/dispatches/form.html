@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% block title %}{{ page_title }} | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}{% block content %}<div class="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h1 class="text-2xl font-bold text-slate-900">New Dispatch</h1><form method="post" class="mt-6 grid gap-4 md:grid-cols-2">{% csrf_token %}{{ form.as_p }}<div class="md:col-span-2"><button class="rounded-lg bg-[#0f7ea6] px-4 py-2.5 text-sm font-semibold text-white">Save Dispatch</button></div></form></div>{% endblock %}
+

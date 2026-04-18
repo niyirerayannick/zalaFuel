@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Administration | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-7xl space-y-6">
+    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h1 class="text-3xl font-bold text-slate-900">Administration</h1>
+        <p class="mt-2 text-sm text-slate-600">Maintain users, master data, system settings, and report structures without changing the shared ZALA Terminal UI shell.</p>
+    </section>
+    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {% for module in admin_modules %}
+        <a href="{% url module.href %}" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#0f7ea6] hover:shadow-md">
+            <h2 class="text-lg font-bold text-slate-900">{{ module.title }}</h2>
+            <p class="mt-2 text-sm text-slate-600">{{ module.description }}</p>
+        </a>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}
+

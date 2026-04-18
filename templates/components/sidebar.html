@@ -9,129 +9,53 @@
             display: none;
         }
     </style>
-    <!-- Header -->
+
     <div class="theme-shell-border theme-shell-strong h-16 px-6 flex items-center justify-between border-b backdrop-blur-sm sticky top-0 z-10">
-        <a href="{% url 'accounts:dashboard' %}" class="flex items-center gap-3 group transition-all duration-300">
-            {% comment %} <div class="h-10 w-auto flex items-center justify-center">
-                <img src="{% static 'img/Afrilott.png' %}" alt="Logo" class="h-8 w-auto object-contain transition-transform group-hover:scale-105" style="filter:brightness(0) invert(1);">
-            </div> {% endcomment %}
+        <a href="{% url 'dashboard:home' %}" class="flex items-center gap-3 group transition-all duration-300">
             <span class="text-xl font-bold text-white tracking-tight">
                 {% if system_settings %}{{ system_settings.company_name }}{% else %}{{ brand_name|default:"ZALA Terminal" }}{% endif %}
             </span>
         </a>
     </div>
 
-    <!-- Navigation -->
-            <nav class="sidebar-scroll-hidden flex-1 overflow-y-auto px-4 py-6 space-y-4">
+    <nav class="sidebar-scroll-hidden flex-1 overflow-y-auto px-4 py-6 space-y-2">
         {% with path=request.path %}
-            <div class="space-y-1">
-                <a href="{% url 'core:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/home' in path or path == '/' %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-                    </svg>
-                    <span class="font-medium">Overview</span>
-                </a>
-            </div>
-
-            <div class="space-y-1">
-                <p class="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Daily Work</p>
-                <a href="{% url 'sales:pos' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/sales/pos/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 5h18M3 12h18M3 19h18"></path>
-                    </svg>
-                    <span class="font-medium">POS / Sales</span>
-                </a>
-                <a href="{% url 'sales:shifts' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/sales/shifts/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span class="font-medium">Shift Sessions</span>
-                </a>
-            </div>
-
-            <div class="space-y-1">
-                <p class="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Inventory & Supply</p>
-                <a href="{% url 'inventory:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if path == '/inventory/' %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 19h16M4 15h10M4 11h16M4 7h7"></path>
-                    </svg>
-                    <span class="font-medium">Stock Levels</span>
-                </a>
-                <a href="{% url 'inventory:tanks' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/inventory/tanks/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 7a4 4 0 014-4h8a4 4 0 014 4v10a4 4 0 01-4 4H8a4 4 0 01-4-4V7z"></path>
-                    </svg>
-                    <span class="font-medium">Tanks</span>
-                </a>
-                <a href="{% url 'stations:pumps' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/stations/pumps/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 7h16M4 12h16M4 17h16"></path>
-                    </svg>
-                    <span class="font-medium">Pumps / Nozzles</span>
-                </a>
-                <a href="{% url 'suppliers:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if path == '/suppliers/' %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 7h18M5 7v10a2 2 0 002 2h10a2 2 0 002-2V7"></path>
-                    </svg>
-                    <span class="font-medium">Suppliers</span>
-                </a>
-                <a href="{% url 'suppliers:deliveries' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/suppliers/deliveries/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 7h18M5 7v10a2 2 0 002 2h10a2 2 0 002-2V7"></path>
-                    </svg>
-                    <span class="font-medium">Deliveries</span>
-                </a>
-            </div>
-
-            <div class="space-y-1">
-                <p class="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Business</p>
-                <a href="{% url 'finance:customers' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/finance/customers/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a4 4 0 00-5-3.87M9 20v-2a4 4 0 00-3-3.87M12 11a4 4 0 100-8 4 4 0 000 8zm0 0c2.21 0 4 1.79 4 4v1a1 1 0 01-1 1H9a1 1 0 01-1-1v-1c0-2.21 1.79-4 4-4z"></path>
-                    </svg>
-                    <span class="font-medium">Customers</span>
-                </a>
-                <a href="{% url 'finance:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/finance/' in path and '/finance/customers/' not in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                    </svg>
-                    <span class="font-medium">Finance</span>
-                </a>
-                <a href="{% url 'reports:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/reports/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 19h16M4 15h10M4 11h16M4 7h7"></path>
-                    </svg>
-                    <span class="font-medium">Reports</span>
-                </a>
-            </div>
-
-            <div class="space-y-1">
-                <p class="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Administration</p>
-                <a href="{% url 'stations:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/stations/' in path and '/stations/pumps/' not in path and '/stations/nozzles/' not in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 7l9-4 9 4v10a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4H9v4a2 2 0 01-2 2H3a2 2 0 01-2-2V7z"></path>
-                    </svg>
-                    <span class="font-medium">Stations</span>
-                </a>
-                <a href="{% url 'accounts:user-list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/users/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a4 4 0 00-5-3.87M9 20v-2a4 4 0 00-3-3.87M12 11a4 4 0 100-8 4 4 0 000 8zm0 0c2.21 0 4 1.79 4 4v1a1 1 0 01-1 1H9a1 1 0 01-1-1v-1c0-2.21 1.79-4 4-4z"></path>
-                    </svg>
-                    <span class="font-medium">Users</span>
-                </a>
-                <a href="{% url 'accounts:system-settings' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/settings/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
-                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    </svg>
-                    <span class="font-medium">System Settings</span>
-                </a>
-            </div>
+            <a href="{% url 'dashboard:home' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/dashboard/' in path or path == '/' or '/home/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">Dashboard</span>
+            </a>
+            <a href="{% url 'terminals:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/terminal-operations/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">Terminal Operations</span>
+            </a>
+            <a href="{% url 'tanks:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/tank-stocks/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">Tank Stocks</span>
+            </a>
+            <a href="{% url 'receipts:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/product-receipts/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">Product Receipts</span>
+            </a>
+            <a href="{% url 'dispatches:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/dispatches/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">Dispatches</span>
+            </a>
+            <a href="{% url 'sales:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/omc-sales/' in path or '/sales/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">OMC Sales</span>
+            </a>
+            <a href="{% url 'revenue:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/revenue-analysis/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">Revenue Analysis</span>
+            </a>
+            <a href="{% url 'analytics:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/market-share/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">Market Share</span>
+            </a>
+            <a href="{% url 'reports:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/reports/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">Reports</span>
+            </a>
+            <a href="{% url 'monitoring:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/monitoring/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">Monitoring</span>
+            </a>
+            <a href="{% url 'core:administration' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/administration/' in path or '/users/' in path or '/settings/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                <span class="font-medium">Administration</span>
+            </a>
         {% endwith %}
     </nav>
 
-
-
-    <!-- User Section -->
     <div class="theme-shell-border theme-shell-strong p-4 border-t">
         <div
             class="flex items-center gap-3 px-2 py-1"

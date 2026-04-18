@@ -25,6 +25,16 @@ class ClientMixin(RoleRequiredMixin):
     allowed_roles = (SystemGroup.CUSTOMER,)
 
 
+class DashboardRoleMixin(RBACRequiredMixin):
+    allowed_roles = (
+        SystemGroup.ADMIN,
+        SystemGroup.STATION_MANAGER,
+        SystemGroup.SUPERVISOR,
+        SystemGroup.PUMP_ATTENDANT,
+        SystemGroup.ACCOUNTANT,
+    )
+
+
 class OperationsRoleMixin(RBACRequiredMixin):
     """POS, shifts, station equipment visibility, operational APIs."""
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import CreditPayment, CreditTransaction, FuelSale, PumpReading, ShiftSession
+from .models import CreditPayment, CreditTransaction, FuelSale, OMCSalesEntry, PumpReading, ShiftSession
 
 
 @admin.register(ShiftSession)
@@ -57,3 +57,10 @@ class CreditPaymentAdmin(admin.ModelAdmin):
     list_display = ("customer", "amount", "method", "reference", "received_by", "created_at")
     list_filter = ("method",)
     search_fields = ("customer__name", "reference", "received_by__full_name")
+
+
+@admin.register(OMCSalesEntry)
+class OMCSalesEntryAdmin(admin.ModelAdmin):
+    list_display = ("sale_date", "omc", "product", "terminal", "volume_liters", "unit_price", "total_amount")
+    list_filter = ("sale_date", "omc", "product", "terminal")
+    search_fields = ("submission_reference", "omc__name", "terminal__name", "product__name")

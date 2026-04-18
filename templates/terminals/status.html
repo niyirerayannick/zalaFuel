@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Terminal Status | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
+{% block content %}
+<div class="space-y-6">
+    <h1 class="text-3xl font-bold text-slate-900">Terminal Status</h1>
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{% for terminal in terminals %}<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">{{ terminal.code }}</p><h2 class="mt-2 text-xl font-bold text-slate-900">{{ terminal.name }}</h2><p class="mt-2 text-sm text-slate-600">{{ terminal.get_status_display }}</p><p class="mt-2 text-sm text-slate-600">Stock {{ terminal.stock_total|default:0|floatformat:2 }} L</p></div>{% endfor %}</div>
+</div>
+{% endblock %}
+

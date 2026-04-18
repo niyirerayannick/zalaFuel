@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Suppliers | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
+{% block content %}
+<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"><div class="px-5 py-4 border-b border-slate-200"><h1 class="text-2xl font-bold text-slate-900">Suppliers</h1></div><table class="min-w-full text-sm"><thead class="bg-slate-50"><tr class="text-left text-slate-500"><th class="px-5 py-3">Supplier</th><th class="px-5 py-3">Contact</th><th class="px-5 py-3">Phone</th><th class="px-5 py-3">Source</th></tr></thead><tbody class="divide-y divide-slate-100">{% for supplier in suppliers %}<tr><td class="px-5 py-4">{{ supplier.name }}</td><td class="px-5 py-4">{{ supplier.contact_person }}</td><td class="px-5 py-4">{{ supplier.phone }}</td><td class="px-5 py-4">{{ supplier.source_location }}</td></tr>{% empty %}<tr><td colspan="4" class="px-5 py-6 text-slate-500">No suppliers added.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}
+

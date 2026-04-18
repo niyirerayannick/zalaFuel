@@ -482,18 +482,18 @@ class ForcePasswordChangeView(LoginRequiredMixin, View):
 
 def dashboard_name_for_user(user):
     if user_has_role(user, SystemGroup.CUSTOMER):
-        return "finance:customers"
+        return "accounts:profile"
     if user_has_role(user, SystemGroup.ACCOUNTANT):
-        return "finance:dashboard"
+        return "revenue:dashboard"
     if user_has_role(user, SystemGroup.STATION_MANAGER):
-        return "core:dashboard"
+        return "dashboard:home"
     if user_has_role(user, SystemGroup.SUPERVISOR):
-        return "core:dashboard"
+        return "dashboard:home"
     if user_has_role(user, SystemGroup.PUMP_ATTENDANT):
-        return "sales:shifts"
+        return "dashboard:home"
     if user_has_role(user, SystemGroup.ADMIN):
-        return "core:dashboard"
-    return "core:dashboard"
+        return "dashboard:home"
+    return "dashboard:home"
 
 
 class LoginVerificationView(View):
@@ -718,27 +718,27 @@ class DashboardView(LoginRequiredMixin, View):
 
 class SuperAdminDashboardView(SuperAdminMixin, View):
     def get(self, request, *args, **kwargs):
-        return redirect("core:dashboard")
+        return redirect("dashboard:home")
 
 
 class AdminDashboardView(AdminMixin, View):
     def get(self, request, *args, **kwargs):
-        return redirect("core:dashboard")
+        return redirect("dashboard:home")
 
 
 class ManagerDashboardView(ManagerMixin, View):
     def get(self, request, *args, **kwargs):
-        return redirect("core:dashboard")
+        return redirect("dashboard:home")
 
 
 class DriverDashboardView(DriverMixin, View):
     def get(self, request, *args, **kwargs):
-        return redirect("sales:shifts")
+        return redirect("dashboard:home")
 
 
 class ClientDashboardView(ClientMixin, View):
     def get(self, request, *args, **kwargs):
-        return redirect("finance:customers")
+        return redirect("dashboard:home")
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):

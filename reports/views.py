@@ -1,129 +1,156 @@
-from django.db.models import DecimalField, ExpressionWrapper, F, Sum
+from django.http import HttpResponse
 from django.views.generic import TemplateView
 
 from accounts.mixins import ReportsRoleMixin
-from accounts.station_access import (
-    filter_delivery_receipts_queryset_for_user,
-    filter_fuel_sales_queryset_for_user,
-    filter_inventory_records_queryset_for_user,
-    filter_shifts_queryset_for_user,
-    filter_tanks_queryset_for_user,
-)
-from finance.models import Payment
-from inventory.models import FuelTank, InventoryRecord
-from sales.models import FuelSale, ShiftSession
-from suppliers.models import DeliveryReceipt
+from analytics.models import MarketShareSnapshot
+from dispatches.models import Dispatch
+from receipts.models import ProductReceipt
+from revenue.models import RevenueEntry
+from sales.models import OMCSalesEntry
+from tanks.models import TankStockEntry
+
+
+def csv_response(filename, headers, rows):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    response.write(",".join(headers) + "\n")
+    for row in rows:
+        response.write(",".join(str(value) for value in row) + "\n")
+    return response
 
 
 class ReportsDashboardView(ReportsRoleMixin, TemplateView):
     template_name = "reports/dashboard.html"
-    extra_context = {"page_title": "Reports", "active_menu": "reports"}
 
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        user = self.request.user
-        ctx.update(
+        context = super().get_context_data(**kwargs)
+        context.update(
             {
-                "sales_total": filter_fuel_sales_queryset_for_user(FuelSale.objects.all(), user).aggregate(
-                    s=Sum("total_amount")
-                )["s"]
-                or 0,
-                "inventory_total": filter_tanks_queryset_for_user(FuelTank.objects.all(), user).aggregate(
-                    s=Sum("current_volume_liters")
-                )["s"]
-                or 0,
-                "shift_count": filter_shifts_queryset_for_user(ShiftSession.objects.all(), user).count(),
-                "payments_total": Payment.objects.aggregate(s=Sum("amount"))["s"] or 0,
+                "page_title": "Reports",
+                "active_menu": "reports",
+                "report_cards": [
+                    {"view_name": "reports:daily-tank-stock", "export_name": "reports:export-daily-tank-stock", "title": "Daily Tank Stock Report", "description": "Closing stock, computed stock, variance, utilization."},
+                    {"view_name": "reports:terminal-stock", "export_name": "reports:export-daily-tank-stock", "title": "Terminal Stock Report", "description": "Stock position by terminal, tank, and product."},
+                    {"view_name": "reports:product-receipts", "export_name": "reports:export-product-receipts", "title": "Product Receipt Report", "description": "Supplier, terminal, tank, and quantity received."},
+                    {"view_name": "reports:dispatches", "export_name": "reports:export-dispatches", "title": "Dispatch Report", "description": "Dispatch destination, OMC, and terminal movement."},
+                    {"view_name": "reports:omc-sales", "export_name": "reports:export-revenue", "title": "OMC Sales Report", "description": "Sales submissions by OMC and product."},
+                    {"view_name": "reports:revenue", "export_name": "reports:export-revenue", "title": "Revenue Report", "description": "Revenue by OMC, product, and period."},
+                    {"view_name": "reports:market-share", "export_name": "reports:revenue", "title": "Market Share Report", "description": "Latest market share ranking and product split."},
+                    {"view_name": "reports:variance", "export_name": "reports:export-daily-tank-stock", "title": "Variance Report", "description": "Tank stock variance monitoring."},
+                    {"view_name": "reports:annual-volume", "export_name": "reports:export-revenue", "title": "Annual Volume Analysis Report", "description": "Yearly product and OMC volume trend."},
+                ],
             }
         )
-        return ctx
+        return context
 
 
-class SalesReportView(ReportsRoleMixin, TemplateView):
-    template_name = "reports/sales.html"
-    extra_context = {"page_title": "Sales Reports", "active_menu": "reports"}
+class DailyTankStockReportView(ReportsRoleMixin, TemplateView):
+    template_name = "reports/daily_tank_stock.html"
 
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        user = self.request.user
-        sales = filter_fuel_sales_queryset_for_user(
-            FuelSale.objects.select_related("shift", "shift__station", "nozzle"),
-            user,
-        ).order_by("-created_at")
-        ctx.update(
+        context = super().get_context_data(**kwargs)
+        context.update({"page_title": "Daily Tank Stock Report", "active_menu": "reports", "rows": TankStockEntry.objects.select_related("tank", "tank__terminal", "tank__product").order_by("-entry_date")[:100]})
+        return context
+
+
+class TerminalStockReportView(ReportsRoleMixin, TemplateView):
+    template_name = "reports/terminal_stock.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"page_title": "Terminal Stock Report", "active_menu": "reports", "rows": TankStockEntry.objects.select_related("tank", "tank__terminal", "tank__product").order_by("-entry_date")[:100]})
+        return context
+
+
+class ProductReceiptReportView(ReportsRoleMixin, TemplateView):
+    template_name = "reports/product_receipts.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"page_title": "Product Receipt Report", "active_menu": "reports", "rows": ProductReceipt.objects.select_related("supplier", "terminal", "tank", "product").order_by("-receipt_date")[:100]})
+        return context
+
+
+class DispatchReportView(ReportsRoleMixin, TemplateView):
+    template_name = "reports/dispatches.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"page_title": "Dispatch Report", "active_menu": "reports", "rows": Dispatch.objects.select_related("omc", "terminal", "tank", "product").order_by("-dispatch_date")[:100]})
+        return context
+
+
+class OMCSalesReportView(ReportsRoleMixin, TemplateView):
+    template_name = "reports/omc_sales.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"page_title": "OMC Sales Report", "active_menu": "reports", "rows": OMCSalesEntry.objects.select_related("omc", "terminal", "product").order_by("-sale_date")[:100]})
+        return context
+
+
+class RevenueReportView(ReportsRoleMixin, TemplateView):
+    template_name = "reports/revenue.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"page_title": "Revenue Report", "active_menu": "reports", "rows": RevenueEntry.objects.select_related("omc", "terminal", "product").order_by("-revenue_date")[:100]})
+        return context
+
+
+class MarketShareReportView(ReportsRoleMixin, TemplateView):
+    template_name = "reports/market_share.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"page_title": "Market Share Report", "active_menu": "reports", "rows": MarketShareSnapshot.objects.select_related("omc", "product").order_by("-snapshot_date", "-market_share_percent")[:100]})
+        return context
+
+
+class VarianceReportView(ReportsRoleMixin, TemplateView):
+    template_name = "reports/variance.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"page_title": "Variance Report", "active_menu": "reports", "rows": TankStockEntry.objects.select_related("tank", "tank__terminal", "tank__product").exclude(variance=0).order_by("-entry_date")[:100]})
+        return context
+
+
+class AnnualVolumeReportView(ReportsRoleMixin, TemplateView):
+    template_name = "reports/annual_volume.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
             {
-                "rows": sales[:100],
-                "total_sales": sales.aggregate(s=Sum("total_amount"))["s"] or 0,
-                "total_liters": sales.aggregate(s=Sum("volume_liters"))["s"] or 0,
+                "page_title": "Annual Volume Analysis Report",
+                "active_menu": "reports",
+                "rows": OMCSalesEntry.objects.values("sale_date__year", "omc__name", "product__name").order_by("-sale_date__year", "omc__name", "product__name"),
             }
         )
-        return ctx
+        return context
 
 
-class InventoryReportView(ReportsRoleMixin, TemplateView):
-    template_name = "reports/inventory.html"
-    extra_context = {"page_title": "Inventory Reports", "active_menu": "reports"}
+class SimpleCsvExportView(ReportsRoleMixin, TemplateView):
+    report_type = ""
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        user = self.request.user
-        ctx.update(
-            {
-                "tanks": filter_tanks_queryset_for_user(
-                    FuelTank.objects.select_related("station"),
-                    user,
-                ).order_by("station__name", "name"),
-                "movements": filter_inventory_records_queryset_for_user(
-                    InventoryRecord.objects.select_related("tank", "tank__station"),
-                    user,
-                ).order_by("-created_at")[:100],
-            }
-        )
-        return ctx
-
-
-class ShiftReportView(ReportsRoleMixin, TemplateView):
-    template_name = "reports/shifts.html"
-    extra_context = {"page_title": "Shift Reports", "active_menu": "reports"}
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        user = self.request.user
-        ctx["shifts"] = (
-            filter_shifts_queryset_for_user(
-                ShiftSession.objects.select_related("station", "attendant"),
-                user,
+    def get(self, request, *args, **kwargs):
+        if self.report_type == "daily_tank_stock":
+            rows = TankStockEntry.objects.select_related("tank", "tank__terminal", "tank__product").values_list(
+                "entry_date", "tank__terminal__name", "tank__name", "tank__product__name", "opening_stock", "stock_in", "stock_out", "closing_stock", "computed_stock", "variance"
             )
-            .order_by("-opened_at")[:100]
+            return csv_response("daily_tank_stock.csv", ["Date", "Terminal", "Tank", "Product", "Opening", "Stock In", "Stock Out", "Closing", "Computed", "Variance"], rows)
+        if self.report_type == "receipts":
+            rows = ProductReceipt.objects.select_related("supplier", "terminal", "tank", "product").values_list(
+                "receipt_date", "reference_number", "supplier__name", "product__name", "quantity_received", "terminal__name", "tank__name"
+            )
+            return csv_response("product_receipts.csv", ["Date", "Reference", "Supplier", "Product", "Quantity", "Terminal", "Tank"], rows)
+        if self.report_type == "dispatches":
+            rows = Dispatch.objects.select_related("omc", "terminal", "tank", "product").values_list(
+                "dispatch_date", "reference_number", "omc__name", "product__name", "quantity_dispatched", "terminal__name", "destination"
+            )
+            return csv_response("dispatches.csv", ["Date", "Reference", "OMC", "Product", "Quantity", "Terminal", "Destination"], rows)
+        rows = RevenueEntry.objects.select_related("omc", "terminal", "product").values_list(
+            "revenue_date", "omc__name", "product__name", "volume_liters", "amount", "terminal__name"
         )
-        return ctx
-
-
-class FinancialReportView(ReportsRoleMixin, TemplateView):
-    template_name = "reports/financial.html"
-    extra_context = {"page_title": "Financial Reports", "active_menu": "reports"}
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        user = self.request.user
-        receipts = filter_delivery_receipts_queryset_for_user(
-            DeliveryReceipt.objects.filter(status=DeliveryReceipt.Status.RECEIVED).exclude(unit_cost__isnull=True),
-            user,
-        )
-        ctx.update(
-            {
-                "payments_total": Payment.objects.aggregate(s=Sum("amount"))["s"] or 0,
-                "receipt_cost_total": receipts.annotate(
-                    line_total=ExpressionWrapper(
-                        F("delivered_volume") * F("unit_cost"),
-                        output_field=DecimalField(max_digits=14, decimal_places=2),
-                    )
-                ).aggregate(s=Sum("line_total"))["s"]
-                or 0,
-                "deliveries": receipts.select_related("purchase_order", "purchase_order__supplier", "tank").order_by(
-                    "-delivery_date"
-                )[:100],
-                "payments": Payment.objects.select_related("invoice", "invoice__customer").order_by("-created_at")[:100],
-            }
-        )
-        return ctx
+        return csv_response("revenue.csv", ["Date", "OMC", "Product", "Volume", "Amount", "Terminal"], rows)
