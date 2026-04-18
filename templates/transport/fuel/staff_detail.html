@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Fuel Request {{ fuel_request.pk }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-6">
+        <a href="{% url 'transport:fuel:list' %}" class="text-sm font-medium text-blue-700 hover:underline">Back to Fuel Requests</a>
+        <div class="mt-2 flex items-center justify-between gap-3">
+            <h1 class="text-2xl font-semibold text-gray-900">Fuel Request #{{ fuel_request.pk }}</h1>
+            {% if not fuel_request.is_approved %}
+            <form method="post" action="{% url 'transport:fuel:approve' fuel_request.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700">
+                    Approve Request
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg border p-5 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div><p class="text-gray-500">Trip</p><p class="font-medium">{{ fuel_request.trip.order_number }}</p></div>
+            <div><p class="text-gray-500">Driver</p><p class="font-medium">{{ fuel_request.driver.full_name|default:fuel_request.driver.email }}</p></div>
+            <div><p class="text-gray-500">Station</p><p class="font-medium">{{ fuel_request.station.name }}</p></div>
+            <div><p class="text-gray-500">Amount</p><p class="font-medium">{{ fuel_request.amount }}</p></div>
+            <div><p class="text-gray-500">Status</p><p class="font-medium">{% if fuel_request.is_approved %}Approved{% else %}Pending{% endif %}</p></div>
+            <div><p class="text-gray-500">Created</p><p class="font-medium">{{ fuel_request.created_at|date:"M d, Y H:i" }}</p></div>
+        </div>
+        {% if fuel_request.notes %}
+        <div>
+            <p class="text-gray-500 text-sm">Notes</p>
+            <p class="text-sm text-gray-800 mt-1">{{ fuel_request.notes }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="bg-white rounded-lg border p-5 mt-6">
+        <h2 class="text-sm font-semibold text-gray-800 mb-3">Uploaded Documents</h2>
+        <ul class="space-y-2">
+            {% for doc in fuel_request.documents.all %}
+            <li class="text-sm"><a class="text-blue-700 hover:underline" href="{{ doc.document.url }}" target="_blank" rel="noopener">Document {{ forloop.counter }}</a></li>
+            {% empty %}
+            <li class="text-sm text-gray-500">No documents uploaded.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

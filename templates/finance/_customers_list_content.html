@@ -1,0 +1,102 @@
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Customer</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Phone</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Type</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Credit Allowed</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Credit Limit</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Balance</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Notes</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for customer in customers %}
+            <tr class="hover:bg-slate-50/80 transition">
+                <td class="px-4 py-3">
+                    <p class="text-sm font-semibold text-slate-900">{{ customer.name }}</p>
+                    <p class="text-xs text-slate-500">{{ customer.email|default:"No email" }}</p>
+                    {% if customer.address %}<p class="mt-1 text-xs text-slate-500">{{ customer.address|truncatechars:42 }}</p>{% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ customer.phone|default:"--" }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ customer.get_customer_type_display }}</td>
+                <td class="px-4 py-3 text-sm">
+                    {% if customer.is_credit_allowed %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Allowed</span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Blocked</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ customer.credit_limit|floatformat:2 }}</td>
+                <td class="px-4 py-3 text-sm font-semibold text-amber-700">{{ customer.current_balance|floatformat:2 }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ customer.notes|default:"-"|truncatechars:48 }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="customer-details-toggle rounded-lg border border-[#0f7ea6] px-3 py-1.5 text-xs font-semibold text-[#0f7ea6] hover:bg-[#0f7ea6]/10" data-target="#customer-details-{{ customer.id }}">View</button>
+                        {% if customer.current_balance > 0 %}
+                        <button type="button" data-payment-url="{% url 'finance:customers-credit-payment' customer.pk %}" class="customer-credit-pay-btn rounded-lg border border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">Receive Payment</button>
+                        {% endif %}
+                        <button type="button" data-edit-url="{% url 'finance:customers-update' customer.pk %}" class="customer-edit-btn rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+                        <button type="button" data-delete-url="{% url 'finance:customers-delete' customer.pk %}" class="customer-delete-btn rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-50">Delete</button>
+                    </div>
+                </td>
+            </tr>
+            <tr id="customer-details-{{ customer.id }}" class="hidden bg-slate-50">
+                <td colspan="8" class="px-6 py-4">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <p class="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Contact & Address</p>
+                            <div class="space-y-2 text-sm text-slate-700">
+                                <p><span class="font-semibold text-slate-900">Name:</span> {{ customer.name }}</p>
+                                <p><span class="font-semibold text-slate-900">Phone:</span> {{ customer.phone|default:"-" }}</p>
+                                <p><span class="font-semibold text-slate-900">Email:</span> {{ customer.email|default:"-" }}</p>
+                                <p><span class="font-semibold text-slate-900">Address:</span> {{ customer.address|default:"-" }}</p>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <p class="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Credit Profile</p>
+                            <div class="space-y-2 text-sm text-slate-700">
+                                <p><span class="font-semibold text-slate-900">Type:</span> {{ customer.get_customer_type_display }}</p>
+                                <p><span class="font-semibold text-slate-900">Credit Allowed:</span> {% if customer.is_credit_allowed %}Yes{% else %}No{% endif %}</p>
+                                <p><span class="font-semibold text-slate-900">Credit Limit:</span> {{ customer.credit_limit|floatformat:2 }}</p>
+                                <p><span class="font-semibold text-slate-900">Current Balance:</span> {{ customer.current_balance|floatformat:2 }}</p>
+                                <p><span class="font-semibold text-slate-900">Available Credit:</span> {{ customer.available_credit|floatformat:2 }}</p>
+                                <p><span class="font-semibold text-slate-900">Notes:</span> {{ customer.notes|default:"-" }}</p>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <p class="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Recent Credit Activity</p>
+                            <div class="space-y-3 text-sm text-slate-700">
+                                {% for entry in customer.recent_credit_transactions %}
+                                <div class="rounded-lg border border-slate-200 p-3">
+                                    <p class="font-semibold text-slate-900">Credit Sale {{ entry.sale.receipt_number|default:entry.sale_id }}</p>
+                                    <p class="text-xs text-slate-500">{{ entry.created_at|date:"Y-m-d H:i" }} · {{ entry.status|title }}</p>
+                                    <p class="mt-1 text-xs text-slate-600">Amount {{ entry.amount|floatformat:2 }} · Paid {{ entry.amount_paid|floatformat:2 }} · Outstanding {{ entry.outstanding_amount|floatformat:2 }}</p>
+                                </div>
+                                {% empty %}
+                                <p class="text-xs text-slate-500">No credit sales recorded yet.</p>
+                                {% endfor %}
+                                {% for payment in customer.recent_credit_payments %}
+                                <div class="rounded-lg border border-emerald-200 bg-emerald-50/60 p-3">
+                                    <p class="font-semibold text-emerald-800">Payment {{ payment.amount|floatformat:2 }}</p>
+                                    <p class="text-xs text-emerald-700">{{ payment.get_method_display }} · {{ payment.created_at|date:"Y-m-d H:i" }}</p>
+                                    <p class="mt-1 text-xs text-emerald-700">{{ payment.reference|default:"No reference" }}</p>
+                                </div>
+                                {% empty %}
+                                <p class="text-xs text-slate-500">No credit payments recorded yet.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="px-6 py-8 text-center text-sm text-slate-500">No customers found. Add your first customer to start tracking credit accounts.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

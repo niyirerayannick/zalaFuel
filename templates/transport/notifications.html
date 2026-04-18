@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-8 rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-col gap-4 border-b border-slate-200 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--theme-700)]">Notification Center</p>
+                <h1 class="mt-2 text-2xl font-bold text-slate-900">{{ page_title }}</h1>
+                <p class="mt-2 text-sm text-slate-500">{{ page_subtitle }}</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-right">
+                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Unread support/chat</p>
+                <p class="mt-2 text-3xl font-bold text-slate-900">{{ support_chat_unread_count }}</p>
+            </div>
+        </div>
+
+        <div class="p-6">
+            {% if notifications %}
+            <div class="space-y-4">
+                {% for item in notifications %}
+                <a href="{{ item.link }}" class="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-slate-50 px-5 py-5 transition hover:border-[var(--theme-200)] hover:bg-white sm:flex-row sm:items-start sm:justify-between">
+                    <div class="flex gap-4">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl {% if item.level == 'danger' %}bg-red-100 text-red-700{% elif item.level == 'warning' %}bg-amber-100 text-amber-700{% else %}bg-[var(--theme-100)] text-[var(--theme-700)]{% endif %}">
+                            <span class="material-symbols-outlined text-[1.35rem]">{{ item.icon }}</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold text-slate-900">{{ item.title }}</p>
+                            <p class="mt-1 text-sm leading-6 text-slate-600">{{ item.message }}</p>
+                        </div>
+                    </div>
+                    <div class="flex shrink-0 items-center justify-between gap-3 sm:block sm:text-right">
+                        <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold {% if item.level == 'danger' %}bg-red-100 text-red-700{% elif item.level == 'warning' %}bg-amber-100 text-amber-700{% else %}bg-[var(--theme-100)] text-[var(--theme-700)]{% endif %}">
+                            {{ item.level|title }}
+                        </span>
+                        <p class="mt-0 text-xs text-slate-400 sm:mt-3">{{ item.timestamp_label }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
+                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-[var(--theme-700)] shadow-sm">
+                    <span class="material-symbols-outlined text-[1.6rem]">notifications</span>
+                </div>
+                <h2 class="mt-4 text-lg font-semibold text-slate-900">No notifications yet</h2>
+                <p class="mt-2 text-sm text-slate-500">New alerts, expiring records, and unread support messages will appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

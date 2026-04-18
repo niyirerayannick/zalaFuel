@@ -1,0 +1,184 @@
+<section class="space-y-4 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+    <div class="flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-200"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Expense Details</p>
+        <div class="h-px flex-1 bg-slate-200"></div>
+    </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Expense Category</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">receipt_long</span>
+                {{ form.type }}
+            </div>
+            <p class="mt-2 text-sm text-red-600" data-error-for="type"></p>
+            {% if form.type.errors %}<p class="mt-2 text-sm text-red-600">{{ form.type.errors.0 }}</p>{% endif %}
+        </div>
+        <div id="custom-expense-type-wrapper" class="hidden">
+            <label class="block text-sm font-medium text-slate-700">{{ form.custom_type_name.label }}</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">edit_note</span>
+                {{ form.custom_type_name }}
+            </div>
+            <p class="mt-2 text-sm text-slate-500">{{ form.custom_type_name.help_text }}</p>
+            <p class="mt-2 text-sm text-red-600" data-error-for="custom_type_name"></p>
+            {% if form.custom_type_name.errors %}<p class="mt-2 text-sm text-red-600">{{ form.custom_type_name.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">{{ form.amount.label }}</label>
+            <div class="relative">
+                <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-green-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-green-700">{{ currency_symbol }}</span>
+                {{ form.amount }}
+            </div>
+            <p class="mt-2 text-sm text-red-600" data-error-for="amount"></p>
+            {% if form.amount.errors %}<p class="mt-2 text-sm text-red-600">{{ form.amount.errors.0 }}</p>{% endif %}
+        </div>
+        <div id="fuel-liters-wrapper" class="hidden">
+            <label class="block text-sm font-medium text-slate-700">Fuel Quantity (Liters)</label>
+            <div class="relative">
+                <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600">Qty</span>
+                {{ form.liters }}
+            </div>
+           <p class="mt-2 text-sm text-red-600" data-error-for="liters"></p>
+            {% if form.liters.errors %}<p class="mt-2 text-sm text-red-600">{{ form.liters.errors.0 }}</p>{% endif %}
+        </div>
+        <div id="fuel-unit-price-wrapper" class="hidden">
+            <label class="block text-sm font-medium text-slate-700">{{ form.fuel_unit_price.label }}</label>
+            <div class="relative">
+                <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600">Rate</span>
+                {{ form.fuel_unit_price }}
+            </div>
+            <p class="mt-2 text-sm text-red-600" data-error-for="fuel_unit_price"></p>
+            {% if form.fuel_unit_price.errors %}<p class="mt-2 text-sm text-red-600">{{ form.fuel_unit_price.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Status</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">inventory</span>
+                {{ form.status }}
+            </div>
+            <p class="mt-2 text-sm text-red-600" data-error-for="status"></p>
+            {% if form.status.errors %}<p class="mt-2 text-sm text-red-600">{{ form.status.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Expense Date</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">calendar_month</span>
+                {{ form.expense_date }}
+            </div>
+            <p class="mt-2 text-sm text-red-600" data-error-for="expense_date"></p>
+            {% if form.expense_date.errors %}<p class="mt-2 text-sm text-red-600">{{ form.expense_date.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-slate-700">Receipt / Supporting Document</label>
+            <div class="mt-2">
+                {{ form.proof_document }}
+            </div>
+            <p class="mt-2 text-sm text-red-600" data-error-for="proof_document"></p>
+            {% if form.proof_document.errors %}<p class="mt-2 text-sm text-red-600">{{ form.proof_document.errors.0 }}</p>{% endif %}
+        </div>
+    </div>
+</section>
+
+<script>
+    (function () {
+        const formRoot = document.currentScript ? document.currentScript.closest("form") : null;
+        const typeField = formRoot ? formRoot.querySelector('[name="type"]') : document.querySelector('[name="type"]');
+        const customWrapper = formRoot ? formRoot.querySelector("#custom-expense-type-wrapper") : document.getElementById("custom-expense-type-wrapper");
+        const customField = formRoot ? formRoot.querySelector('[name="custom_type_name"]') : document.querySelector('[name="custom_type_name"]');
+        const litersWrapper = formRoot ? formRoot.querySelector("#fuel-liters-wrapper") : document.getElementById("fuel-liters-wrapper");
+        const litersField = formRoot ? formRoot.querySelector('[name="liters"]') : document.querySelector('[name="liters"]');
+        const fuelUnitPriceWrapper = formRoot ? formRoot.querySelector("#fuel-unit-price-wrapper") : document.getElementById("fuel-unit-price-wrapper");
+        const fuelUnitPriceField = formRoot ? formRoot.querySelector('[name="fuel_unit_price"]') : document.querySelector('[name="fuel_unit_price"]');
+        const amountField = formRoot ? formRoot.querySelector('[name="amount"]') : document.querySelector('[name="amount"]');
+
+        if (!typeField || !customWrapper || !customField || !litersWrapper || !litersField || !fuelUnitPriceWrapper || !fuelUnitPriceField || !amountField) {
+            return;
+        }
+
+        function syncFuelAmount() {
+            const liters = Number.parseFloat(litersField.value || "");
+            const unitPrice = Number.parseFloat(fuelUnitPriceField.value || "");
+            if (!Number.isNaN(liters) && liters > 0 && !Number.isNaN(unitPrice) && unitPrice > 0) {
+                amountField.value = (liters * unitPrice).toFixed(2);
+            } else if (amountField.readOnly) {
+                amountField.value = "";
+            }
+        }
+
+        function syncCustomExpenseField() {
+            const selectedLabel = typeField.options[typeField.selectedIndex] ? typeField.options[typeField.selectedIndex].text.trim().toLowerCase() : "";
+            const showCustomType = selectedLabel === "other expense";
+            const showFuelLiters = selectedLabel === "fuel";
+            customWrapper.classList.toggle("hidden", !showCustomType);
+            litersWrapper.classList.toggle("hidden", !showFuelLiters);
+            fuelUnitPriceWrapper.classList.toggle("hidden", !showFuelLiters);
+            customField.required = showCustomType;
+            amountField.readOnly = showFuelLiters;
+            amountField.classList.toggle("bg-slate-50", showFuelLiters);
+            if (!showCustomType) {
+                customField.value = "";
+            }
+            if (!showFuelLiters) {
+                litersField.value = "";
+                fuelUnitPriceField.value = "";
+            } else {
+                syncFuelAmount();
+            }
+        }
+
+        typeField.addEventListener("change", syncCustomExpenseField);
+        litersField.addEventListener("input", syncFuelAmount);
+        fuelUnitPriceField.addEventListener("input", syncFuelAmount);
+        syncCustomExpenseField();
+    })();
+</script>
+
+<section class="space-y-4 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+    <div class="flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-200"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Linked Records</p>
+        <div class="h-px flex-1 bg-slate-200"></div>
+    </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Trip</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">route</span>
+                {{ form.trip }}
+            </div>
+            <p class="mt-2 text-sm text-red-600" data-error-for="trip"></p>
+            {% if form.trip.errors %}<p class="mt-2 text-sm text-red-600">{{ form.trip.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Vehicle</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">local_shipping</span>
+                {{ form.vehicle }}
+            </div>
+            <p class="mt-2 text-sm text-red-600" data-error-for="vehicle"></p>
+            {% if form.vehicle.errors %}<p class="mt-2 text-sm text-red-600">{{ form.vehicle.errors.0 }}</p>{% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="space-y-4 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+    <div class="flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-200"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Notes</p>
+        <div class="h-px flex-1 bg-slate-200"></div>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-slate-700">Description</label>
+        <div class="relative">
+            <span class="material-symbols-outlined pointer-events-none absolute left-4 top-4 text-[18px] text-slate-400">description</span>
+            {{ form.description }}
+        </div>
+        <div class="mt-2 flex items-center justify-between gap-3 text-xs text-slate-500">
+            <span>Add enough context for audits and monthly reporting.</span>
+            <span>At least 10 characters.</span>
+        </div>
+        <p class="mt-2 text-sm text-red-600" data-error-for="description"></p>
+        {% if form.description.errors %}<p class="mt-2 text-sm text-red-600">{{ form.description.errors.0 }}</p>{% endif %}
+    </div>
+</section>

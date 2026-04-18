@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Permission Management | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Access Control</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Permission Management</h1>
+                <p class="mt-1 text-sm text-slate-600">Grant or revoke role permissions across the system modules.</p>
+            </div>
+            <a href="{% url 'accounts:role-management' %}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                <span class="material-symbols-outlined text-[18px] leading-none">shield_person</span>
+                Role Management
+            </a>
+        </div>
+    </div>
+
+    <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Apps</p>
+                <span class="material-symbols-outlined text-[18px] text-green-700">apps</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ permissions_by_app|length }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Roles</p>
+                <span class="material-symbols-outlined text-[18px] text-green-700">groups</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ role_choices|length }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Granted</p>
+                <span class="material-symbols-outlined text-[18px] text-emerald-700">check_circle</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-emerald-700">{{ role_permissions|length }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Modules</p>
+                <span class="material-symbols-outlined text-[18px] text-slate-500">dashboard_customize</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ brand_name|default:"ZALA/ECO ENERGY" }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <aside class="space-y-6 xl:col-span-1">
+            <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div class="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                    <h2 class="text-sm font-semibold text-slate-900">Current Role Permissions</h2>
+                </div>
+                <div class="max-h-[36rem] overflow-y-auto p-5 space-y-4">
+                    {% for role_code, role_name in role_choices %}
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <div class="flex items-center justify-between gap-3">
+                            <h3 class="text-sm font-semibold text-slate-900">{{ role_name }}</h3>
+                            <span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800">
+                                {{ role_permissions|dictsort:"role"|length }}
+                            </span>
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            {% for assignment in role_permissions %}
+                                {% if assignment.role == role_code %}
+                                <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700">
+                                    {{ assignment.permission.codename }}
+                                </span>
+                                {% endif %}
+                            {% empty %}
+                                <span class="text-xs text-slate-500">No explicit permissions assigned.</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </aside>
+
+        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm xl:col-span-2">
+            <div class="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                <h2 class="text-sm font-semibold text-slate-900">Permission Directory</h2>
+            </div>
+            <div class="p-5 space-y-6">
+                {% for app_label, permissions in permissions_by_app.items %}
+                <div class="rounded-2xl border border-slate-200 bg-white">
+                    <div class="border-b border-slate-200 px-5 py-4">
+                        <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-700">{{ app_label }}</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Permission</th>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Code</th>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Role</th>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white">
+                                {% for permission in permissions %}
+                                <tr class="hover:bg-slate-50">
+                                    <td class="px-5 py-4">
+                                        <p class="text-sm font-semibold text-slate-900">{{ permission.name }}</p>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <span class="rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">{{ permission.codename }}</span>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <form method="post" class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="permission_id" value="{{ permission.id }}">
+                                            <select name="role" class="rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+                                                {% for role_code, role_name in role_choices %}
+                                                <option value="{{ role_code }}">{{ role_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                            <div class="flex items-center gap-2">
+                                                <button type="submit" name="action" value="grant" class="inline-flex items-center rounded-lg bg-green-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-green-800">
+                                                    Grant
+                                                </button>
+                                                <button type="submit" name="action" value="revoke" class="inline-flex items-center rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-100">
+                                                    Revoke
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center">
+                    <p class="text-sm font-medium text-slate-800">No permissions found.</p>
+                    <p class="mt-1 text-sm text-slate-500">System permissions will appear here once apps are registered.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

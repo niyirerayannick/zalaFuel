@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Finance | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div class="rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Finance</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Overview</h1>
+                <p class="mt-1 text-sm text-slate-600">Monitor revenue, procurement expense, margin, and customer credit from one page.</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'finance:revenue' %}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-[#0f7ea6] px-4 py-2 text-sm font-semibold text-[#0f7ea6] shadow-sm transition hover:bg-[#0f7ea6]/10">
+                    <span class="material-symbols-outlined text-[18px] leading-none">payments</span>
+                    Revenue
+                </a>
+                <a href="{% url 'finance:expenses' %}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                    <span class="material-symbols-outlined text-[18px] leading-none">receipt_long</span>
+                    Expenses
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Revenue</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ total_revenue|floatformat:2 }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Expenses</p>
+            <h3 class="mt-1 text-2xl font-bold text-rose-700">{{ total_expenses|floatformat:2 }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Gross Margin</p>
+            <h3 class="mt-1 text-2xl font-bold {% if gross_margin < 0 %}text-rose-700{% else %}text-emerald-700{% endif %}">{{ gross_margin|floatformat:2 }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Customer Credit</p>
+            <h3 class="mt-1 text-2xl font-bold text-amber-700">{{ credit_balance|floatformat:2 }}</h3>
+        </div>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-3">
+                <div>
+                    <h2 class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-900">Recent Revenue</h2>
+                    <p class="text-xs text-slate-500">Latest posted fuel sales.</p>
+                </div>
+                <a href="{% url 'finance:revenue' %}" class="text-xs font-semibold text-[#0f7ea6] hover:text-[#0c5069]">View all</a>
+            </div>
+            <div class="p-5 space-y-2">
+                {% for sale in recent_revenue %}
+                <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
+                    <div>
+                        <div class="text-sm text-slate-800">{{ sale.shift.station.name }} Ã¢â‚¬Â¢ {{ sale.nozzle.pump.label }}</div>
+                        <div class="text-xs text-slate-500">{{ sale.get_payment_method_display }} Ã¢â‚¬Â¢ {{ sale.created_at|date:"Y-m-d H:i" }}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-semibold text-slate-900">{{ sale.total_amount|floatformat:2 }}</div>
+                        <div class="text-xs text-slate-500">{{ sale.volume_liters|floatformat:2 }} L</div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-sm text-slate-500">No revenue records yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-3">
+                <div>
+                    <h2 class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-900">Recent Expenses</h2>
+                    <p class="text-xs text-slate-500">Latest delivery receipts and procurement costs.</p>
+                </div>
+                <a href="{% url 'finance:expenses' %}" class="text-xs font-semibold text-[#0f7ea6] hover:text-[#0c5069]">View all</a>
+            </div>
+            <div class="p-5 space-y-2">
+                {% for receipt in recent_expenses %}
+                <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
+                    <div>
+                        <div class="text-sm text-slate-800">{{ receipt.purchase_order.supplier.name }} Ã¢â‚¬Â¢ {{ receipt.tank.name|default:"No tank" }}</div>
+                        <div class="text-xs text-slate-500">{{ receipt.get_status_display }} Ã¢â‚¬Â¢ {{ receipt.delivery_date|date:"Y-m-d" }}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-semibold text-slate-900">
+                            {% if receipt.unit_cost %}{{ receipt.delivered_volume|floatformat:2 }} x {{ receipt.unit_cost|floatformat:2 }}{% else %}Pending cost{% endif %}
+                        </div>
+                        <div class="text-xs text-slate-500">{{ receipt.delivered_volume|floatformat:2 }} L</div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-sm text-slate-500">No expense records yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

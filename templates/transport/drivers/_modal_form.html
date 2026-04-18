@@ -1,0 +1,5 @@
+<form id="driver-modal-form" method="post" enctype="multipart/form-data" action="{{ request.path }}" class="space-y-5" novalidate>
+    {% csrf_token %}
+    <div id="driver-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"></div>
+    {% include "transport/drivers/_form_fields.html" %}
+</form>

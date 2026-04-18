@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Shift #{{ shift.pk }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <a href="{% url 'sales:shifts' %}" class="text-sm font-medium text-slate-500 hover:text-slate-700">Back to Shifts</a>
+        <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Shift Operations</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Shift #{{ shift.pk }} - {{ shift.station.name }}</h1>
+                <p class="mt-1 text-sm text-slate-600">
+                    Attendant: {{ shift.attendant.full_name|default:shift.attendant }} Ã‚Â· {{ shift.get_shift_type_display }} Ã‚Â· Opened {{ shift.opened_at }}
+                </p>
+            </div>
+            {% if shift.status == 'open' %}
+            <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Open</span>
+            {% else %}
+            <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">Closed</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include "sales/_shift_sales_summary.html" %}
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-3">
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.12em] text-slate-500">Reconciliation</h2>
+            <dl class="mt-4 space-y-3 text-sm">
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">Shift Type</dt><dd class="font-semibold text-slate-900">{{ shift.get_shift_type_display }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">Opening Cash</dt><dd class="font-semibold text-slate-900">{{ shift.opening_cash|currency }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">Expected Amount</dt><dd class="font-semibold text-slate-900">{{ summary.total_sales|currency }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">Closing Amount</dt><dd class="font-semibold text-slate-900">{% if shift.closing_cash is not None %}{{ shift.closing_cash|currency }}{% else %}Pending{% endif %}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">Variance</dt><dd class="font-semibold {% if shift.variance_amount == 0 %}text-emerald-700{% elif shift.variance_amount > 0 %}text-amber-700{% else %}text-red-700{% endif %}">{{ shift.variance_amount|currency }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">Closed By</dt><dd class="font-semibold text-slate-900">{{ shift.closed_by.full_name|default:shift.closed_by|default:"Pending" }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">Closed At</dt><dd class="font-semibold text-slate-900">{{ shift.closed_at|default:"Pending" }}</dd></div>
+            </dl>
+            {% if shift.closing_note %}
+            <div class="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">{{ shift.closing_note }}</div>
+            {% endif %}
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.12em] text-slate-500">Linked Sales</h2>
+            <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 text-sm">
+                    <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <tr>
+                            <th class="px-3 py-2">Receipt</th>
+                            <th class="px-3 py-2">Nozzle</th>
+                            <th class="px-3 py-2">Liters</th>
+                            <th class="px-3 py-2">Payment</th>
+                            <th class="px-3 py-2 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for sale in sales %}
+                        <tr>
+                            <td class="px-3 py-3">{{ sale.receipt_number|default:sale.pk }}</td>
+                            <td class="px-3 py-3">{{ sale.nozzle.pump.label }} - {{ sale.nozzle.get_fuel_type_display }}</td>
+                            <td class="px-3 py-3">{{ sale.volume_liters|floatformat:2 }}</td>
+                            <td class="px-3 py-3">{{ sale.get_payment_method_display }}</td>
+                            <td class="px-3 py-3 text-right font-semibold">{{ sale.total_amount|currency }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="px-3 py-6 text-center text-slate-500">No sales linked to this shift yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Add User | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .driver-modal-field,
+    .driver-modal-file {
+        width: 100%; min-height: 2.8rem; border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225); background: rgb(248 250 252); color: rgb(15 23 42);
+        transition: all 0.2s ease;
+    }
+    .driver-modal-field { padding: 0.78rem 0.95rem 0.78rem 2.75rem; }
+    .driver-modal-file { padding: 0.7rem 0.95rem 0.7rem 2.75rem; }
+    .driver-modal-field:focus, .driver-modal-file:focus { outline: none; background: white; border-color: rgb(21 128 61); box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08); }
+    .driver-label { display:block; margin-bottom:0.45rem; font-size:0.74rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:rgb(51 65 85); }
+    .driver-help { margin-top:0.35rem; font-size:0.72rem; color:rgb(100 116 139); }
+    .driver-error { min-height:1rem; margin-top:0.45rem; font-size:0.75rem; color:rgb(220 38 38); }
+    .driver-input-shell, .driver-file-shell { position:relative; }
+    .driver-field-icon { position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); color:rgb(100 116 139); font-size:1.05rem; pointer-events:none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Management</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Add User</h1>
+                <p class="mt-1 text-sm text-slate-600">Create a staff account using the same fast-entry form pattern.</p>
+            </div>
+            <a href="{% url 'accounts:user-list' %}" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Back to Users</a>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-5" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ form.non_field_errors|striptags }}</div>
+        {% endif %}
+        {% include "accounts/users/_form_fields.html" %}
+        <div class="flex items-center justify-end gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+            <a href="{% url 'accounts:user-list' %}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</a>
+            <button type="submit" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">Save User</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

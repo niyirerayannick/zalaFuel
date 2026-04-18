@@ -1,0 +1,157 @@
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/80 flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg bg-green-100 text-green-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px] leading-none">directions_car</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Vehicle Information</h3>
+            <p class="text-xs text-slate-500">Select the vehicle receiving maintenance.</p>
+        </div>
+    </div>
+    <div class="p-5">
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+                <label for="id_vehicle" class="field-label">Vehicle <span class="text-red-500">*</span></label>
+                <div class="input-shell">
+                    <span class="material-symbols-outlined field-icon">directions_car</span>
+                    {{ form.vehicle }}
+                </div>
+                {% if form.vehicle.errors %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="vehicle">{{ form.vehicle.errors.0 }}</p>{% else %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="vehicle"></p>{% endif %}
+                {% if form.vehicle.help_text %}<p class="field-help">{{ form.vehicle.help_text }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="id_trip" class="field-label">Trip</label>
+                <div class="input-shell">
+                    <span class="material-symbols-outlined field-icon">route</span>
+                    {{ form.trip }}
+                </div>
+                {% if form.trip.errors %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="trip">{{ form.trip.errors.0 }}</p>{% else %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="trip"></p>{% endif %}
+                {% if form.trip.help_text %}<p class="field-help">{{ form.trip.help_text }}</p>{% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/80 flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px] leading-none">handyman</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Maintenance Details</h3>
+            <p class="text-xs text-slate-500">What service was done and where it happened.</p>
+        </div>
+    </div>
+    <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+            <label for="id_service_type" class="field-label">Service Type <span class="text-red-500">*</span></label>
+            <div class="input-shell">
+                <span class="material-symbols-outlined field-icon">description</span>
+                <select id="id_service_type" name="service_type" class="maint-field" required>
+                    <option value="">Select service type...</option>
+                    {% for type in service_types %}
+                    <option value="{{ type }}" {% if form.service_type.value == type %}selected{% endif %}>{{ type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% if form.service_type.errors %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="service_type">{{ form.service_type.errors.0 }}</p>{% else %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="service_type"></p>{% endif %}
+            {% if form.service_type.help_text %}<p class="field-help">{{ form.service_type.help_text }}</p>{% endif %}
+        </div>
+        <div>
+            <label for="id_workshop" class="field-label">Workshop / Service Center <span class="text-red-500">*</span></label>
+            <div class="input-shell">
+                <span class="material-symbols-outlined field-icon">storefront</span>
+                {{ form.workshop }}
+            </div>
+            {% if form.workshop.errors %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="workshop">{{ form.workshop.errors.0 }}</p>{% else %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="workshop"></p>{% endif %}
+            {% if form.workshop.help_text %}<p class="field-help">{{ form.workshop.help_text }}</p>{% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/80 flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg bg-green-100 text-green-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px] leading-none">event</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Service Information</h3>
+            <p class="text-xs text-slate-500">Service date, odometer reading, and downtime.</p>
+        </div>
+    </div>
+    <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+            <label for="id_service_date" class="field-label">Service Date <span class="text-red-500">*</span></label>
+            <div class="input-shell">
+                <span class="material-symbols-outlined field-icon">calendar_month</span>
+                {{ form.service_date }}
+            </div>
+            {% if form.service_date.errors %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="service_date">{{ form.service_date.errors.0 }}</p>{% else %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="service_date"></p>{% endif %}
+            {% if form.service_date.help_text %}<p class="field-help">{{ form.service_date.help_text }}</p>{% endif %}
+        </div>
+        <div>
+            <label for="id_service_km" class="field-label">Odometer at Service (km) <span class="text-red-500">*</span></label>
+            <div class="input-shell">
+                <span class="material-symbols-outlined field-icon">speed</span>
+                {{ form.service_km }}
+            </div>
+            {% if form.service_km.errors %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="service_km">{{ form.service_km.errors.0 }}</p>{% else %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="service_km"></p>{% endif %}
+            {% if form.service_km.help_text %}<p class="field-help">{{ form.service_km.help_text }}</p>{% endif %}
+        </div>
+        <div class="md:col-span-2">
+            <label for="id_downtime_days" class="field-label">Downtime (days)</label>
+            <div class="input-shell">
+                <span class="material-symbols-outlined field-icon">schedule</span>
+                {{ form.downtime_days }}
+            </div>
+            {% if form.downtime_days.errors %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="downtime_days">{{ form.downtime_days.errors.0 }}</p>{% else %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="downtime_days"></p>{% endif %}
+            {% if form.downtime_days.help_text %}<p class="field-help">{{ form.downtime_days.help_text }}</p>{% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/80 flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg bg-lime-100 text-lime-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px] leading-none">payments</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Cost Information</h3>
+            <p class="text-xs text-slate-500">Record the total maintenance cost.</p>
+        </div>
+    </div>
+    <div class="p-5">
+        <label for="id_cost" class="field-label">Maintenance Cost <span class="text-red-500">*</span></label>
+        <div class="input-shell">
+            <span class="material-symbols-outlined field-icon">payments</span>
+            {{ form.cost }}
+        </div>
+        {% if form.cost.errors %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="cost">{{ form.cost.errors.0 }}</p>{% else %}<p class="mt-1 text-xs text-red-600 field-error" data-error-for="cost"></p>{% endif %}
+        {% if form.cost.help_text %}<p class="field-help">{{ form.cost.help_text }}</p>{% endif %}
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/80 flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px] leading-none">event_repeat</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Next Maintenance Schedule</h3>
+            <p class="text-xs text-slate-500">Projected return date and next-service note.</p>
+        </div>
+    </div>
+    <div class="p-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Estimated Return to Service</p>
+                <p id="estimatedReturnDate" class="mt-1 text-sm font-semibold text-slate-900">--</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Downtime Window</p>
+                <p id="downtimeWindow" class="mt-1 text-sm font-semibold text-slate-900">0 day(s)</p>
+            </div>
+        </div>
+        <p class="mt-3 text-xs text-slate-500">After saving, the system updates vehicle service metrics and status automatically based on this record.</p>
+    </div>
+</section>

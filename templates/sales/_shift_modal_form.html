@@ -1,0 +1,8 @@
+<form id="shift-modal-form" method="post" action="{{ action|default:request.path }}" class="space-y-5" novalidate>
+    {% csrf_token %}
+    <div id="shift-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"></div>
+    {% if summary %}
+        {% include "sales/_shift_sales_summary.html" %}
+    {% endif %}
+    {% include "sales/_shift_form_fields.html" %}
+</form>

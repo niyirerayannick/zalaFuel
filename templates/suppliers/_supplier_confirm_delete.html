@@ -1,0 +1,16 @@
+<form id="supplier-modal-form" method="post" action="{{ action|default:request.path }}">
+    {% csrf_token %}
+    <div id="supplier-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"></div>
+    <div class="space-y-4 rounded-2xl border border-rose-200 bg-white p-5 shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">delete</span>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-slate-900">Delete Supplier</h3>
+                <p class="text-xs text-slate-500">This action is blocked when procurement history already exists.</p>
+            </div>
+        </div>
+        <p class="text-sm text-slate-700">Delete supplier <strong>{{ supplier.name }}</strong>?</p>
+    </div>
+</form>

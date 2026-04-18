@@ -1,0 +1,139 @@
+<section class="space-y-4 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+    <div class="flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-200"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Financial Context</p>
+        <div class="h-px flex-1 bg-slate-200"></div>
+    </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Order</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">inventory_2</span>
+                {{ form.order }}
+            </div>
+            <p data-error-for="order" class="mt-2 text-sm text-red-600">{% if form.order.errors %}{{ form.order.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Trip</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">local_shipping</span>
+                {{ form.trip }}
+            </div>
+            {% if form.trip.help_text %}<p class="mt-2 text-xs leading-5 text-slate-500">{{ form.trip.help_text }}</p>{% endif %}
+            <p data-error-for="trip" class="mt-2 text-sm text-red-600">{% if form.trip.errors %}{{ form.trip.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Customer</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">person</span>
+                {{ form.customer }}
+            </div>
+            {% if form.customer.help_text %}<p class="mt-2 text-xs leading-5 text-slate-500">{{ form.customer.help_text }}</p>{% endif %}
+            <p data-error-for="customer" class="mt-2 text-sm text-red-600">{% if form.customer.errors %}{{ form.customer.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Status</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">flag</span>
+                {{ form.status }}
+            </div>
+            <p data-error-for="status" class="mt-2 text-sm text-red-600">{% if form.status.errors %}{{ form.status.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>
+
+<section class="space-y-4 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+    <div class="flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-200"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Payment Information</p>
+        <div class="h-px flex-1 bg-slate-200"></div>
+    </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+            <label class="block text-sm font-medium text-slate-700">{{ form.amount.label }}</label>
+            <div class="relative">
+                <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-green-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-green-700">{{ currency_symbol }}</span>
+                {{ form.amount }}
+            </div>
+            <p data-error-for="amount" class="mt-2 text-sm text-red-600">{% if form.amount.errors %}{{ form.amount.errors.0 }}{% endif %}</p>
+        </div>
+        <div id="payment-amount-paid-wrap">
+            <label class="block text-sm font-medium text-slate-700">{{ form.amount_paid.label }}</label>
+            <div class="relative">
+                <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-green-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-green-700">{{ currency_symbol }}</span>
+                {{ form.amount_paid }}
+            </div>
+            {% if form.amount_paid.help_text %}<p class="mt-2 text-xs leading-5 text-slate-500">{{ form.amount_paid.help_text }}</p>{% endif %}
+            <p data-error-for="amount_paid" class="mt-2 text-sm text-red-600">{% if form.amount_paid.errors %}{{ form.amount_paid.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Payment Date</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">calendar_month</span>
+                {{ form.payment_date }}
+            </div>
+            <p data-error-for="payment_date" class="mt-2 text-sm text-red-600">{% if form.payment_date.errors %}{{ form.payment_date.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Payment Method</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">credit_card</span>
+                {{ form.payment_method }}
+            </div>
+            <p data-error-for="payment_method" class="mt-2 text-sm text-red-600">{% if form.payment_method.errors %}{{ form.payment_method.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Reference</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">tag</span>
+                {{ form.reference }}
+            </div>
+            <p data-error-for="reference" class="mt-2 text-sm text-red-600">{% if form.reference.errors %}{{ form.reference.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Proof of Payment</label>
+            <div class="relative">
+                {{ form.proof_document }}
+            </div>
+            <p class="mt-2 text-xs leading-5 text-slate-500">Upload a receipt, bank slip, or payment photo as supporting proof.</p>
+            <p data-error-for="proof_document" class="mt-2 text-sm text-red-600">{% if form.proof_document.errors %}{{ form.proof_document.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>
+
+<section id="payment-failure-wrap" class="space-y-4 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+    <div class="flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-200"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Failure Details</p>
+        <div class="h-px flex-1 bg-slate-200"></div>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-slate-700">Failure Reason</label>
+        <div class="relative">
+            <span class="material-symbols-outlined pointer-events-none absolute left-4 top-4 text-[18px] text-slate-400">warning</span>
+            {{ form.failure_reason }}
+        </div>
+        <p class="mt-2 text-xs leading-5 text-slate-500">Required when the payment status is failed.</p>
+        <p data-error-for="failure_reason" class="mt-2 text-sm text-red-600">{% if form.failure_reason.errors %}{{ form.failure_reason.errors.0 }}{% endif %}</p>
+    </div>
+</section>
+
+<section class="space-y-4 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+    <div class="flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-200"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Notes</p>
+        <div class="h-px flex-1 bg-slate-200"></div>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-slate-700">Notes</label>
+        <div class="relative">
+            <span class="material-symbols-outlined pointer-events-none absolute left-4 top-4 text-[18px] text-slate-400">edit_note</span>
+            {{ form.notes }}
+        </div>
+        <div class="mt-2 flex items-center justify-between gap-3 text-xs text-slate-500">
+            <span>Optional context for approvals, reconciliation, or finance reporting.</span>
+            <span>Keep it brief and useful.</span>
+        </div>
+        <p data-error-for="notes" class="mt-2 text-sm text-red-600">{% if form.notes.errors %}{{ form.notes.errors.0 }}{% endif %}</p>
+    </div>
+</section>

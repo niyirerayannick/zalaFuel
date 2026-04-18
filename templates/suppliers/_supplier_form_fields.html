@@ -1,0 +1,53 @@
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">local_shipping</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Supplier Details</h3>
+            <p class="text-xs text-slate-500">Manage vendor identity and contacts.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="md:col-span-2">
+            <label class="driver-label" for="{{ form.name.id_for_label }}">Supplier Name <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">badge</span>
+                {{ form.name }}
+            </div>
+            <p class="driver-error" data-error-for="name">{% if form.name.errors %}{{ form.name.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="driver-label" for="{{ form.contact_person.id_for_label }}">Contact Person</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">person</span>
+                {{ form.contact_person }}
+            </div>
+            <p class="driver-error" data-error-for="contact_person">{% if form.contact_person.errors %}{{ form.contact_person.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="driver-label" for="{{ form.phone.id_for_label }}">Phone</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">call</span>
+                {{ form.phone }}
+            </div>
+            <p class="driver-error" data-error-for="phone">{% if form.phone.errors %}{{ form.phone.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="driver-label" for="{{ form.email.id_for_label }}">Email</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">mail</span>
+                {{ form.email }}
+            </div>
+            <p class="driver-error" data-error-for="email">{% if form.email.errors %}{{ form.email.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="driver-label" for="{{ form.address.id_for_label }}">Address</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">location_on</span>
+                {{ form.address }}
+            </div>
+            <p class="driver-error" data-error-for="address">{% if form.address.errors %}{{ form.address.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>

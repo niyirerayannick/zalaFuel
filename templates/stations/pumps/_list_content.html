@@ -1,0 +1,79 @@
+<div class="overflow-x-auto w-full">
+    <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Pump</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Station</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Tank</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Nozzles</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Fuel Types</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for pump in pumps %}
+            <tr class="hover:bg-slate-50/80 transition">
+                <td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ pump.label }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ pump.station.name }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{% if pump.tank %}{{ pump.tank.name }}{% else %}—{% endif %}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ pump.nozzles.count }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">
+                    {% if pump.nozzles.all %}
+                        {% for n in pump.nozzles.all %}
+                            <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-700">
+                                {{ n.get_fuel_type_display }}
+                            </span>
+                        {% empty %}{% endfor %}
+                    {% else %}
+                        <span class="text-xs text-slate-400">—</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    {% if pump.is_active %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">Inactive</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-600">
+                    <div class="flex flex-wrap gap-2">
+                        <button data-edit-url="{% url 'stations:pumps-update' pump.pk %}" class="pump-edit-btn rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+                        <button data-delete-url="{% url 'stations:pumps-delete' pump.pk %}" class="pump-delete-btn rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-50">Delete</button>
+                        <button type="button" class="pump-nozzles-toggle rounded-lg border border-[#0f7ea6] px-3 py-1.5 text-xs font-semibold text-[#0f7ea6] hover:bg-[#0f7ea6]/10" data-target="#nozzles-{{ pump.id }}">View Nozzles</button>
+                        <button type="button" class="nozzle-add-btn rounded-lg border border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50" data-add-url="{% url 'stations:nozzles-create' %}?pump={{ pump.id }}">Add Nozzle</button>
+                    </div>
+                </td>
+            </tr>
+            <tr id="nozzles-{{ pump.id }}" class="hidden bg-slate-50">
+                <td colspan="7" class="px-6 py-4">
+                    {% if pump.nozzles.all %}
+                        <div class="space-y-2">
+                            {% for noz in pump.nozzles.all %}
+                                <div class="rounded-xl border border-slate-200 bg-white px-4 py-3 flex flex-wrap items-center gap-3">
+                                    <span class="text-sm font-semibold text-slate-900">{{ noz.get_fuel_type_display }}</span>
+                                    <span class="text-xs text-slate-500">Tank: {{ noz.tank.name|default:"—" }}</span>
+                                    <span class="text-xs text-slate-500">Meter: {{ noz.meter_start }} → {{ noz.meter_end }}</span>
+                                    <span class="text-xs text-slate-500">Status: {{ noz.is_active|yesno:"Active,Inactive" }}</span>
+                                    <div class="ml-auto flex gap-2">
+                                        <button data-edit-url="{% url 'stations:nozzles-update' noz.pk %}" class="nozzle-edit-btn rounded-lg border border-slate-200 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+                                        <button data-delete-url="{% url 'stations:nozzles-delete' noz.pk %}" class="nozzle-delete-btn rounded-lg border border-rose-200 px-2.5 py-1 text-[11px] font-semibold text-rose-700 hover:bg-rose-50">Delete</button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-sm text-slate-500">No nozzles registered for this pump.</p>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500">
+                    No pumps found. Add your first pump to get started.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

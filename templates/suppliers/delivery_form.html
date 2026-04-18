@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div class="rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-emerald-50 p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">Receiving</p>
+        <h1 class="mt-1 text-2xl font-bold text-slate-900">{{ title }}</h1>
+        <p class="mt-1 text-sm text-slate-600">Capture the supplier receipt first, then use the Post Receipt action to increase tank stock and create an inventory move.</p>
+    </div>
+
+    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 shadow-sm">
+        Tank quantity does not increase when this draft is saved. Stock moves only when the receipt is posted after validation.
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <div class="grid gap-5 md:grid-cols-2">
+            {% for field in form %}
+            <div class="{% if field.name == 'notes' %}md:col-span-2{% endif %}">
+                <label for="{{ field.id_for_label }}" class="mb-2 block text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="text-rose-500">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}<p class="mt-1 text-xs text-slate-500">{{ field.help_text }}</p>{% endif %}
+                {% if field.errors %}<p class="mt-1 text-xs text-rose-600">{{ field.errors.0 }}</p>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mt-6 flex items-center justify-end gap-3">
+            <a href="{% url 'suppliers:deliveries' %}" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</a>
+            <button type="submit" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">Save Delivery</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const purchaseOrder = document.getElementById('id_purchase_order');
+    const tank = document.getElementById('id_tank');
+    if (!purchaseOrder || !tank) return;
+
+    async function reloadTanks() {
+        const poId = purchaseOrder.value;
+        if (!poId) {
+            tank.innerHTML = '<option value="">Select tank</option>';
+            return;
+        }
+        try {
+            const response = await fetch(`/suppliers/api/purchase-orders/${poId}/tanks/`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            const current = tank.value;
+            tank.innerHTML = '<option value="">Select tank</option>';
+            (payload.results || []).forEach(function (row) {
+                const option = document.createElement('option');
+                option.value = row.id;
+                option.textContent = row.label;
+                if (String(row.id) === String(current)) {
+                    option.selected = true;
+                }
+                tank.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Failed to load tanks for purchase order', error);
+        }
+    }
+
+    purchaseOrder.addEventListener('change', reloadTanks);
+    reloadTanks();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ owner.name }} | Car Owner | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <section class="rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 sm:p-6 shadow-sm">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-start gap-4">
+                <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-green-700 to-green-600 text-white flex items-center justify-center shadow-md shadow-green-700/20">
+                    <span class="material-symbols-outlined text-[24px] leading-none">person</span>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fleet Management</p>
+                    <h1 class="mt-1 text-2xl font-bold text-slate-900">{{ owner.name }}</h1>
+                    <p class="mt-1 text-sm text-slate-600">External vehicle owner profile and linked fleet units.</p>
+                </div>
+            </div>
+            <a href="{% url 'transport:vehicles:owner-list' %}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+                <span class="material-symbols-outlined text-[18px] leading-none">arrow_back</span>
+                Back
+            </a>
+        </div>
+    </section>
+
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Vehicles</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ total_vehicles }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Available</p>
+            <p class="mt-2 text-2xl font-bold text-green-700">{{ available_vehicles }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Assigned</p>
+            <p class="mt-2 text-2xl font-bold text-amber-700">{{ assigned_vehicles }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Maintenance</p>
+            <p class="mt-2 text-2xl font-bold text-red-700">{{ maintenance_vehicles }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm lg:col-span-1">
+            <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/80">
+                <h2 class="text-sm font-semibold text-slate-900">Owner Information</h2>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Phone</p>
+                    <p class="mt-1 text-sm text-slate-900">{{ owner.phone|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Bank Name</p>
+                    <p class="mt-1 text-sm text-slate-900">{{ owner.bank_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Bank Account</p>
+                    <p class="mt-1 text-sm text-slate-900">{{ owner.bank_account|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Created</p>
+                    <p class="mt-1 text-sm text-slate-900">{{ owner.created_at|date:"d M Y H:i" }}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm lg:col-span-2 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/80">
+                <h2 class="text-sm font-semibold text-slate-900">Linked Vehicles</h2>
+            </div>
+            {% if vehicles %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Vehicle</th>
+                            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Type</th>
+                            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Load Capacity</th>
+                            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        {% for vehicle in vehicles %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-5 py-4 text-sm font-semibold text-slate-900">{{ vehicle.plate_number }}</td>
+                            <td class="px-5 py-4 text-sm text-slate-700">{{ vehicle.get_vehicle_type_display }}</td>
+                            <td class="px-5 py-4 text-sm text-slate-700">{{ vehicle.load_capacity|floatformat:1 }} tons</td>
+                            <td class="px-5 py-4">
+                                <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold {% if vehicle.status == 'AVAILABLE' %}bg-green-100 text-green-700{% elif vehicle.status == 'ASSIGNED' %}bg-amber-100 text-amber-700{% elif vehicle.status == 'MAINTENANCE' %}bg-red-100 text-red-700{% else %}bg-slate-100 text-slate-700{% endif %}">
+                                    {{ vehicle.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-4">
+                                <a href="{% url 'transport:vehicles:detail' vehicle.pk %}" class="inline-flex items-center rounded-md border border-slate-300 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">View Vehicle</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-10 text-center">
+                <p class="text-sm font-medium text-slate-800">No vehicles linked yet.</p>
+                <p class="mt-1 text-sm text-slate-500">Vehicles assigned to this owner will appear here.</p>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

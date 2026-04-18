@@ -1,0 +1,143 @@
+{% load currency_tags %}
+
+<div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Total Customers</p>
+            <span class="material-symbols-outlined text-[18px] text-green-700">groups</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-slate-900">{{ total_customers|default:0 }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Active</p>
+            <span class="material-symbols-outlined text-[18px] text-emerald-700">check_circle</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-emerald-700">{{ active_customers|default:0 }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Inactive</p>
+            <span class="material-symbols-outlined text-[18px] text-amber-600">pause_circle</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-amber-700">{{ inactive_customers|default:0 }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Revenue</p>
+            <span class="material-symbols-outlined text-[18px] text-slate-500">payments</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-slate-900">{{ total_revenue|default:0|currency }}</p>
+    </div>
+</div>
+
+<div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-5 py-4">
+        <h2 class="text-sm font-semibold text-slate-900">Filter Customers</h2>
+    </div>
+    <form method="get" class="p-5">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div>
+                <label for="search" class="block text-xs font-medium uppercase tracking-wide text-slate-600">Search</label>
+                <input type="text" name="search" id="search" value="{{ request.GET.search }}" placeholder="Search by name, contact, or email..." class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+            </div>
+            <div>
+                <label for="status" class="block text-xs font-medium uppercase tracking-wide text-slate-600">Status</label>
+                <select name="status" id="status" class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+                    <option value="">All Statuses</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-end gap-3">
+                <button type="submit" class="w-full rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-800">Apply</button>
+                <a href="{% url 'transport:customers:list' %}" class="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Clear</a>
+            </div>
+        </div>
+    </form>
+    <div class="border-t border-slate-200 px-5 py-4 flex flex-wrap items-center justify-end gap-3 bg-slate-50/60">
+        <a href="{% url 'transport:customers:export-pdf' %}?{{ request.GET.urlencode }}" class="inline-flex items-center rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100">Export PDF</a>
+        <a href="{% url 'transport:customers:export-excel' %}?{{ request.GET.urlencode }}" class="inline-flex items-center rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100">Export Excel</a>
+    </div>
+</div>
+
+<div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-5 py-4">
+        <h2 class="text-sm font-semibold text-slate-900">Customers Directory</h2>
+    </div>
+    {% if customers %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Customer</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Contact</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Address</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Created</th>
+                    <th class="px-5 py-3"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                {% for customer in customers %}
+                <tr class="transition-colors hover:bg-slate-50">
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-11 w-11 items-center justify-center rounded-full bg-green-100 text-sm font-semibold text-green-700">
+                                {{ customer.company_name|first|upper }}
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">{{ customer.company_name }}</p>
+                                <p class="text-xs text-slate-500">Customer ID #{{ customer.pk }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4">
+                        <p class="text-sm text-slate-900">{{ customer.contact_person|default:"No contact person" }}</p>
+                        <p class="text-xs text-slate-500">{{ customer.phone|default:"No phone" }}</p>
+                        <p class="text-xs text-slate-500">{{ customer.email|default:"No email" }}</p>
+                    </td>
+                    <td class="px-5 py-4">
+                        <p class="text-sm text-slate-700">{{ customer.address|default:"No address provided"|truncatechars:50 }}</p>
+                    </td>
+                    <td class="px-5 py-4">
+                        {% if customer.status == 'ACTIVE' %}
+                        <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">Active</span>
+                        {% elif customer.status == 'INACTIVE' %}
+                        <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">Inactive</span>
+                        {% else %}
+                        <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800">Suspended</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-5 py-4 text-sm text-slate-700">{{ customer.created_at|date:"M j, Y" }}</td>
+                    <td class="px-5 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <a href="{% url 'transport:customers:detail' customer.pk %}" class="inline-flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-800 transition hover:border-green-300 hover:bg-green-100">
+                                <span class="material-symbols-outlined text-[15px] leading-none">visibility</span>
+                                View
+                            </a>
+                            {% if request.user.role != 'driver' %}
+                            <button type="button" class="customer-edit-btn inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50" data-edit-url="{% url 'transport:customers:edit' customer.pk %}">
+                                <span class="material-symbols-outlined text-[15px] leading-none">edit</span>
+                                Edit
+                            </button>
+                            <button type="button" class="inline-flex cursor-not-allowed items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-400" title="Delete is not available in the current backend flow">
+                                <span class="material-symbols-outlined text-[15px] leading-none">delete</span>
+                                Delete
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="p-10 text-center">
+        <p class="text-sm font-medium text-slate-800">No customers found.</p>
+        <p class="mt-1 text-sm text-slate-500">Use Add Customer to create your first customer profile.</p>
+    </div>
+    {% endif %}
+</div>

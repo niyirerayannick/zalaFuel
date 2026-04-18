@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-slate-900">Support</h1>
+        <p class="mt-1 text-sm text-slate-500">Reply to active conversations and start a new chat only when you need to.</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+        <div class="rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Support Chats</p>
+                    <h2 class="mt-1 text-lg font-semibold text-slate-900">Conversations</h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">{{ support_user_total }} chats</span>
+                    <button
+                        type="button"
+                        id="support-picker-open"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-700 text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800"
+                        aria-label="Start a new chat"
+                    >
+                        <span class="material-symbols-outlined text-[20px] leading-none">add</span>
+                    </button>
+                </div>
+            </div>
+            <div class="space-y-3 p-5">
+                {% for item in support_user_cards %}
+                <a href="?user={{ item.user.pk }}" class="flex items-center justify-between rounded-2xl border px-4 py-3 transition {% if item.unread_count %}border-green-200 bg-green-50/90{% elif selected_support_user and selected_support_user.pk == item.user.pk %}border-green-200 bg-green-50{% else %}border-slate-200 bg-white hover:border-green-200 hover:bg-green-50/60{% endif %}">
+                    <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <p class="font-semibold text-slate-900">{{ item.user.full_name|default:item.user.email }}</p>
+                            <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">{{ item.role_label }}</span>
+                            {% if item.unread_count %}
+                            <span class="rounded-full bg-green-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">Needs reply</span>
+                            {% elif item.has_conversation %}
+                            <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Answered</span>
+                            {% endif %}
+                        </div>
+                        <p class="truncate text-xs text-slate-500">{{ item.contact }}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        {% if item.unread_count %}
+                        <span class="rounded-full bg-green-700 px-2 py-0.5 text-[10px] font-semibold text-white">{{ item.unread_count }} unread</span>
+                        {% endif %}
+                        <span class="material-symbols-outlined {% if item.unread_count %}text-green-700{% else %}text-slate-400{% endif %}">chat</span>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center">
+                    <p class="text-sm font-medium text-slate-900">No active conversations yet.</p>
+                    <p class="mt-1 text-sm text-slate-500">Use the plus button to choose a user and start a chat.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Conversation</p>
+                    <h2 class="mt-1 text-lg font-semibold text-slate-900">{% if selected_support_user %}{{ selected_support_user.full_name|default:selected_support_user.email }}{% else %}Select a user{% endif %}</h2>
+                </div>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{{ support_message_unread }} unread</span>
+            </div>
+            <div class="p-5">
+                {% if selected_support_user %}
+                <div class="mb-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                    <p class="font-medium text-slate-900">{{ selected_support_user.full_name|default:selected_support_user.email }}</p>
+                    <p class="mt-1 text-xs text-slate-500">{{ selected_support_user.phone|default:selected_support_user.email }}</p>
+                </div>
+
+                <div class="space-y-3">
+                    {% for message in support_messages %}
+                    <div class="flex {% if message.sender_id == request.user.id %}justify-end{% else %}justify-start{% endif %}">
+                        <div class="max-w-[85%] rounded-2xl border px-4 py-3 {% if message.sender_id == request.user.id %}border-green-700 bg-green-700 text-white{% elif message.was_unread %}border-green-200 bg-green-50 text-slate-900{% else %}border-slate-200 bg-slate-100 text-slate-900{% endif %}">
+                            <p class="text-sm">{{ message.body }}</p>
+                            <p class="mt-2 text-xs {% if message.sender_id == request.user.id %}text-green-100{% elif message.was_unread %}text-green-700{% else %}text-slate-500{% endif %}">
+                                {{ message.sender.full_name|default:message.sender.email }} - {{ message.created_at|date:"d M Y H:i" }}
+                            </p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-sm text-slate-500">No messages in this conversation yet. Send the first message below.</p>
+                    {% endfor %}
+                </div>
+
+                <form method="post" action="{% url 'transport:analytics:driver-message-send' %}" class="mt-5 space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ selected_support_user.pk }}">
+                    <input type="hidden" name="range" value="{{ current_range|default:'month' }}">
+                    <div>
+                        <label for="{{ support_message_form.body.id_for_label }}" class="block text-sm font-medium text-slate-700">Message {{ selected_support_user.full_name|default:selected_support_user.email }}</label>
+                        <div class="mt-2">
+                            {{ support_message_form.body }}
+                        </div>
+                        {% if support_message_form.body.errors %}<p class="mt-1 text-xs text-red-600">{{ support_message_form.body.errors.0 }}</p>{% endif %}
+                    </div>
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                        <span class="material-symbols-outlined text-[18px] leading-none">send</span>
+                        Send Message
+                    </button>
+                </form>
+                {% else %}
+                <p class="text-sm text-slate-500">Choose a conversation or use the plus button to start chatting with a user.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="support-picker-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<div id="support-picker-modal" class="fixed inset-x-4 top-[8%] z-50 hidden mx-auto w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
+    <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Start Chat</p>
+            <h2 class="mt-1 text-lg font-semibold text-slate-900">Choose a user</h2>
+        </div>
+        <button type="button" id="support-picker-close" class="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Close">
+            <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+        </button>
+    </div>
+    <div class="max-h-[70vh] overflow-y-auto p-5">
+        <div class="mb-4 flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
+            <p class="text-sm text-slate-600">Select who you want to message.</p>
+            <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">{{ support_available_total }} users</span>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+            {% for item in support_available_users %}
+            <a href="?user={{ item.user.pk }}" class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 transition hover:border-green-200 hover:bg-green-50/60">
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <p class="font-semibold text-slate-900">{{ item.user.full_name|default:item.user.email }}</p>
+                        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">{{ item.role_label }}</span>
+                        {% if item.has_conversation %}
+                        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Existing chat</span>
+                        {% endif %}
+                    </div>
+                    <p class="truncate text-xs text-slate-500">{{ item.contact }}</p>
+                </div>
+                <span class="material-symbols-outlined text-green-700">chat</span>
+            </a>
+            {% empty %}
+            <p class="text-sm text-slate-500">No active users are available for support messaging.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const openBtn = document.getElementById('support-picker-open');
+    const closeBtn = document.getElementById('support-picker-close');
+    const overlay = document.getElementById('support-picker-overlay');
+    const modal = document.getElementById('support-picker-modal');
+
+    if (!openBtn || !closeBtn || !overlay || !modal) {
+        return;
+    }
+
+    function openModal() {
+        overlay.classList.remove('hidden');
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeModal() {
+        overlay.classList.add('hidden');
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
+});
+</script>
+{% endblock %}

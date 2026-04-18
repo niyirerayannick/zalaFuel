@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Driver Fees | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">Driver Fees</h1>
+            <p class="mt-1 text-sm text-slate-500">Track payout entries linked to completed trips.</p>
+        </div>
+        {% if can_manage_finance %}
+        <a href="{% url 'transport:finance:driverfee-create' %}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-800">
+            <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+            Add Driver Fee
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+                <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    <tr>
+                        <th class="px-5 py-3">Date</th>
+                        <th class="px-5 py-3">Driver</th>
+                        <th class="px-5 py-3">Trip</th>
+                        <th class="px-5 py-3">Status</th>
+                        <th class="px-5 py-3 text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for fee in driver_fees %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-5 py-4">{{ fee.fee_date|date:"d M Y" }}</td>
+                        <td class="px-5 py-4 font-medium text-slate-900">{{ fee.driver.name }}</td>
+                        <td class="px-5 py-4 text-slate-600">{{ fee.trip.order_number }}</td>
+                        <td class="px-5 py-4">
+                            <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {% if fee.payment_status == 'PAID' %}bg-green-100 text-green-700{% else %}bg-amber-100 text-amber-700{% endif %}">{{ fee.get_payment_status_display }}</span>
+                        </td>
+                        <td class="px-5 py-4 text-right font-semibold text-slate-900">{{ fee.amount|currency }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="px-5 py-8 text-center text-slate-500">No driver fees recorded yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

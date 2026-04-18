@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}{{ station.name }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{% url 'transport:fuel:station-list' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 transition">
+            <svg class="-ml-1 mr-1 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Back to Fuel Stations
+        </a>
+    </div>
+
+    <!-- Page Header -->
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center">
+            <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+            </div>
+            <div class="ml-4">
+                <h1 class="text-2xl font-bold text-gray-900">{{ station.name }}</h1>
+                <div class="flex items-center gap-3 mt-1">
+                    {% if station.location %}<span class="text-sm text-gray-500">{{ station.location }}</span>{% endif %}
+                    {% if station.is_active %}
+                    <span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                    {% else %}
+                    <span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <a href="{% url 'transport:fuel:station-edit' station.pk %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Edit
+            </a>
+            <a href="{% url 'transport:fuel:station-delete' station.pk %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-white border border-red-300 rounded-md hover:bg-red-50 transition">
+                <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Delete
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white shadow rounded-lg p-4 text-center">
+            <p class="text-sm text-gray-500">Total Entries</p>
+            <p class="text-2xl font-bold text-gray-900">{{ entry_count }}</p>
+        </div>
+        <div class="bg-white shadow rounded-lg p-4 text-center">
+            <p class="text-sm text-gray-500">Total Liters</p>
+            <p class="text-2xl font-bold text-blue-700">{{ total_liters|floatformat:0 }} L</p>
+        </div>
+        <div class="bg-white shadow rounded-lg p-4 text-center">
+            <p class="text-sm text-gray-500">Total Cost</p>
+            <p class="text-2xl font-bold text-red-700">{{ total_cost|currency }}</p>
+        </div>
+        <div class="bg-white shadow rounded-lg p-4 text-center">
+            <p class="text-sm text-gray-500">Avg Price/L</p>
+            <p class="text-2xl font-bold text-amber-700">{{ avg_price|currency }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Station Details -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-5 py-4 border-b border-gray-200">
+                <h3 class="text-base font-semibold text-gray-900">Station Details</h3>
+            </div>
+            <dl class="divide-y divide-gray-100">
+                <div class="px-5 py-3 flex justify-between">
+                    <dt class="text-sm text-gray-500">Name</dt>
+                    <dd class="text-sm font-medium text-gray-900">{{ station.name }}</dd>
+                </div>
+                <div class="px-5 py-3 flex justify-between">
+                    <dt class="text-sm text-gray-500">Location</dt>
+                    <dd class="text-sm font-medium text-gray-900">{{ station.location|default:"-" }}</dd>
+                </div>
+                <div class="px-5 py-3 flex justify-between">
+                    <dt class="text-sm text-gray-500">Contact Person</dt>
+                    <dd class="text-sm font-medium text-gray-900">{{ station.contact_person|default:"-" }}</dd>
+                </div>
+                <div class="px-5 py-3 flex justify-between">
+                    <dt class="text-sm text-gray-500">Phone</dt>
+                    <dd class="text-sm font-medium text-gray-900">{{ station.phone|default:"-" }}</dd>
+                </div>
+                <div class="px-5 py-3 flex justify-between">
+                    <dt class="text-sm text-gray-500">Status</dt>
+                    <dd>
+                        {% if station.is_active %}
+                        <span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                        {% else %}
+                        <span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="px-5 py-3 flex justify-between">
+                    <dt class="text-sm text-gray-500">Added</dt>
+                    <dd class="text-sm text-gray-900">{{ station.created_at|date:"d M Y" }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Recent Fuel Entries -->
+        <div class="lg:col-span-2 bg-white shadow rounded-lg">
+            <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-base font-semibold text-gray-900">Recent Fuel Entries</h3>
+                <span class="text-xs text-gray-500">Last 10</span>
+            </div>
+            {% if recent_entries %}
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Trip</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Liters</th>
+                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Price/L</th>
+                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for entry in recent_entries %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-2 text-sm">
+                            <a href="{% url 'transport:fuel:detail' entry.pk %}" class="text-blue-600 hover:underline">{{ entry.trip.order_number }}</a>
+                        </td>
+                        <td class="px-4 py-2 text-sm text-gray-600">{{ entry.date|date:"d M Y" }}</td>
+                        <td class="px-4 py-2 text-sm text-right text-gray-900">{{ entry.liters|floatformat:1 }}</td>
+                        <td class="px-4 py-2 text-sm text-right text-gray-600">{{ entry.price_per_liter|currency }}</td>
+                        <td class="px-4 py-2 text-sm text-right font-medium text-gray-900">{{ entry.total_cost|currency }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="p-8 text-center text-sm text-gray-500">
+                <svg class="mx-auto h-10 w-10 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                No fuel entries recorded at this station yet
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,173 @@
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">person</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">User Details</h3>
+            <p class="text-xs text-slate-500">Login identity, contact details, and staff reference.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="md:col-span-2">
+            <label for="{{ form.full_name.id_for_label }}" class="driver-label">Full Name <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">badge</span>
+                {{ form.full_name }}
+            </div>
+            <p class="driver-error" data-error-for="full_name">{% if form.full_name.errors %}{{ form.full_name.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.email.id_for_label }}" class="driver-label">Email <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">mail</span>
+                {{ form.email }}
+            </div>
+            <p class="driver-help">Used for email-based login.</p>
+            <p class="driver-error" data-error-for="email">{% if form.email.errors %}{{ form.email.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.phone.id_for_label }}" class="driver-label">Phone</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">call</span>
+                {{ form.phone }}
+            </div>
+            <p class="driver-error" data-error-for="phone">{% if form.phone.errors %}{{ form.phone.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.staff_id.id_for_label }}" class="driver-label">Staff ID</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">qr_code_2</span>
+                {{ form.staff_id }}
+            </div>
+            <p class="driver-error" data-error-for="staff_id">{% if form.staff_id.errors %}{{ form.staff_id.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.profile_photo.id_for_label }}" class="driver-label">Profile Photo</label>
+            <div class="driver-file-shell">
+                <span class="material-symbols-outlined driver-field-icon">photo_camera</span>
+                {{ form.profile_photo }}
+            </div>
+            <p class="driver-error" data-error-for="profile_photo">{% if form.profile_photo.errors %}{{ form.profile_photo.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">admin_panel_settings</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Access & Station</h3>
+            <p class="text-xs text-slate-500">Control system role, station assignment, and account availability.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div>
+            <label for="{{ form.role.id_for_label }}" class="driver-label">Role <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">groups</span>
+                {{ form.role }}
+            </div>
+            <p class="driver-error" data-error-for="role">{% if form.role.errors %}{{ form.role.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.assigned_station.id_for_label }}" class="driver-label">Assigned Station</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">warehouse</span>
+                {{ form.assigned_station }}
+            </div>
+            <p class="driver-help">Required for station staff roles.</p>
+            <p class="driver-error" data-error-for="assigned_station">{% if form.assigned_station.errors %}{{ form.assigned_station.errors.0 }}{% endif %}</p>
+        </div>
+        <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            {{ form.is_active }}
+            <label for="{{ form.is_active.id_for_label }}" class="text-sm font-semibold text-slate-800">Active</label>
+            <p class="text-xs text-slate-500">Inactive users cannot log in.</p>
+        </div>
+        <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            {{ form.is_staff }}
+            <label for="{{ form.is_staff.id_for_label }}" class="text-sm font-semibold text-slate-800">Django Staff</label>
+            <p class="text-xs text-slate-500">Allows Django admin access when permissions allow.</p>
+        </div>
+    </div>
+</section>
+
+{% if form.password1 %}
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">lock</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Temporary Password</h3>
+            <p class="text-xs text-slate-500">User will be required to change this after first login.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div>
+            <label for="{{ form.password1.id_for_label }}" class="driver-label">Password <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">key</span>
+                {{ form.password1 }}
+            </div>
+            <p class="driver-error" data-error-for="password1">{% if form.password1.errors %}{{ form.password1.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.password2.id_for_label }}" class="driver-label">Confirm Password <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">key</span>
+                {{ form.password2 }}
+            </div>
+            <p class="driver-error" data-error-for="password2">{% if form.password2.errors %}{{ form.password2.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">assignment_ind</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Profile Details</h3>
+            <p class="text-xs text-slate-500">Optional supporting staff profile records.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="md:col-span-2">
+            <label for="{{ form.address.id_for_label }}" class="driver-label">Address</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">location_on</span>
+                {{ form.address }}
+            </div>
+            <p class="driver-error" data-error-for="address">{% if form.address.errors %}{{ form.address.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.national_id.id_for_label }}" class="driver-label">National ID</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">badge</span>
+                {{ form.national_id }}
+            </div>
+            <p class="driver-error" data-error-for="national_id">{% if form.national_id.errors %}{{ form.national_id.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.emergency_contact.id_for_label }}" class="driver-label">Emergency Contact</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">contact_phone</span>
+                {{ form.emergency_contact }}
+            </div>
+            <p class="driver-error" data-error-for="emergency_contact">{% if form.emergency_contact.errors %}{{ form.emergency_contact.errors.0 }}{% endif %}</p>
+        </div>
+        <div class="md:col-span-2">
+            <label for="{{ form.license_number.id_for_label }}" class="driver-label">License Number</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">credit_card</span>
+                {{ form.license_number }}
+            </div>
+            <p class="driver-error" data-error-for="license_number">{% if form.license_number.errors %}{{ form.license_number.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>

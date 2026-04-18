@@ -1,0 +1,37 @@
+<form id="shipment-modal-form" method="post" action="{% if editing_shipment %}{% url 'transport:trips:shipment-edit' editing_shipment.pk %}{% else %}{{ request.path }}{% endif %}" class="space-y-5" novalidate>
+    {% csrf_token %}
+    <div id="shipment-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"></div>
+
+    <div>
+        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Order</label>
+        {{ form.order }}
+        <p data-error-for="order" class="mt-1 text-xs text-red-600"></p>
+        {% if form.order.help_text %}<p class="mt-1 text-xs text-slate-500">{{ form.order.help_text }}</p>{% endif %}
+    </div>
+
+    <div id="order-preview" class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+        <p class="font-semibold text-slate-900">Order details</p>
+        <p class="mt-2">Choose an order to view cargo, route, and remaining quantity.</p>
+    </div>
+
+    <div>
+        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">{{ form.weight_kg.label }}</label>
+        {{ form.weight_kg }}
+        <p data-error-for="weight_kg" class="mt-1 text-xs text-red-600"></p>
+        {% if form.weight_kg.help_text %}<p class="mt-1 text-xs text-slate-500">{{ form.weight_kg.help_text }}</p>{% endif %}
+    </div>
+
+    <div>
+        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Carriage Type</label>
+        {{ form.carriage_type }}
+        <p data-error-for="carriage_type" class="mt-1 text-xs text-red-600"></p>
+        {% if form.carriage_type.help_text %}<p class="mt-1 text-xs text-slate-500">{{ form.carriage_type.help_text }}</p>{% endif %}
+    </div>
+
+    <div id="container-number-field">
+        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Container Number</label>
+        {{ form.container_number }}
+        <p data-error-for="container_number" class="mt-1 text-xs text-red-600"></p>
+        {% if form.container_number.help_text %}<p class="mt-1 text-xs text-slate-500">{{ form.container_number.help_text }}</p>{% endif %}
+    </div>
+</form>

@@ -1,0 +1,92 @@
+{% load currency_tags %}
+{% if payments %}
+<div>
+    <table class="w-full divide-y divide-slate-200 table-fixed">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="w-[12%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Date</th>
+                <th class="w-[22%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Trip / Order</th>
+                <th class="w-[22%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Customer</th>
+                <th class="w-[14%] px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Amount</th>
+                <th class="w-[18%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                <th class="w-[12%] px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Action</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for payment in payments %}
+            <tr class="transition-colors hover:bg-slate-50">
+                <td class="px-5 py-4 text-sm text-slate-900">{{ payment.payment_date|date:"M j, Y" }}</td>
+                <td class="px-5 py-4">
+                    {% if payment.trip %}
+                    <a href="{% url 'transport:trips:detail' payment.trip.pk %}" class="block truncate text-sm font-semibold text-slate-900 hover:text-green-700">{{ payment.trip.order_number }}</a>
+                    <p class="truncate text-xs text-slate-500">{{ payment.order.order_number|default:"Trip-linked revenue" }}</p>
+                    {% elif payment.order %}
+                    <a href="{% url 'transport:orders:detail' payment.order.pk %}" class="block truncate text-sm font-semibold text-slate-900 hover:text-green-700">{{ payment.order.order_number }}</a>
+                    <p class="truncate text-xs text-slate-500">Manual order revenue</p>
+                    {% else %}
+                    <p class="truncate text-sm font-semibold text-slate-700">Manual Revenue</p>
+                    <p class="truncate text-xs text-slate-500">Not linked to a trip</p>
+                    {% endif %}
+                </td>
+                <td class="px-5 py-4 text-sm text-slate-700">
+                    {% if payment.customer %}
+                    <span class="block truncate">{{ payment.customer.company_name }}</span>
+                    {% elif payment.trip and payment.trip.customer %}
+                    <span class="block truncate">{{ payment.trip.customer.company_name }}</span>
+                    {% else %}
+                    Unassigned
+                    {% endif %}
+                </td>
+                <td class="px-5 py-4 text-right text-sm font-semibold text-slate-900">{{ payment.amount|currency }}</td>
+                <td class="px-5 py-4">
+                    <div class="flex flex-col items-start gap-1">
+                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold {% if payment.status == 'PAID' %}bg-emerald-100 text-emerald-800{% elif payment.status == 'PARTIAL' %}bg-amber-100 text-amber-800{% elif payment.status == 'FAILED' %}bg-red-100 text-red-800{% else %}bg-slate-100 text-slate-700{% endif %}">
+                            {{ payment.get_status_display }}
+                        </span>
+                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-medium {% if payment.trip %}bg-green-50 text-green-700{% else %}bg-slate-100 text-slate-600{% endif %}">
+                            {% if payment.trip %}Trip Revenue{% else %}Manual Revenue{% endif %}
+                        </span>
+                    </div>
+                </td>
+                <td class="px-5 py-4 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                        <a href="{% url 'transport:finance:payment-detail' payment.pk %}" class="inline-flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-800 transition hover:border-green-300 hover:bg-green-100">
+                            <span class="material-symbols-outlined text-[15px] leading-none">visibility</span>
+                            View
+                        </a>
+                        {% if can_manage_finance %}
+                        <button type="button" class="payment-edit-btn inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50" data-edit-url="{% url 'transport:finance:payment-edit' payment.pk %}">
+                            <span class="material-symbols-outlined text-[15px] leading-none">edit</span>
+                            Edit
+                        </button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="border-t border-slate-200 px-5 py-4">
+    <div class="flex items-center justify-between text-sm text-slate-600">
+        <div>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
+        <div class="flex gap-2">
+            {% if page_obj.has_previous %}
+            <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}" class="payment-pagination-link rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50">Previous</a>
+            {% else %}
+            <span class="cursor-not-allowed rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-400">Previous</span>
+            {% endif %}
+            {% if page_obj.has_next %}
+            <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}" class="payment-pagination-link rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50">Next</a>
+            {% else %}
+            <span class="cursor-not-allowed rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-400">Next</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="p-10 text-center">
+    <p class="text-sm font-medium text-slate-800">No revenue found.</p>
+    <p class="mt-1 text-sm text-slate-500">Use Add Revenue to create your first revenue record.</p>
+</div>
+{% endif %}

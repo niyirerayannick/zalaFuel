@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ station.name }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{% url 'transport:fuel:station-detail' station.pk %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 transition">
+            <svg class="-ml-1 mr-1 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Back to Station Details
+        </a>
+    </div>
+
+    <!-- Page Header -->
+    <div class="mb-6">
+        <div class="flex items-center">
+            <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+            </div>
+            <div class="ml-4">
+                <h1 class="text-2xl font-bold text-gray-900">Edit Fuel Station</h1>
+                <p class="text-sm text-gray-500">Update details for {{ station.name }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white shadow-sm rounded-xl border border-gray-200">
+
+        {% if form.non_field_errors %}
+        <div class="mx-6 mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex">
+                <svg class="h-5 w-5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Please correct the following errors:</h3>
+                    <ul class="mt-1 text-sm text-red-700 list-disc list-inside">
+                        {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+
+            <!-- Section: Station Information -->
+            <div>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold mr-2">1</span>
+                    Station Information
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="id_name" class="block text-sm font-medium text-gray-700">Station Name <span class="text-red-500">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}<p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="id_location" class="block text-sm font-medium text-gray-700">Location / Address</label>
+                        {{ form.location }}
+                        {% if form.location.errors %}<p class="mt-1 text-sm text-red-600">{{ form.location.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Contact Details -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold mr-2">2</span>
+                    Contact Details
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="id_contact_person" class="block text-sm font-medium text-gray-700">Contact Person</label>
+                        {{ form.contact_person }}
+                        {% if form.contact_person.errors %}<p class="mt-1 text-sm text-red-600">{{ form.contact_person.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label for="id_phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}<p class="mt-1 text-sm text-red-600">{{ form.phone.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Status -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold mr-2">3</span>
+                    Status
+                </h3>
+                <div class="flex items-center gap-3">
+                    {{ form.is_active }}
+                    <label for="id_is_active" class="text-sm font-medium text-gray-700">Active station (available for fuel entries)</label>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="border-t border-gray-200 pt-6 flex items-center justify-between">
+                <a href="{% url 'transport:fuel:station-delete' station.pk %}" class="text-sm text-red-600 hover:text-red-800 transition">
+                    Delete this station
+                </a>
+                <div class="flex gap-3">
+                    <a href="{% url 'transport:fuel:station-detail' station.pk %}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shadow-sm transition">
+                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

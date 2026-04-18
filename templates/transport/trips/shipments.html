@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block title %}Shipments | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .shipment-panel {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .shipment-modal-field {
+        width: 100%;
+        min-height: 2.8rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225);
+        background: rgb(248 250 252);
+        color: rgb(15 23 42);
+        transition: all 0.2s ease;
+        padding: 0.78rem 0.95rem;
+    }
+
+    .shipment-modal-field:focus {
+        outline: none;
+        background: white;
+        border-color: rgb(21 128 61);
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+
+    .shipment-modal-error {
+        border-color: rgb(239 68 68) !important;
+        background: rgb(254 242 242) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fleet Operations</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Shipments</h1>
+                <p class="mt-1 text-sm text-slate-600">Prepare cargo units from orders before assigning them to trips.</p>
+            </div>
+            {% if can_create_shipments %}
+            <button type="button" id="shipment-add-new-btn" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                Add Shipment
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="shipment-list-content">
+        {% include "transport/trips/_shipments_list_content.html" %}
+    </div>
+</div>
+
+{% if can_create_shipments %}
+<div id="shipment-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="shipment-panel" class="shipment-panel fixed inset-y-0 right-0 z-50 hidden w-full max-w-xl translate-x-full transform shadow-2xl transition-transform duration-300">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                    <span class="material-symbols-outlined text-[20px] leading-none">inventory_2</span>
+                </div>
+                <div>
+                    <h2 id="shipment-panel-title" class="text-base font-semibold text-slate-900">Add Shipment</h2>
+                    <p id="shipment-panel-subtitle" class="text-xs text-slate-500">Prepare cargo from an existing order.</p>
+                </div>
+            </div>
+            <button type="button" id="shipment-close-btn" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+        <div id="shipment-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+        <div class="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-3 backdrop-blur">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="shipment-cancel-btn" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</button>
+                <button type="button" id="shipment-save-btn" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">Save Shipment</button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if can_create_shipments %}
+{{ orders_payload|json_script:"shipment-orders-data" }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('shipment-add-new-btn');
+    const overlay = document.getElementById('shipment-overlay');
+    const panel = document.getElementById('shipment-panel');
+    const panelBody = document.getElementById('shipment-panel-body');
+    const closeBtn = document.getElementById('shipment-close-btn');
+    const cancelBtn = document.getElementById('shipment-cancel-btn');
+    const saveBtn = document.getElementById('shipment-save-btn');
+    const listContainer = document.getElementById('shipment-list-content');
+    const payloadElement = document.getElementById('shipment-orders-data');
+    const panelTitle = document.getElementById('shipment-panel-title');
+    const panelSubtitle = document.getElementById('shipment-panel-subtitle');
+    const orders = payloadElement ? JSON.parse(payloadElement.textContent || '[]') : [];
+    const ordersById = Object.fromEntries(orders.map(function (order) { return [order.id, order]; }));
+    let currentForm = null;
+
+    if (!addBtn || !overlay || !panel || !panelBody || !saveBtn || !listContainer) {
+        return;
+    }
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(function () {
+            panel.classList.remove('translate-x-full');
+        });
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(function () {
+            overlay.classList.add('hidden');
+            panel.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            if (panelTitle) panelTitle.textContent = 'Add Shipment';
+            if (panelSubtitle) panelSubtitle.textContent = 'Prepare cargo from an existing order.';
+            currentForm = null;
+        }, 220);
+    }
+
+    function styleModalFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden' || el.type === 'checkbox') return;
+            el.classList.add('shipment-modal-field');
+        });
+    }
+
+    function syncOrderPreview(preserveExisting) {
+        const orderSelect = panelBody.querySelector('#id_order');
+        const quantityInput = panelBody.querySelector('#id_weight_kg');
+        const preview = panelBody.querySelector('#order-preview');
+        if (!orderSelect || !preview) return;
+
+        const selected = ordersById[orderSelect.value];
+        if (!selected) {
+            preview.innerHTML = '<p class="font-semibold text-slate-900">Order details</p><p class="mt-2">Choose an order to view cargo, route, and remaining quantity.</p>';
+            if (quantityInput) {
+                quantityInput.removeAttribute('max');
+                quantityInput.setAttribute('placeholder', '0.00');
+                if (!preserveExisting) {
+                    quantityInput.value = '';
+                }
+            }
+            return;
+        }
+
+        preview.innerHTML = `
+            <p class="font-semibold text-slate-900">${selected.order_number}</p>
+            <div class="mt-2 space-y-1 text-xs text-slate-600">
+                <p><span class="font-medium text-slate-700">Customer:</span> ${selected.customer}</p>
+                <p><span class="font-medium text-slate-700">Cargo:</span> ${selected.cargo_category} / ${selected.commodity_type}</p>
+                <p><span class="font-medium text-slate-700">Route:</span> ${selected.route}</p>
+                <p><span class="font-medium text-slate-700">Business Quantity:</span> ${selected.display_business_quantity}</p>
+                <p><span class="font-medium text-slate-700">Order Weight:</span> ${selected.display_total_quantity}</p>
+                <p><span class="font-medium text-slate-700">Remaining Shipment Weight:</span> ${selected.display_remaining_quantity}</p>
+                <p><span class="font-medium text-slate-700">Pickup:</span> ${selected.pickup_address || 'Not provided'}</p>
+                <p><span class="font-medium text-slate-700">Delivery:</span> ${selected.delivery_address || 'Not provided'}</p>
+            </div>
+        `;
+
+        if (quantityInput) {
+            const maxValue = parseFloat((selected.display_remaining_quantity || '0').replace(/,/g, '').split(' ')[0]) || 0;
+            quantityInput.setAttribute('max', maxValue);
+            quantityInput.setAttribute('placeholder', maxValue.toString());
+            if (!preserveExisting || !quantityInput.value) {
+                quantityInput.value = maxValue > 0 ? maxValue.toString() : '';
+            }
+        }
+    }
+
+    function syncContainerField() {
+        const carriageType = panelBody.querySelector('#id_carriage_type');
+        const containerWrapper = panelBody.querySelector('#container-number-field');
+        const containerInput = panelBody.querySelector('#id_container_number');
+        if (!carriageType || !containerWrapper || !containerInput) return;
+
+        const needsContainer = carriageType.value === 'container';
+        containerWrapper.classList.toggle('hidden', !needsContainer);
+        containerInput.required = needsContainer;
+        if (!needsContainer) {
+            containerInput.value = '';
+        }
+    }
+
+    function clearErrors() {
+        const formError = panelBody.querySelector('#shipment-form-error');
+        if (formError) {
+            formError.classList.add('hidden');
+            formError.textContent = '';
+        }
+        panelBody.querySelectorAll('.shipment-modal-error').forEach(function (el) { el.classList.remove('shipment-modal-error'); });
+        panelBody.querySelectorAll('[data-error-for]').forEach(function (el) { el.textContent = ''; });
+    }
+
+    function showErrors(payload) {
+        const formError = panelBody.querySelector('#shipment-form-error');
+        if (payload.non_field_errors && payload.non_field_errors.length && formError) {
+            formError.classList.remove('hidden');
+            formError.textContent = payload.non_field_errors.join(' ');
+        }
+        if (payload.errors) {
+            Object.keys(payload.errors).forEach(function (field) {
+                const input = panelBody.querySelector('#id_' + field);
+                const error = panelBody.querySelector('[data-error-for="' + field + '"]');
+                if (input) input.classList.add('shipment-modal-error');
+                if (error) error.textContent = payload.errors[field].join(' ');
+            });
+        }
+    }
+
+    async function refreshList() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('partial', 'list');
+        const response = await fetch(url.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        listContainer.innerHTML = await response.text();
+    }
+
+    async function loadForm(url, mode) {
+        openPanel();
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        if (panelTitle) panelTitle.textContent = mode === 'edit' ? 'Edit Shipment' : 'Add Shipment';
+        if (panelSubtitle) panelSubtitle.textContent = mode === 'edit' ? 'Update the prepared shipment details.' : 'Prepare cargo from an existing order.';
+        const response = await fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        panelBody.innerHTML = await response.text();
+        currentForm = panelBody.querySelector('#shipment-modal-form');
+        styleModalFields();
+        syncOrderPreview(true);
+        syncContainerField();
+        const orderSelect = panelBody.querySelector('#id_order');
+        const carriageType = panelBody.querySelector('#id_carriage_type');
+        if (orderSelect) {
+            orderSelect.addEventListener('change', function () {
+                syncOrderPreview(false);
+            });
+        }
+        if (carriageType) {
+            carriageType.addEventListener('change', syncContainerField);
+        }
+    }
+
+    addBtn.addEventListener('click', function () {
+        clearErrors();
+        loadForm("{% url 'transport:trips:shipment-list' %}?partial=form", 'create');
+    });
+
+    listContainer.addEventListener('click', function (event) {
+        const inlineAddBtn = event.target.closest('#shipment-add-inline-btn');
+        const editBtn = event.target.closest('.shipment-edit-btn');
+        if (inlineAddBtn) {
+            clearErrors();
+            loadForm("{% url 'transport:trips:shipment-list' %}?partial=form", 'create');
+        }
+        if (editBtn) {
+            clearErrors();
+            loadForm(editBtn.dataset.editUrl, 'edit');
+        }
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !panel.classList.contains('hidden')) {
+            closePanel();
+        }
+    });
+
+    saveBtn.addEventListener('click', async function () {
+        if (!currentForm) return;
+        clearErrors();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        try {
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+            closePanel();
+            await refreshList();
+        } catch (error) {
+            const formError = panelBody.querySelector('#shipment-form-error');
+            if (formError) {
+                formError.classList.remove('hidden');
+                formError.textContent = 'Unable to save the shipment right now. Please try again.';
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Shipment';
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

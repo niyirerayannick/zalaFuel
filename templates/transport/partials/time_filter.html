@@ -1,0 +1,12 @@
+<div class="period-wrap">
+  <select class="period-select" id="periodSelect">
+    <option value="today" {% if selected_range == "today" %}selected{% endif %}>Today</option>
+    <option value="week" {% if selected_range == "week" %}selected{% endif %}>This Week</option>
+    <option value="month" {% if selected_range == "month" or not selected_range %}selected{% endif %}>This Month</option>
+    <option value="year" {% if selected_range == "year" %}selected{% endif %}>This Year</option>
+    <option value="all" {% if selected_range == "all" %}selected{% endif %}>All Time</option>
+  </select>
+  <svg class="period-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <polyline points="6 9 12 15 18 9"/>
+  </svg>
+</div>

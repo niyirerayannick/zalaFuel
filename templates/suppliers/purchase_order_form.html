@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .driver-modal-field,
+    .driver-modal-file {
+        width: 100%; min-height: 2.8rem; border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225); background: rgb(248 250 252); color: rgb(15 23 42);
+        transition: all 0.2s ease;
+    }
+    .driver-modal-field { padding: 0.78rem 0.95rem 0.78rem 2.75rem; }
+    .driver-modal-file { padding: 0.7rem 0.95rem 0.7rem 2.75rem; }
+    .driver-modal-field:focus, .driver-modal-file:focus {
+        outline: none; background: white; border-color: rgb(15 126 166);
+        box-shadow: 0 0 0 3px rgba(15, 126, 166, 0.18), 0 8px 20px rgba(15, 126, 166, 0.08);
+    }
+    .driver-modal-error { border-color: rgb(239 68 68) !important; background: rgb(254 242 242) !important; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important; }
+    .driver-label { display:block; margin-bottom:0.45rem; font-size:0.74rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:rgb(51 65 85); }
+    .driver-error { min-height:1rem; margin-top:0.45rem; font-size:0.75rem; color:rgb(220 38 38); }
+    .driver-input-shell { position: relative; }
+    .driver-input-shell-textarea .driver-field-icon-textarea {
+        top: 0.95rem;
+        transform: none;
+    }
+    .driver-input-shell textarea.driver-modal-field {
+        min-height: 6.5rem;
+        padding-top: 0.85rem;
+        resize: vertical;
+    }
+    .driver-field-icon { position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); color:rgb(100 116 139); font-size:1.05rem; pointer-events:none; transition: color 0.2s ease; }
+    .driver-input-shell:focus-within .driver-field-icon { color: rgb(15 126 166); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div class="rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-cyan-50 p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#0f7ea6]">Procurement</p>
+        <h1 class="mt-1 text-2xl font-bold text-slate-900">{{ title }}</h1>
+        <p class="mt-1 text-sm text-slate-600">Create a fuel order that can later be received into a tank through posted delivery receipts.</p>
+    </div>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div id="po-form-error" class="{% if not form.non_field_errors %}hidden{% endif %} rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+        </div>
+        {% include "suppliers/_purchase_order_form_fields.html" %}
+        <div class="flex items-center justify-end gap-3 pt-2">
+            <a href="{% url 'suppliers:purchase-orders' %}" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</a>
+            <button type="submit" class="rounded-xl bg-[#0f7ea6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0c6d8c]">Save Purchase Order</button>
+        </div>
+    </form>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('input, select, textarea').forEach(function (el) {
+        if (el.type === 'hidden' || el.type === 'checkbox') return;
+        if (el.type === 'file') el.classList.add('driver-modal-file');
+        else el.classList.add('driver-modal-field');
+    });
+});
+</script>
+{% endblock %}

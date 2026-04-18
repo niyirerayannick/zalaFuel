@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Role & Permission Management | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Page Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Role & Permission Management</h1>
+                <p class="mt-2 text-sm text-gray-600">Manage user roles and system permissions</p>
+            </div>
+            <div class="space-x-4">
+                <a href="{% url 'accounts:permission-management' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    Manage Permissions
+                </a>
+                <a href="{% url 'accounts:activity-logs' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                    <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Activity Logs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        {% for role_stat in role_stats %}
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 
+                            {% if role_stat.code == 'superadmin' %}bg-red-500
+                            {% elif role_stat.code == 'admin' %}bg-orange-500
+                            {% elif role_stat.code == 'manager' %}bg-blue-500
+                            {% elif role_stat.code == 'driver' %}bg-green-500
+                            {% elif role_stat.code == 'client' %}bg-purple-500
+                            {% endif %} 
+                            rounded-md flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ role_stat.name }}</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ role_stat.count }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- User Role Management -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">User Role Assignment</h3>
+                <p class="text-sm text-gray-500">Update user roles and privileges</p>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search Users</label>
+                    <input type="text" id="userSearch" placeholder="Search by name or email..." 
+                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div class="space-y-4" id="userList">
+                    {% for user in users %}
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg user-item"
+                         data-name="{{ user.full_name|lower }}" data-email="{{ user.email|lower }}">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                {% if user.profile_photo %}
+                                <img class="h-10 w-10 rounded-full" src="{{ user.profile_photo.url }}" alt="{{ user.full_name }}">
+                                {% else %}
+                                <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                    <span class="text-sm font-medium text-gray-700">{{ user.full_name|slice:":1"|upper }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">{{ user.full_name }}</div>
+                                <div class="text-sm text-gray-500">{{ user.email }}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                {% if user.role == 'superadmin' %}bg-red-100 text-red-800
+                                {% elif user.role == 'admin' %}bg-orange-100 text-orange-800
+                                {% elif user.role == 'manager' %}bg-blue-100 text-blue-800
+                                {% elif user.role == 'driver' %}bg-green-100 text-green-800
+                                {% elif user.role == 'client' %}bg-purple-100 text-purple-800
+                                {% endif %}">
+                                {{ user.get_role_display }}
+                            </span>
+                            {% if user != request.user %}
+                            <button onclick="showRoleModal('{{ user.id }}', '{{ user.full_name }}', '{{ user.role }}')"
+                                    class="text-blue-600 hover:text-blue-500 text-sm font-medium">
+                                Change Role
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Role Changes -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Recent Role Changes</h3>
+                <p class="text-sm text-gray-500">Latest role and permission modifications</p>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for log in recent_role_changes %}
+                <div class="px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-900">{{ log.description }}</p>
+                            <p class="text-xs text-gray-500">by {{ log.user.full_name }}</p>
+                        </div>
+                        <div class="text-xs text-gray-500">{{ log.created_at|timesince }} ago</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="px-6 py-8 text-center">
+                    <p class="text-sm text-gray-500">No recent role changes found</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="px-6 py-3 bg-gray-50">
+                <a href="{% url 'accounts:activity-logs' %}" class="text-sm text-blue-600 hover:text-blue-500">
+                    View all activity logs Ã¢â€ â€™
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Role Change Modal -->
+<div id="roleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <form id="roleForm" method="post" action="">
+                {% csrf_token %}
+                <div class="bg-white px-6 pt-6 pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">
+                                Change User Role
+                            </h3>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-500" id="modalDescription">
+                                    Select a new role for this user.
+                                </p>
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700">New Role</label>
+                                    <select name="role" id="roleSelect" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                        {% for role_code, role_name in role_choices %}
+                                        <option value="{{ role_code }}">{{ role_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-6 py-3 sm:flex sm:flex-row-reverse">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Update Role
+                    </button>
+                    <button type="button" onclick="hideRoleModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// User search functionality
+document.getElementById('userSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const userItems = document.querySelectorAll('.user-item');
+    
+    userItems.forEach(item => {
+        const name = item.getAttribute('data-name');
+        const email = item.getAttribute('data-email');
+        
+        if (name.includes(searchTerm) || email.includes(searchTerm)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+// Role change modal functions
+function showRoleModal(userId, userName, currentRole) {
+    const modal = document.getElementById('roleModal');
+    const form = document.getElementById('roleForm');
+    const title = document.getElementById('modalTitle');
+    const description = document.getElementById('modalDescription');
+    const roleSelect = document.getElementById('roleSelect');
+    
+    form.action = `/accounts/users/${userId}/role/`;
+    title.textContent = `Change Role for ${userName}`;
+    description.textContent = `Current role: ${currentRole}. Select a new role below.`;
+    roleSelect.value = currentRole;
+    
+    modal.classList.remove('hidden');
+}
+
+function hideRoleModal() {
+    document.getElementById('roleModal').classList.add('hidden');
+}
+
+// Close modal on outside click
+document.getElementById('roleModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideRoleModal();
+    }
+});
+</script>
+{% endblock %}

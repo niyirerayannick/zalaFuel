@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Record Expense | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div>
+        <a href="{% url 'transport:finance:expense-list' %}" class="text-sm font-medium text-slate-500 hover:text-slate-700">Back to Expenses</a>
+        <h1 class="mt-3 text-3xl font-bold text-slate-900">Record Expense</h1>
+        <p class="mt-1 text-sm text-slate-500">Capture manual expenses and optionally link them to a trip or vehicle.</p>
+    </div>
+
+    <div class="rounded-[26px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <form method="post" enctype="multipart/form-data" class="divide-y divide-slate-200">
+            {% csrf_token %}
+            <div class="p-6">
+                {% include "transport/finance/_expense_form_fields.html" %}
+            </div>
+            <div class="flex items-center justify-end gap-3 bg-slate-50 px-6 py-4">
+                <a href="{% url 'transport:finance:expense-list' %}" class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</a>
+                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700">Record Expense</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

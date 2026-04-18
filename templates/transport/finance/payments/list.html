@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Revenue | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .payment-panel {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .payment-modal-field {
+        width: 100%;
+        min-height: 2.8rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225);
+        background: rgb(248 250 252);
+        color: rgb(15 23 42);
+        transition: all 0.2s ease;
+        padding: 0.78rem 0.95rem 0.78rem 2.75rem;
+    }
+
+    .payment-modal-field:focus {
+        outline: none;
+        background: white;
+        border-color: rgb(21 128 61);
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+
+    .payment-modal-error {
+        border-color: rgb(239 68 68) !important;
+        background: rgb(254 242 242) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+    }
+
+    select.payment-modal-field {
+        appearance: none;
+        padding-right: 2rem;
+        background-image: linear-gradient(45deg, transparent 50%, rgb(71 85 105) 50%), linear-gradient(135deg, rgb(71 85 105) 50%, transparent 50%);
+        background-position: calc(100% - 18px) 18px, calc(100% - 13px) 18px;
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+    }
+
+    .payment-note-field {
+        padding-top: 0.95rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-[92rem] px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Finance Operations</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Revenue</h1>
+                <p class="mt-1 text-sm text-slate-600">Track trip-linked payments and manual revenue in the same fast workflow.</p>
+            </div>
+            {% if can_manage_finance %}
+            <button type="button" id="payment-add-new-btn" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                Add Revenue
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="payments-list-content">
+        {% include "transport/finance/payments/_list_content.html" %}
+    </div>
+</div>
+
+{% if can_manage_finance %}
+<div id="payment-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="payment-panel" class="payment-panel fixed inset-y-0 right-0 z-50 hidden w-full max-w-2xl translate-x-full transform shadow-2xl transition-transform duration-300">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                    <span class="material-symbols-outlined text-[20px] leading-none">payments</span>
+                </div>
+                <div>
+                    <h2 id="payment-panel-title" class="text-base font-semibold text-slate-900">Add Revenue</h2>
+                    <p id="payment-panel-subtitle" class="text-xs text-slate-500">Capture payment details without leaving the list.</p>
+                </div>
+            </div>
+            <button type="button" id="payment-close-btn" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+        <div id="payment-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+        <div class="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-3 backdrop-blur">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="payment-cancel-btn" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</button>
+                <button type="button" id="payment-save-btn" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">Save Revenue</button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if can_manage_finance %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('payment-add-new-btn');
+    const overlay = document.getElementById('payment-overlay');
+    const panel = document.getElementById('payment-panel');
+    const panelTitle = document.getElementById('payment-panel-title');
+    const panelSubtitle = document.getElementById('payment-panel-subtitle');
+    const panelBody = document.getElementById('payment-panel-body');
+    const closeBtn = document.getElementById('payment-close-btn');
+    const cancelBtn = document.getElementById('payment-cancel-btn');
+    const saveBtn = document.getElementById('payment-save-btn');
+    const listContainer = document.getElementById('payments-list-content');
+    let currentForm = null;
+
+    if (!addBtn || !overlay || !panel || !panelBody || !saveBtn || !listContainer) {
+        return;
+    }
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(function () {
+            panel.classList.remove('translate-x-full');
+        });
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(function () {
+            overlay.classList.add('hidden');
+            panel.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            currentForm = null;
+        }, 220);
+    }
+
+    function styleModalFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden' || el.type === 'checkbox') return;
+            el.classList.add('payment-modal-field');
+            if (el.tagName === 'TEXTAREA') {
+                el.classList.add('payment-note-field');
+            }
+        });
+    }
+
+    function syncPaymentStatusFields() {
+        const statusField = panelBody.querySelector('#id_status');
+        const amountPaidWrap = panelBody.querySelector('#payment-amount-paid-wrap');
+        const failureWrap = panelBody.querySelector('#payment-failure-wrap');
+        const amountPaidField = panelBody.querySelector('#id_amount_paid');
+        const failureField = panelBody.querySelector('#id_failure_reason');
+
+        if (!statusField) return;
+
+        function update() {
+            const status = statusField.value;
+            if (amountPaidWrap) {
+                amountPaidWrap.classList.toggle('hidden', status !== 'PARTIAL');
+            }
+            if (failureWrap) {
+                failureWrap.classList.toggle('hidden', status !== 'FAILED');
+            }
+            if (status !== 'PARTIAL' && amountPaidField) {
+                amountPaidField.value = status === 'PAID' ? panelBody.querySelector('#id_amount')?.value || amountPaidField.value : '';
+            }
+            if (status !== 'FAILED' && failureField) {
+                failureField.value = '';
+            }
+        }
+
+        statusField.addEventListener('change', update);
+        update();
+    }
+
+    function clearErrors() {
+        const formError = panelBody.querySelector('#payment-form-error');
+        if (formError) {
+            formError.classList.add('hidden');
+            formError.textContent = '';
+        }
+        panelBody.querySelectorAll('[data-error-for]').forEach(function (el) {
+            el.textContent = '';
+        });
+        panelBody.querySelectorAll('.payment-modal-error').forEach(function (el) {
+            el.classList.remove('payment-modal-error');
+        });
+    }
+
+    function showErrors(payload) {
+        const formError = panelBody.querySelector('#payment-form-error');
+        if (payload.non_field_errors && payload.non_field_errors.length && formError) {
+            formError.classList.remove('hidden');
+            formError.textContent = payload.non_field_errors.join(' ');
+        }
+        if (payload.errors) {
+            Object.keys(payload.errors).forEach(function (field) {
+                const input = panelBody.querySelector('#id_' + field);
+                const error = panelBody.querySelector('[data-error-for="' + field + '"]');
+                if (input) input.classList.add('payment-modal-error');
+                if (error) error.textContent = payload.errors[field].join(' ');
+            });
+        }
+    }
+
+    async function refreshList() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('partial', 'list');
+        const response = await fetch(url.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        listContainer.innerHTML = await response.text();
+    }
+
+    async function loadForm(url, title, subtitle, submitLabel) {
+        openPanel();
+        panelTitle.textContent = title;
+        panelSubtitle.textContent = subtitle;
+        saveBtn.textContent = submitLabel;
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        const separator = url.includes('?') ? '&' : '?';
+        const response = await fetch(url + separator + 'partial=form', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        panelBody.innerHTML = await response.text();
+        currentForm = panelBody.querySelector('#payment-modal-form');
+        styleModalFields();
+        syncPaymentStatusFields();
+    }
+
+    addBtn.addEventListener('click', function () {
+        clearErrors();
+        loadForm("{% url 'transport:finance:payment-create' %}", 'Add Revenue', 'Capture payment details without leaving the list.', 'Save Revenue');
+    });
+
+    listContainer.addEventListener('click', function (event) {
+        const editBtn = event.target.closest('.payment-edit-btn');
+        if (editBtn) {
+            event.preventDefault();
+            clearErrors();
+            loadForm(editBtn.dataset.editUrl, 'Edit Revenue', 'Update payment details and keep the list in sync.', 'Update Revenue');
+            return;
+        }
+
+        const paginationLink = event.target.closest('.payment-pagination-link');
+        if (paginationLink) {
+            event.preventDefault();
+            const url = new URL(paginationLink.href, window.location.origin);
+            url.searchParams.set('partial', 'list');
+            fetch(url.toString(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(function (response) { return response.text(); })
+                .then(function (html) {
+                    listContainer.innerHTML = html;
+                    window.history.replaceState({}, '', paginationLink.href);
+                });
+        }
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !panel.classList.contains('hidden')) {
+            closePanel();
+        }
+    });
+
+    saveBtn.addEventListener('click', async function () {
+        if (!currentForm) return;
+        clearErrors();
+        saveBtn.disabled = true;
+        const originalLabel = saveBtn.textContent;
+        saveBtn.textContent = originalLabel.includes('Update') ? 'Updating...' : 'Saving...';
+
+        try {
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+            closePanel();
+            await refreshList();
+        } catch (error) {
+            const formError = panelBody.querySelector('#payment-form-error');
+            if (formError) {
+                formError.classList.remove('hidden');
+                formError.textContent = 'Unable to save the revenue entry right now. Please try again.';
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalLabel;
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,531 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}{{ vehicle.plate_number }} | Fleet Details | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{% url 'transport:vehicles:list' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 transition">
+            <svg class="-ml-1 mr-1 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Back to Fleet
+        </a>
+    </div>
+
+    <!-- Vehicle Header -->
+    <div class="bg-white shadow-sm rounded-xl border border-gray-200 mb-8">
+        <div class="p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex items-center">
+                    <div class="h-14 w-14 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/20">
+                        <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM21 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5">
+                        <h1 class="text-2xl font-bold text-gray-900">{{ vehicle.plate_number }}</h1>
+                        <div class="flex items-center mt-1 space-x-3">
+                            <span class="text-sm text-gray-500">{{ vehicle.get_vehicle_type_display }} &bull; Load Capacity: {{ vehicle.capacity|floatformat:1 }} tons</span>
+                            <span class="inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full
+                                {% if vehicle.status == 'AVAILABLE' %}bg-green-100 text-green-800
+                                {% elif vehicle.status == 'ASSIGNED' %}bg-green-100 text-green-800
+                                {% elif vehicle.status == 'MAINTENANCE' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ vehicle.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% if request.can_manage_fleet %}
+                <div class="mt-4 sm:mt-0 flex space-x-3">
+                    <a href="{% url 'transport:vehicles:edit' vehicle.pk %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition">
+                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Edit Vehicle
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    {% if alerts %}
+    <div class="space-y-3 mb-8">
+        {% for alert in alerts %}
+        <div class="rounded-lg p-4 flex items-start
+            {% if alert.type == 'danger' %}bg-red-50 border border-red-200
+            {% elif alert.type == 'warning' %}bg-amber-50 border border-amber-200
+            {% else %}bg-green-50 border border-green-200{% endif %}">
+            <svg class="w-5 h-5 flex-shrink-0 mt-0.5
+                {% if alert.type == 'danger' %}text-red-500
+                {% elif alert.type == 'warning' %}text-amber-500
+                {% else %}text-green-500{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <p class="ml-3 text-sm font-medium
+                {% if alert.type == 'danger' %}text-red-800
+                {% elif alert.type == 'warning' %}text-amber-800
+                {% else %}text-green-800{% endif %}">
+                {{ alert.message }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- KPI Cards Row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Total Trips -->
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-5">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-xs text-gray-500 font-medium">Total Trips</p>
+                    <p class="text-xl font-bold text-gray-900">{{ performance_metrics.total_trips }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Distance -->
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-5">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-xs text-gray-500 font-medium">Total Distance</p>
+                    <p class="text-xl font-bold text-gray-900">{{ performance_metrics.total_distance|floatformat:0 }} km</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Revenue -->
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-5">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-xs text-gray-500 font-medium">Revenue</p>
+                    <p class="text-xl font-bold text-gray-900">{{ performance_metrics.total_revenue|currency }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Profit -->
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-5">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-xs text-gray-500 font-medium">Profit</p>
+                    <p class="text-xl font-bold {% if performance_metrics.total_profit >= 0 %}text-green-600{% else %}text-red-600{% endif %}">{{ performance_metrics.total_profit|currency }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Main Content (2/3) -->
+        <div class="lg:col-span-2 space-y-8">
+
+            <!-- Vehicle Details Card -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h2 class="text-lg font-semibold text-gray-900">Vehicle Information</h2>
+                </div>
+                <div class="p-6">
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Plate Number</dt>
+                            <dd class="mt-1 text-sm font-semibold text-gray-900">{{ vehicle.plate_number }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle Model</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ vehicle.vehicle_model|default:"-" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle Type</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ vehicle.get_vehicle_type_display }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Year</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ vehicle.year|default:"-" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Load Capacity</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ vehicle.capacity|floatformat:1 }} tons</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Ownership Type</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ vehicle.get_ownership_type_display }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle Owner</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if vehicle.owner %}
+                                    {{ vehicle.owner.name }}{% if vehicle.owner.phone %} Ã‚Â· {{ vehicle.owner.phone }}{% endif %}
+                                {% else %}
+                                    Company Fleet
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Fuel Type</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ vehicle.get_fuel_type_display|default:vehicle.fuel_type|default:"-" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Engine Capacity</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ vehicle.engine_capacity|default:"-" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Color</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ vehicle.color|default:"-" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Status</dt>
+                            <dd class="mt-1">
+                                <span class="inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full
+                                    {% if vehicle.status == 'AVAILABLE' %}bg-green-100 text-green-800
+                                    {% elif vehicle.status == 'ASSIGNED' %}bg-blue-100 text-blue-800
+                                    {% elif vehicle.status == 'MAINTENANCE' %}bg-red-100 text-red-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ vehicle.get_status_display }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Current Odometer</dt>
+                            <dd class="mt-1 text-sm text-gray-900 tabular-nums">{{ vehicle.current_odometer|floatformat:0 }} km</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Next Service Due</dt>
+                            <dd class="mt-1 text-sm tabular-nums {% if vehicle.current_odometer >= vehicle.next_service_km %}text-red-600 font-semibold{% else %}text-gray-900{% endif %}">
+                                {{ vehicle.next_service_km|floatformat:0 }} km
+                                {% if vehicle.current_odometer < vehicle.next_service_km %}
+                                    <span class="text-xs text-gray-400">({{ vehicle.next_service_km|floatformat:0 }} - {{ vehicle.current_odometer|floatformat:0 }} = {% widthratio vehicle.next_service_km 1 1 as nsk %}{% widthratio vehicle.current_odometer 1 1 as cod %}{{ vehicle.next_service_km|floatformat:0 }} km left)</span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Service Interval</dt>
+                            <dd class="mt-1 text-sm text-gray-900 tabular-nums">Every {{ vehicle.service_interval_km|floatformat:0 }} km</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Last Service At</dt>
+                            <dd class="mt-1 text-sm text-gray-900 tabular-nums">{{ vehicle.last_service_km|floatformat:0 }} km</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Documents & Compliance -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h2 class="text-lg font-semibold text-gray-900">Documents & Compliance</h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Insurance -->
+                        <div class="p-4 rounded-lg border
+                            {% if vehicle.insurance_expiry < today %}border-red-200 bg-red-50
+                            {% elif vehicle.insurance_expiry < warning_date %}border-amber-200 bg-amber-50
+                            {% else %}border-green-200 bg-green-50{% endif %}">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-sm font-semibold
+                                    {% if vehicle.insurance_expiry < today %}text-red-800
+                                    {% elif vehicle.insurance_expiry < warning_date %}text-amber-800
+                                    {% else %}text-green-800{% endif %}">Insurance</h4>
+                                {% if vehicle.insurance_expiry < today %}
+                                <span class="inline-flex px-2 py-0.5 text-xs font-bold rounded bg-red-200 text-red-800">EXPIRED</span>
+                                {% elif vehicle.insurance_expiry < warning_date %}
+                                <span class="inline-flex px-2 py-0.5 text-xs font-bold rounded bg-amber-200 text-amber-800">EXPIRING SOON</span>
+                                {% else %}
+                                <span class="inline-flex px-2 py-0.5 text-xs font-bold rounded bg-green-200 text-green-800">VALID</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-sm
+                                {% if vehicle.insurance_expiry < today %}text-red-700
+                                {% elif vehicle.insurance_expiry < warning_date %}text-amber-700
+                                {% else %}text-green-700{% endif %}">
+                                Expires: <span class="font-medium">{{ vehicle.insurance_expiry|date:"d M Y" }}</span>
+                            </p>
+                        </div>
+
+                        <!-- Inspection -->
+                        <div class="p-4 rounded-lg border
+                            {% if vehicle.inspection_expiry < today %}border-red-200 bg-red-50
+                            {% elif vehicle.inspection_expiry < warning_date %}border-amber-200 bg-amber-50
+                            {% else %}border-green-200 bg-green-50{% endif %}">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-sm font-semibold
+                                    {% if vehicle.inspection_expiry < today %}text-red-800
+                                    {% elif vehicle.inspection_expiry < warning_date %}text-amber-800
+                                    {% else %}text-green-800{% endif %}">Inspection</h4>
+                                {% if vehicle.inspection_expiry < today %}
+                                <span class="inline-flex px-2 py-0.5 text-xs font-bold rounded bg-red-200 text-red-800">EXPIRED</span>
+                                {% elif vehicle.inspection_expiry < warning_date %}
+                                <span class="inline-flex px-2 py-0.5 text-xs font-bold rounded bg-amber-200 text-amber-800">EXPIRING SOON</span>
+                                {% else %}
+                                <span class="inline-flex px-2 py-0.5 text-xs font-bold rounded bg-green-200 text-green-800">VALID</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-sm
+                                {% if vehicle.inspection_expiry < today %}text-red-700
+                                {% elif vehicle.inspection_expiry < warning_date %}text-amber-700
+                                {% else %}text-green-700{% endif %}">
+                                Expires: <span class="font-medium">{{ vehicle.inspection_expiry|date:"d M Y" }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Trips Table -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-gray-900">Recent Trips</h2>
+                    <span class="text-xs text-gray-400">{{ total_trips }} total</span>
+                </div>
+                {% if recent_trips %}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trip #</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Distance</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for trip in recent_trips %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-3 text-sm">
+                                    <a href="{% url 'transport:trips:detail' trip.pk %}" class="font-medium text-blue-600 hover:text-blue-800">{{ trip.order_number }}</a>
+                                </td>
+                                <td class="px-6 py-3 text-sm text-gray-700">{{ trip.customer }}</td>
+                                <td class="px-6 py-3 text-sm">
+                                    <span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full
+                                        {% if trip.status == 'DELIVERED' or trip.status == 'CLOSED' %}bg-green-100 text-green-800
+                                        {% elif trip.status == 'IN_TRANSIT' %}bg-blue-100 text-blue-800
+                                        {% elif trip.status == 'ASSIGNED' %}bg-yellow-100 text-yellow-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ trip.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-3 text-sm text-gray-900 text-right tabular-nums">{{ trip.distance|floatformat:0 }} km</td>
+                                <td class="px-6 py-3 text-sm font-medium text-gray-900 text-right">{{ trip.revenue|currency }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-8 text-center">
+                    <svg class="mx-auto h-10 w-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-500">No trips recorded yet for this vehicle</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Maintenance Records -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-gray-900">Maintenance History</h2>
+                </div>
+                {% if maintenance_records %}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Service Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Workshop</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Odometer</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cost</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Downtime</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for record in maintenance_records %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-3 text-sm font-medium text-gray-900">{{ record.service_type }}</td>
+                                <td class="px-6 py-3 text-sm text-gray-700">{{ record.service_date|date:"d M Y" }}</td>
+                                <td class="px-6 py-3 text-sm text-gray-700">{{ record.workshop }}</td>
+                                <td class="px-6 py-3 text-sm text-gray-900 text-right tabular-nums">{{ record.service_km|floatformat:0 }} km</td>
+                                <td class="px-6 py-3 text-sm font-medium text-gray-900 text-right">{{ record.cost|currency }}</td>
+                                <td class="px-6 py-3 text-sm text-gray-700 text-right">{{ record.downtime_days }} day{{ record.downtime_days|pluralize }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-8 text-center">
+                    <svg class="mx-auto h-10 w-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-500">No maintenance records yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar (1/3) -->
+        <div class="lg:col-span-1 space-y-6">
+
+            <!-- Cost Summary -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-5 py-4">
+                    <h3 class="text-sm font-semibold text-white flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        Cost Summary
+                    </h3>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Revenue</span>
+                        <span class="font-medium text-green-600">{{ performance_metrics.total_revenue|currency }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Total Costs</span>
+                        <span class="font-medium text-red-600">{{ performance_metrics.total_cost|currency }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Fuel Cost</span>
+                        <span class="font-medium text-gray-700">{{ performance_metrics.total_fuel_cost|currency }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Maintenance</span>
+                        <span class="font-medium text-gray-700">{{ total_maintenance_cost|currency }}</span>
+                    </div>
+                    <div class="border-t border-dashed border-gray-200 pt-3 flex justify-between text-sm">
+                        <span class="text-gray-600 font-medium">Net Profit</span>
+                        <span class="font-bold {% if performance_metrics.total_profit >= 0 %}text-green-600{% else %}text-red-600{% endif %}">{{ performance_metrics.total_profit|currency }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Avg Cost/km</span>
+                        <span class="font-medium text-gray-700">{{ performance_metrics.avg_cost_per_km|currency }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fuel & Distance -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-5">
+                <h4 class="text-sm font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
+                    Fuel & Distance
+                </h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Total Fuel Issued</span>
+                        <span class="font-medium text-gray-900">{{ total_fuel_issued|floatformat:1 }} L</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Total Fuel Cost</span>
+                        <span class="font-medium text-gray-900">{{ total_fuel_cost|currency }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Total Distance</span>
+                        <span class="font-medium text-gray-900">{{ performance_metrics.total_distance|floatformat:0 }} km</span>
+                    </div>
+                    {% if performance_metrics.total_distance > 0 and total_fuel_issued > 0 %}
+                    <div class="border-t border-gray-100 pt-3 flex justify-between text-sm">
+                        <span class="text-gray-500">Avg Consumption</span>
+                        <span class="font-medium text-gray-900">Ã¢â‚¬â€</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Service Progress -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-5">
+                <h4 class="text-sm font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Service Progress
+                </h4>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>{{ vehicle.current_odometer|floatformat:0 }} km</span>
+                        <span>{{ vehicle.next_service_km|floatformat:0 }} km</span>
+                    </div>
+                    {% if vehicle.current_odometer >= vehicle.next_service_km %}
+                    <div class="w-full bg-red-200 rounded-full h-2.5">
+                        <div class="bg-red-500 h-2.5 rounded-full" style="width: 100%"></div>
+                    </div>
+                    <p class="text-xs font-medium text-red-600">Service overdue!</p>
+                    {% else %}
+                    {% widthratio vehicle.current_odometer vehicle.next_service_km 100 as pct %}
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-blue-500 h-2.5 rounded-full transition-all" style="width: {{ pct }}%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500">
+                        {% widthratio vehicle.next_service_km 1 1 as next_svc %}
+                        Next service at {{ vehicle.next_service_km|floatformat:0 }} km
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-5">
+                <h4 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Quick Actions
+                </h4>
+                <div class="space-y-2">
+                    {% if request.can_manage_fleet %}
+                    <a href="{% url 'transport:vehicles:edit' vehicle.pk %}" class="flex items-center text-sm text-gray-600 hover:text-blue-600 transition py-1.5">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        Edit Vehicle
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'transport:vehicles:list' %}" class="flex items-center text-sm text-gray-600 hover:text-blue-600 transition py-1.5">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                        Back to Fleet List
+                    </a>
+                    {% if request.can_manage_fleet %}
+                    <a href="{% url 'transport:vehicles:create' %}" class="flex items-center text-sm text-gray-600 hover:text-blue-600 transition py-1.5">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        Add New Vehicle
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-5">
+                <h4 class="text-sm font-semibold text-gray-900 mb-3">Timeline</h4>
+                <div class="text-xs text-gray-500 space-y-2">
+                    <div class="flex justify-between">
+                        <span>Created</span>
+                        <span class="font-medium text-gray-700">{{ vehicle.created_at|date:"d M Y" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Last Updated</span>
+                        <span class="font-medium text-gray-700">{{ vehicle.updated_at|date:"d M Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,229 @@
+{# Shift Information Section #}
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">schedule</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Shift Information</h3>
+            <p class="text-xs text-slate-500">Attendant, station, and timing for this shift.</p>
+        </div>
+        {% if attendant_name %}
+        <span class="ml-auto inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <span class="material-symbols-outlined text-[16px] leading-none">person</span>
+            {{ attendant_name }}
+        </span>
+        {% endif %}
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        {% if form.station %}
+        <div>
+            <label class="driver-label" for="{{ form.station.id_for_label }}">Station</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">warehouse</span>
+                {{ form.station }}
+            </div>
+            <p class="driver-error" data-error-for="station">{% if form.station.errors %}{{ form.station.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+
+        {% if form.attendant %}
+        <div id="shift-attendant-field" data-attendants-url="{% url 'sales:api-station-attendants' %}">
+            <label class="driver-label" for="{{ form.attendant.id_for_label }}">Attendant</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">badge</span>
+                {{ form.attendant }}
+            </div>
+            <p id="shift-attendant-empty" class="driver-help hidden">No active attendants are assigned to this station.</p>
+            <p class="driver-error" data-error-for="attendant">{% if form.attendant.errors %}{{ form.attendant.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+
+        {% if form.shift_type %}
+        <div>
+            <label class="driver-label" for="{{ form.shift_type.id_for_label }}">Shift Type</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">timelapse</span>
+                {{ form.shift_type }}
+            </div>
+            <p class="driver-error" data-error-for="shift_type">{% if form.shift_type.errors %}{{ form.shift_type.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+
+        {% if form.status %}
+        <div>
+            <label class="driver-label" for="{{ form.status.id_for_label }}">Status</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">radio_button_checked</span>
+                {{ form.status }}
+            </div>
+            <p class="driver-error" data-error-for="status">{% if form.status.errors %}{{ form.status.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+
+        {% if form.opened_at %}
+        <div>
+            <label class="driver-label" for="{{ form.opened_at.id_for_label }}">Start Time</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">schedule</span>
+                {{ form.opened_at }}
+            </div>
+            <p class="driver-error" data-error-for="opened_at">{% if form.opened_at.errors %}{{ form.opened_at.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+
+        {% if form.closed_at %}
+        <div>
+            <label class="driver-label" for="{{ form.closed_at.id_for_label }}">End Time</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">schedule</span>
+                {{ form.closed_at }}
+            </div>
+            <p class="driver-error" data-error-for="closed_at">{% if form.closed_at.errors %}{{ form.closed_at.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{# Meter / cash fields #}
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">speed</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Shift Cash & Meter</h3>
+            <p class="text-xs text-slate-500">Opening / closing amounts and readings.</p>
+        </div>
+    </div>
+    <div class="grid gap-4 p-5 md:grid-cols-2">
+        {% if form.opening_cash %}
+        <div>
+            <label class="driver-label" for="{{ form.opening_cash.id_for_label }}">Opening Cash</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">payments</span>
+                {{ form.opening_cash }}
+            </div>
+            <p class="driver-error" data-error-for="opening_cash">{% if form.opening_cash.errors %}{{ form.opening_cash.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+
+        {% if form.station and form.opening_cash %}
+        <div class="md:col-span-2">
+            <div class="rounded-2xl border border-cyan-100 bg-cyan-50/60 p-4">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-900">Opening Readings</h4>
+                        <p class="mt-1 text-xs leading-5 text-slate-600">Select a station to load each nozzle's opening meter. Defaults use the latest closing reading when available.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-cyan-700 shadow-sm">
+                        <span class="material-symbols-outlined text-[15px] leading-none">speed</span>
+                        Nozzles
+                    </span>
+                </div>
+                <div id="shift-opening-readings" data-readings-url="{% url 'sales:api-station-nozzle-readings' %}" class="mt-4 space-y-3">
+                    <p class="rounded-xl border border-dashed border-cyan-200 bg-white/70 px-4 py-3 text-sm text-slate-500">Choose a station to load opening readings.</p>
+                </div>
+                <p class="driver-error" data-error-for="opening_readings"></p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if form.closing_summary %}
+        <div class="md:col-span-2">
+            <label class="driver-label" for="{{ form.closing_summary.id_for_label }}">{{ form.closing_summary.label }}</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">summarize</span>
+                {{ form.closing_summary }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if form.expected_amount %}
+        <div>
+            <label class="driver-label" for="{{ form.expected_amount.id_for_label }}">{{ form.expected_amount.label }}</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">receipt_long</span>
+                {{ form.expected_amount }}
+            </div>
+            <p class="driver-help">Computed from actual sales linked to this shift.</p>
+        </div>
+        {% endif %}
+
+        {% if form.closing_cash %}
+        <div>
+            <label class="driver-label" for="{{ form.closing_cash.id_for_label }}">{{ form.closing_cash.label|default:"Closing Amount" }}</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">payments</span>
+                {{ form.closing_cash }}
+            </div>
+            <p id="shift-variance-preview" class="driver-help">Enter the declared closing amount to calculate variance.</p>
+            <p class="driver-error" data-error-for="closing_cash">{% if form.closing_cash.errors %}{{ form.closing_cash.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+
+        {% if form.cash_amount %}
+        <div>
+            <label class="driver-label" for="{{ form.cash_amount.id_for_label }}">Cash Collected</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">attach_money</span>
+                {{ form.cash_amount }}
+            </div>
+            <p class="driver-error" data-error-for="cash_amount">{% if form.cash_amount.errors %}{{ form.cash_amount.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+        {% if form.momo_amount %}
+        <div>
+            <label class="driver-label" for="{{ form.momo_amount.id_for_label }}">MOMO Collected</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">smartphone</span>
+                {{ form.momo_amount }}
+            </div>
+            <p class="driver-error" data-error-for="momo_amount">{% if form.momo_amount.errors %}{{ form.momo_amount.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+        {% if form.pos_amount %}
+        <div>
+            <label class="driver-label" for="{{ form.pos_amount.id_for_label }}">POS Collected</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">credit_card</span>
+                {{ form.pos_amount }}
+            </div>
+            <p class="driver-error" data-error-for="pos_amount">{% if form.pos_amount.errors %}{{ form.pos_amount.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+        {% if form.credit_amount %}
+        <div>
+            <label class="driver-label" for="{{ form.credit_amount.id_for_label }}">Credit Sales</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">account_balance</span>
+                {{ form.credit_amount }}
+            </div>
+            <p class="driver-error" data-error-for="credit_amount">{% if form.credit_amount.errors %}{{ form.credit_amount.errors.0 }}{% endif %}</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{# Notes #}
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">notes</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Notes</h3>
+            <p class="text-xs text-slate-500">Add context or incidents for this shift.</p>
+        </div>
+    </div>
+    <div class="p-5">
+        {% if form.note %}
+        {{ form.note }}
+        <p class="driver-error" data-error-for="note">{% if form.note.errors %}{{ form.note.errors.0 }}{% endif %}</p>
+        {% endif %}
+        {% if form.closing_note %}
+        {{ form.closing_note }}
+        <p class="driver-error" data-error-for="closing_note">{% if form.closing_note.errors %}{{ form.closing_note.errors.0 }}{% endif %}</p>
+        {% endif %}
+    </div>
+</section>

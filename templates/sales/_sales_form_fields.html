@@ -1,0 +1,281 @@
+{# Shift Information #}
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex items-center gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">schedule</span>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-slate-900">Shift Information</h3>
+                <p class="text-xs text-slate-500">Sale must be attached to an open shift.</p>
+            </div>
+        </div>
+        {% if active_shift %}
+        <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <span class="material-symbols-outlined text-[16px]">check_circle</span>
+            Default Shift #{{ active_shift.id }} · {{ active_shift.station.name }}
+        </span>
+        {% else %}
+        <span class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+            <span class="material-symbols-outlined text-[16px]">warning</span>
+            No open shift
+        </span>
+        {% endif %}
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div>
+            <label class="driver-label">Open Shift <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">schedule</span>
+                <select id="pos-shift" name="shift" class="driver-modal-field">
+                    <option value="">Select open shift</option>
+                    {% for shift in open_shifts %}
+                    <option
+                        value="{{ shift.id }}"
+                        data-station-id="{{ shift.station_id }}"
+                        data-station-name="{{ shift.station.name }}"
+                        data-attendant-name="{{ shift.attendant.full_name|default:shift.attendant }}"
+                        data-shift-type="{{ shift.get_shift_type_display }}"
+                        {% if active_shift and shift.id == active_shift.id %}selected{% endif %}>
+                        Shift #{{ shift.id }} · {{ shift.station.name }} · {{ shift.attendant.full_name|default:shift.attendant }} · {{ shift.get_shift_type_display }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Select the shift that should own this sale.</p>
+            <p class="driver-error" data-error-for="shift"></p>
+        </div>
+        <div>
+            <label class="driver-label">Station <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">warehouse</span>
+                <select id="pos-station" name="station" class="driver-modal-field" disabled>
+                    <option value="">Select station</option>
+                    {% for station in stations %}
+                        <option value="{{ station.id }}" {% if active_shift and station.id == active_shift.station_id %}selected{% endif %}>
+                            {{ station.name }} ({{ station.code }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Auto-filled from the selected shift.</p>
+            <p class="driver-error" data-error-for="station"></p>
+        </div>
+        <div>
+            <label class="driver-label">Attendant <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">person</span>
+                <input type="text" id="pos-attendant" class="driver-modal-field" readonly placeholder="Auto-filled"
+                    value="{% if active_shift %}{{ active_shift.attendant.full_name|default:active_shift.attendant }}{% endif %}">
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Automatically attached from the selected shift.</p>
+        </div>
+        <div>
+            <label class="driver-label">Shift Type</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">timelapse</span>
+                <input type="text" id="pos-shift-type" class="driver-modal-field" readonly placeholder="Auto-filled"
+                    value="{% if active_shift %}{{ active_shift.get_shift_type_display }}{% endif %}">
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Morning, Evening, or Night shift.</p>
+        </div>
+    </div>
+</section>
+
+{# Pump & Nozzle Selection #}
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">local_gas_station</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Pump & Nozzle</h3>
+            <p class="text-xs text-slate-500">Select pump, then nozzle with fuel type.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div>
+            <label class="driver-label">Pump <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">local_gas_station</span>
+                <select id="pos-pump" name="pump" class="driver-modal-field" {% if not open_shifts %}disabled{% endif %}>
+                    <option value="">Select pump</option>
+                </select>
+            </div>
+            <p class="driver-error" data-error-for="pump"></p>
+        </div>
+        <div>
+            <label class="driver-label">Nozzle <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">gas_meter</span>
+                <select id="pos-nozzle" name="nozzle" class="driver-modal-field" {% if not open_shifts %}disabled{% endif %}>
+                    <option value="">Select nozzle</option>
+                </select>
+            </div>
+            <p class="driver-error" data-error-for="nozzle"></p>
+        </div>
+    </div>
+</section>
+
+{# Tank Information Display #}
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">water</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Tank Information</h3>
+            <p class="text-xs text-slate-500">Auto-filled from selected nozzle.</p>
+        </div>
+    </div>
+    <div class="p-5">
+        <div class="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 sm:grid-cols-2 lg:grid-cols-5">
+            <div class="min-w-0">
+                <span class="text-xs font-semibold uppercase tracking-wide text-slate-600">Tank</span>
+                <p id="pos-tank-name" class="text-sm font-semibold text-slate-900">--</p>
+            </div>
+            <div class="min-w-0 sm:border-l sm:border-slate-300 sm:pl-3">
+                <span class="text-xs font-semibold uppercase tracking-wide text-slate-600">Fuel Type</span>
+                <p id="pos-tank-fuel" class="text-sm font-semibold text-slate-900">--</p>
+            </div>
+            <div class="min-w-0 sm:border-l sm:border-slate-300 sm:pl-3">
+                <span class="text-xs font-semibold uppercase tracking-wide text-slate-600">Current Stock</span>
+                <p id="pos-tank-stock" class="text-sm font-semibold text-slate-900">-- L</p>
+            </div>
+            <div class="min-w-0 sm:border-l sm:border-slate-300 sm:pl-3">
+                <span class="text-xs font-semibold uppercase tracking-wide text-slate-600">Capacity</span>
+                <p id="pos-tank-capacity" class="text-sm font-semibold text-slate-900">-- L</p>
+            </div>
+            <div class="min-w-0 sm:border-l sm:border-slate-300 sm:pl-3">
+                <span class="text-xs font-semibold uppercase tracking-wide text-slate-600">Low Level</span>
+                <p id="pos-tank-threshold" class="text-sm font-semibold text-slate-900">-- L</p>
+            </div>
+            <div id="pos-tank-alert" class="hidden sm:col-span-2 lg:col-span-5">
+                <span class="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                    <span class="material-symbols-outlined text-[16px] leading-none">warning</span>Low stock
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# Fuel Sale Details #}
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">local_fire_department</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Fuel Sale Details</h3>
+            <p class="text-xs text-slate-500">Meter readings & pricing. Quantity auto-calculated.</p>
+        </div>
+    </div>
+    <div class="grid gap-5 p-5 md:grid-cols-3">
+        <div>
+            <label class="driver-label">Opening Meter (Liters) <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">counter_1</span>
+                <input type="number" step="0.01" id="pos-opening" name="opening_meter" class="driver-modal-field" placeholder="0.00" readonly>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">Auto-filled from the selected nozzle's latest closing meter.</p>
+            <p class="driver-error" data-error-for="opening_meter"></p>
+        </div>
+        <div>
+            <label class="driver-label">Closing Meter (Liters) <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">counter_2</span>
+                <input type="number" step="0.01" id="pos-closing" name="closing_meter" class="driver-modal-field" placeholder="0.00">
+            </div>
+            <p class="driver-error" data-error-for="closing_meter"></p>
+        </div>
+        <div>
+            <label class="driver-label">Quantity (Auto) <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">scale</span>
+                <input type="number" step="0.01" id="pos-quantity" name="volume_liters" class="driver-modal-field" placeholder="0.00" readonly>
+            </div>
+            <p class="driver-error" data-error-for="volume_liters"></p>
+        </div>
+        <div>
+            <label class="driver-label">Unit Price / Liter <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">payments</span>
+                <input type="number" step="0.01" id="pos-price" name="unit_price" class="driver-modal-field" placeholder="0.00" readonly>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">Auto-filled from Settings based on the selected fuel type.</p>
+            <p class="driver-error" data-error-for="unit_price"></p>
+        </div>
+        <div>
+            <label class="driver-label">Total Amount (Auto) <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">attach_money</span>
+                <input type="number" step="0.01" id="pos-total" name="total_amount" class="driver-modal-field" placeholder="0.00" readonly>
+            </div>
+            <p class="driver-error" data-error-for="total_amount"></p>
+        </div>
+    </div>
+</section>
+
+{# Payment Details #}
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">credit_card</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Payment Details</h3>
+            <p class="text-xs text-slate-500">Support cash, MOMO, POS, or customer credit.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="md:col-span-2">
+            <label class="driver-label">Payment Method <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">credit_card</span>
+                <select id="pos-method" name="payment_method" class="driver-modal-field">
+                    {% for choice, label in form_payment_methods %}
+                    <option value="{{ choice }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <p class="driver-error" data-error-for="payment_method"></p>
+        </div>
+
+        <div id="credit-customer-wrapper" class="md:col-span-2 hidden">
+            <label class="driver-label">Credit Customer <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">account_balance_wallet</span>
+                <select id="pos-credit-customer" name="customer" class="driver-modal-field">
+                    <option value="">Select credit customer</option>
+                    {% for c in credit_customers %}
+                    <option value="{{ c.id }}" title="Limit: {{ c.credit_limit }}, Balance: {{ c.current_balance }}">
+                        {{ c.name }} (Limit: {{ c.credit_limit }}, Balance: {{ c.current_balance }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Required for credit sales. Shows only when credit payment method is selected.</p>
+            <p class="driver-error" data-error-for="customer"></p>
+        </div>
+
+        <div>
+            <label class="driver-label">Customer Name</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">person</span>
+                <input type="text" id="pos-customer" name="customer_name" class="driver-modal-field" placeholder="Walk-in customer">
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Optional for cash/MOMO/POS. Hidden during credit sales.</p>
+            <p class="driver-error" data-error-for="customer_name"></p>
+        </div>
+
+        <div>
+            <label class="driver-label">Receipt / Reference Number</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">receipt</span>
+                <input type="text" id="pos-receipt" name="receipt_number" class="driver-modal-field" placeholder="Auto-generated or manual">
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Optional reference for tracking.</p>
+            <p class="driver-error" data-error-for="receipt_number"></p>
+        </div>
+    </div>
+</section>

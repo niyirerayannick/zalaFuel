@@ -1,0 +1,25 @@
+<form id="customer-modal-form" method="post" action="{{ action|default:request.path }}" class="space-y-4 bg-white">
+    {% csrf_token %}
+    <div id="customer-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"></div>
+    <section class="rounded-2xl border border-rose-200 bg-white shadow-sm overflow-hidden">
+        <div class="flex items-center gap-3 border-b border-rose-200 bg-rose-50 px-5 py-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-100 text-rose-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">delete</span>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-slate-900">Delete Customer</h3>
+                <p class="text-xs text-slate-500">Confirm removal from the customer list.</p>
+            </div>
+        </div>
+        <div class="p-5">
+            <p class="text-sm leading-6 text-slate-700">
+                Delete <span class="font-semibold text-slate-900">{{ customer.name }}</span>? This action cannot be undone.
+            </p>
+            {% if customer.current_balance %}
+                <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    This customer has a current balance of {{ customer.current_balance|floatformat:2 }}. Review carefully before deleting.
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</form>

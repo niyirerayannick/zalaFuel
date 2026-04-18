@@ -1,0 +1,27 @@
+<div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+    <table class="min-w-full divide-y divide-slate-200" data-sortable-table>
+        <thead class="bg-slate-50">
+            <tr>
+                {% for header in headers %}
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <button type="button" class="inline-flex items-center gap-1" data-sort-col="{{ forloop.counter0 }}">
+                            {{ header }}
+                            <span class="text-slate-400">↕</span>
+                        </button>
+                    </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-sm">
+            {% for row in rows %}
+                <tr class="hover:bg-slate-50">
+                    {% for col in row %}
+                        <td class="px-4 py-3 text-slate-700">{{ col }}</td>
+                    {% endfor %}
+                </tr>
+            {% empty %}
+                <tr><td colspan="{{ headers|length }}" class="px-4 py-6 text-center text-slate-500">No data available.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

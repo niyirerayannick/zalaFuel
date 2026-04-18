@@ -1,0 +1,111 @@
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100 text-[#0f7ea6]">
+            <span class="material-symbols-outlined text-[20px] leading-none">shopping_cart</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Order &amp; delivery</h3>
+            <p class="text-xs text-slate-500">Supplier, station, and fuel to order.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div>
+            <label class="driver-label" for="{{ form.supplier.id_for_label }}">Supplier <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">storefront</span>
+                {{ form.supplier }}
+            </div>
+            <p class="driver-error" data-error-for="supplier">{% if form.supplier.errors %}{{ form.supplier.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="driver-label" for="{{ form.station.id_for_label }}">Station <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">warehouse</span>
+                {{ form.station }}
+            </div>
+            <p class="driver-error" data-error-for="station">{% if form.station.errors %}{{ form.station.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="driver-label" for="{{ form.fuel_type.id_for_label }}">Fuel type <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">local_fire_department</span>
+                {{ form.fuel_type }}
+            </div>
+            <p class="driver-error" data-error-for="fuel_type">{% if form.fuel_type.errors %}{{ form.fuel_type.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="driver-label" for="{{ form.volume_liters.id_for_label }}">Volume (L) <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">water_drop</span>
+                {{ form.volume_liters }}
+            </div>
+            <p class="driver-error" data-error-for="volume_liters">{% if form.volume_liters.errors %}{{ form.volume_liters.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="driver-label" for="{{ form.unit_cost.id_for_label }}">Unit cost</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">payments</span>
+                {{ form.unit_cost }}
+            </div>
+            <p class="driver-error" data-error-for="unit_cost">{% if form.unit_cost.errors %}{{ form.unit_cost.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="driver-label" for="{{ form.expected_delivery_date.id_for_label }}">Expected delivery</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">calendar_today</span>
+                {{ form.expected_delivery_date }}
+            </div>
+            <p class="driver-error" data-error-for="expected_delivery_date">{% if form.expected_delivery_date.errors %}{{ form.expected_delivery_date.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">tag</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Reference &amp; status</h3>
+            <p class="text-xs text-slate-500">PO number and workflow state.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div>
+            <label class="driver-label" for="{{ form.reference.id_for_label }}">Reference <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">numbers</span>
+                {{ form.reference }}
+            </div>
+            <p class="driver-error" data-error-for="reference">{% if form.reference.errors %}{{ form.reference.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label class="driver-label" for="{{ form.status.id_for_label }}">Status</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">flag</span>
+                {{ form.status }}
+            </div>
+            <p class="driver-error" data-error-for="status">{% if form.status.errors %}{{ form.status.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
+            <span class="material-symbols-outlined text-[20px] leading-none">notes</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Notes</h3>
+            <p class="text-xs text-slate-500">Optional instructions for receiving or supplier.</p>
+        </div>
+    </div>
+    <div class="p-5">
+        <label class="driver-label" for="{{ form.notes.id_for_label }}">Notes</label>
+        <div class="driver-input-shell driver-input-shell-textarea">
+            <span class="material-symbols-outlined driver-field-icon driver-field-icon-textarea">edit_note</span>
+            {{ form.notes }}
+        </div>
+        <p class="driver-error" data-error-for="notes">{% if form.notes.errors %}{{ form.notes.errors.0 }}{% endif %}</p>
+    </div>
+</section>

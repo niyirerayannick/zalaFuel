@@ -1,0 +1,192 @@
+<form id="vehicle-modal-form" method="post" action="{{ form_action }}" class="space-y-5">
+    {% csrf_token %}
+
+    <div id="vehicle-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"></div>
+
+    <section class="vehicle-modal-card p-4">
+        <h3 class="vehicle-modal-title flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] leading-none text-green-700">badge</span>
+            Vehicle Information
+        </h3>
+        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="id_plate_number" class="vehicle-label">Plate Number <span class="text-red-500">*</span></label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">pin</span>
+                    {{ form.plate_number }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="plate_number"></p>
+            </div>
+            <div>
+                <label for="id_vehicle_model" class="vehicle-label">Vehicle Model</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">directions_car</span>
+                    {{ form.vehicle_model }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="vehicle_model"></p>
+            </div>
+            <div>
+                <label for="id_vehicle_type" class="vehicle-label">Vehicle Category <span class="text-red-500">*</span></label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">category</span>
+                    {{ form.vehicle_type }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="vehicle_type"></p>
+            </div>
+            <div>
+                <label for="id_year" class="vehicle-label">Year</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">calendar_month</span>
+                    {{ form.year }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="year"></p>
+            </div>
+            <div class="md:col-span-2">
+                <label for="id_status" class="vehicle-label">Status <span class="text-red-500">*</span></label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">toggle_on</span>
+                    {{ form.status }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="status"></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="vehicle-modal-card p-4">
+        <h3 class="vehicle-modal-title flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] leading-none text-green-700">group</span>
+            Ownership Information
+        </h3>
+        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="id_ownership_type" class="vehicle-label">Ownership Type <span class="text-red-500">*</span></label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">apartment</span>
+                    {{ form.ownership_type }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="ownership_type"></p>
+            </div>
+            <div id="vehicle-owner-select-block">
+                <label for="id_owner" class="vehicle-label">Vehicle Owner</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">person</span>
+                    {{ form.owner }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="owner"></p>
+            </div>
+            <div id="vehicle-owner-name-block">
+                <label for="id_new_owner_name" class="vehicle-label">New Owner Name</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">badge</span>
+                    {{ form.new_owner_name }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="new_owner_name"></p>
+            </div>
+            <div id="vehicle-owner-phone-block">
+                <label for="id_new_owner_phone" class="vehicle-label">New Owner Phone</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">call</span>
+                    {{ form.new_owner_phone }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="new_owner_phone"></p>
+            </div>
+            <div id="vehicle-owner-bank-name-block">
+                <label for="id_new_owner_bank_name" class="vehicle-label">Bank Name</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">account_balance</span>
+                    {{ form.new_owner_bank_name }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="new_owner_bank_name"></p>
+            </div>
+            <div id="vehicle-owner-bank-account-block">
+                <label for="id_new_owner_bank_account" class="vehicle-label">Bank Account</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">payments</span>
+                    {{ form.new_owner_bank_account }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="new_owner_bank_account"></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="vehicle-modal-card p-4">
+        <h3 class="vehicle-modal-title flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] leading-none text-green-700">construction</span>
+            Technical Details
+        </h3>
+        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="id_fuel_type" class="vehicle-label">Fuel Type</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">local_gas_station</span>
+                    {{ form.fuel_type }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="fuel_type"></p>
+            </div>
+            <div>
+                <label for="id_engine_capacity" class="vehicle-label">Engine Capacity</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">settings</span>
+                    {{ form.engine_capacity }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="engine_capacity"></p>
+            </div>
+            <div>
+                <label for="id_color" class="vehicle-label">Color</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">palette</span>
+                    {{ form.color }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="color"></p>
+            </div>
+            <div>
+                <label for="id_capacity" class="vehicle-label">Load Capacity <span class="text-red-500">*</span></label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">scale</span>
+                    {{ form.capacity }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="capacity"></p>
+            </div>
+            <div>
+                <label for="id_current_odometer" class="vehicle-label">Odometer <span class="text-red-500">*</span></label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">speed</span>
+                    {{ form.current_odometer }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="current_odometer"></p>
+            </div>
+            <div>
+                <label for="id_service_interval_km" class="vehicle-label">Service Interval <span class="text-red-500">*</span></label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">event_repeat</span>
+                    {{ form.service_interval_km }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="service_interval_km"></p>
+            </div>
+            <div>
+                <label for="id_last_service_km" class="vehicle-label">Last Service KM</label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">history</span>
+                    {{ form.last_service_km }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="last_service_km"></p>
+            </div>
+            <div>
+                <label for="id_insurance_expiry" class="vehicle-label">Insurance Expiry <span class="text-red-500">*</span></label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">shield</span>
+                    {{ form.insurance_expiry }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="insurance_expiry"></p>
+            </div>
+            <div>
+                <label for="id_inspection_expiry" class="vehicle-label">Inspection Expiry <span class="text-red-500">*</span></label>
+                <div class="vehicle-input-wrap">
+                    <span class="material-symbols-outlined vehicle-input-icon">fact_check</span>
+                    {{ form.inspection_expiry }}
+                </div>
+                <p class="mt-1 text-xs text-red-600 vehicle-field-error" data-error-for="inspection_expiry"></p>
+            </div>
+        </div>
+    </section>
+</form>

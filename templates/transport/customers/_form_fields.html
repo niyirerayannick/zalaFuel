@@ -1,0 +1,130 @@
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">business</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Customer Information</h3>
+            <p class="text-xs text-slate-500">Primary identity and communication details.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="md:col-span-2">
+            <label for="{{ form.company_name.id_for_label }}" class="customer-label">Customer Name <span class="text-red-500">*</span></label>
+            <div class="customer-input-shell">
+                <span class="material-symbols-outlined customer-field-icon">apartment</span>
+                {{ form.company_name }}
+            </div>
+            <p class="customer-error" data-error-for="company_name">{% if form.company_name.errors %}{{ form.company_name.errors.0 }}{% endif %}</p>
+            <p class="customer-help">Use the company name or customer name shown in your billing records.</p>
+        </div>
+        <div>
+            <label for="{{ form.contact_person.id_for_label }}" class="customer-label">Contact Person</label>
+            <div class="customer-input-shell">
+                <span class="material-symbols-outlined customer-field-icon">person</span>
+                {{ form.contact_person }}
+            </div>
+            <p class="customer-error" data-error-for="contact_person">{% if form.contact_person.errors %}{{ form.contact_person.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.phone.id_for_label }}" class="customer-label">Phone Number</label>
+            <div class="customer-input-shell">
+                <span class="material-symbols-outlined customer-field-icon">call</span>
+                {{ form.phone }}
+            </div>
+            <p class="customer-error" data-error-for="phone">{% if form.phone.errors %}{{ form.phone.errors.0 }}{% endif %}</p>
+        </div>
+        <div class="md:col-span-2">
+            <label for="{{ form.email.id_for_label }}" class="customer-label">Email <span class="text-red-500">*</span></label>
+            <div class="customer-input-shell">
+                <span class="material-symbols-outlined customer-field-icon">mail</span>
+                {{ form.email }}
+            </div>
+            <p class="customer-error" data-error-for="email">{% if form.email.errors %}{{ form.email.errors.0 }}{% endif %}</p>
+            {% if form.email.help_text %}<p class="customer-help">{{ form.email.help_text }}</p>{% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">location_on</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Address Information</h3>
+            <p class="text-xs text-slate-500">Keep location details clear for invoicing and delivery coordination.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5">
+        <div>
+            <label for="{{ form.address.id_for_label }}" class="customer-label">Address</label>
+            <div class="customer-input-shell">
+                <span class="material-symbols-outlined customer-field-icon top-4 translate-y-0">home_pin</span>
+                {{ form.address }}
+            </div>
+            <p class="customer-error" data-error-for="address">{% if form.address.errors %}{{ form.address.errors.0 }}{% endif %}</p>
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">City</p>
+                <p id="customer-city-preview" class="mt-2 text-sm font-semibold text-slate-900">Not detected</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Country</p>
+                <p id="customer-country-preview" class="mt-2 text-sm font-semibold text-slate-900">Not detected</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-lime-100 text-lime-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">domain_verification</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Business Information</h3>
+            <p class="text-xs text-slate-500">Account state and client access details.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div>
+            <label for="{{ form.status.id_for_label }}" class="customer-label">Customer Type / Status</label>
+            <div class="customer-input-shell">
+                <span class="material-symbols-outlined customer-field-icon">rule</span>
+                {{ form.status }}
+            </div>
+            <p class="customer-error" data-error-for="status">{% if form.status.errors %}{{ form.status.errors.0 }}{% endif %}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Notes</p>
+            <p class="mt-2 text-sm text-slate-600">Customer notes are not stored as a dedicated field in the current backend, so this layout preserves the existing data model.</p>
+        </div>
+        {% if form.create_account %}
+        <div class="md:col-span-2 rounded-2xl border border-green-200 bg-green-50 p-4">
+            <div class="flex items-start gap-3">
+                <div class="pt-1">{{ form.create_account }}</div>
+                <div>
+                    <label for="{{ form.create_account.id_for_label }}" class="text-sm font-semibold text-green-900">{{ form.create_account.label }}</label>
+                    <p class="mt-1 text-xs text-green-800">{{ form.create_account.help_text }}</p>
+                </div>
+            </div>
+            <div id="customer-account-info" class="mt-4 rounded-xl border border-green-200 bg-white/80 p-3 text-xs text-slate-600">
+                A system-generated password will be sent to the customer's email so they can access the client portal.
+            </div>
+        </div>
+        {% else %}
+        <div class="md:col-span-2 rounded-2xl border {% if customer and customer.user %}border-green-200 bg-green-50{% else %}border-amber-200 bg-amber-50{% endif %} p-4">
+            <p class="text-sm font-semibold {% if customer and customer.user %}text-green-900{% else %}text-amber-900{% endif %}">
+                {% if customer and customer.user %}
+                    Linked Account: {{ customer.user.email }}
+                {% else %}
+                    No linked account for this customer
+                {% endif %}
+            </p>
+            <p class="mt-1 text-xs text-slate-600">This summary is informational only and keeps the existing account workflow unchanged.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>

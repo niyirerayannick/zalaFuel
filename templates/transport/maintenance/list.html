@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Vehicle Maintenance | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block extra_head %}
+<style>
+    .mm-panel {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .mm-card {
+        border: 1px solid rgb(226 232 240);
+        border-radius: 0.9rem;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 22px rgba(15, 23, 42, 0.05);
+    }
+
+    .mm-card-title {
+        color: rgb(30 41 59);
+        font-size: 0.77rem;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+    }
+
+    .mm-input-wrap {
+        position: relative;
+    }
+
+    .mm-input-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1rem;
+        line-height: 1;
+        color: rgb(71 85 105);
+        pointer-events: none;
+        transition: color 0.22s ease;
+    }
+
+    .mm-input-wrap:focus-within .mm-input-icon {
+        color: rgb(21 128 61);
+    }
+
+    .mm-input {
+        width: 100%;
+        min-height: 2.7rem;
+        border: 1px solid rgb(203 213 225);
+        border-radius: 0.62rem;
+        background: rgb(248 250 252);
+        padding: 0.68rem 0.9rem 0.68rem 2.4rem;
+        color: rgb(15 23 42);
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .mm-input::placeholder {
+        color: rgb(148 163 184);
+    }
+
+    .mm-input:focus {
+        outline: none;
+        background: #fff;
+        border-color: rgb(21 128 61);
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+
+    select.mm-input {
+        appearance: none;
+        padding-right: 2rem;
+        background-image: linear-gradient(45deg, transparent 50%, rgb(71 85 105) 50%), linear-gradient(135deg, rgb(71 85 105) 50%, transparent 50%);
+        background-position: calc(100% - 18px) 17px, calc(100% - 13px) 17px;
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+    }
+
+    .mm-label {
+        display: block;
+        margin-bottom: 0.38rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: rgb(51 65 85);
+    }
+
+    .mm-primary-btn {
+        border-radius: 0.62rem;
+        background: linear-gradient(135deg, rgb(21 128 61), rgb(22 101 52));
+        box-shadow: 0 6px 18px rgba(21, 128, 61, 0.28);
+        transition: all 0.2s ease;
+    }
+
+    .mm-primary-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(21, 128, 61, 0.34);
+    }
+
+    .mm-secondary-btn {
+        border-radius: 0.62rem;
+    }
+
+    .mm-input-error {
+        border-color: rgb(239 68 68) !important;
+        background-color: rgb(254 242 242) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 sm:p-6 shadow-sm">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-start gap-4">
+                
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fleet Operations</p>
+                    <h1 class="mt-1 text-2xl font-bold text-slate-900">Vehicle Maintenance</h1>
+                    <p class="mt-1 text-sm text-slate-600">Track service history, downtime, and maintenance costs.</p>
+                </div>
+            </div>
+            {% if request.user.role != 'driver' and request.user.role != 'client' %}
+            <button
+                type="button"
+                id="maintenance-add-new-btn"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 hover:bg-green-800 transition"
+            >
+                <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                Add Maintenance
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="maintenance-list-content">
+        {% include "transport/maintenance/_list_content.html" %}
+    </div>
+</div>
+
+{% if request.user.role != 'driver' and request.user.role != 'client' %}
+<div id="maintenance-create-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="maintenance-create-panel" class="mm-panel fixed inset-y-0 right-0 z-50 hidden w-full max-w-2xl transform shadow-2xl transition-transform duration-300 translate-x-full">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-white/90 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="h-9 w-9 rounded-lg bg-green-100 text-green-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px] leading-none">build_circle</span>
+                </div>
+                <div>
+                    <h2 class="text-base font-semibold text-slate-900">Add Maintenance Record</h2>
+                    <p class="text-xs text-slate-500">Fast entry mode for fleet maintenance updates.</p>
+                </div>
+            </div>
+            <button type="button" id="maintenance-close-panel-btn" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+
+        <div id="maintenance-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+        <div class="sticky bottom-0 bg-white/95 backdrop-blur pt-3 border-t border-slate-200 px-5 pb-5">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="maintenance-cancel-panel-btn" class="mm-secondary-btn rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
+                <button type="button" id="maintenance-save-btn" class="mm-primary-btn rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 disabled:cursor-not-allowed">
+                    Save Maintenance
+                </button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if request.user.role != 'driver' and request.user.role != 'client' %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('maintenance-add-new-btn');
+    const panel = document.getElementById('maintenance-create-panel');
+    const overlay = document.getElementById('maintenance-create-overlay');
+    const closeBtn = document.getElementById('maintenance-close-panel-btn');
+    const cancelBtn = document.getElementById('maintenance-cancel-panel-btn');
+    const saveBtn = document.getElementById('maintenance-save-btn');
+    const listContainer = document.getElementById('maintenance-list-content');
+    const panelBody = document.getElementById('maintenance-panel-body');
+    let currentForm = null;
+    let lastTrigger = null;
+
+    if (!addBtn || !panel || !overlay || !listContainer || !panelBody || !saveBtn) {
+        return;
+    }
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(function () {
+            panel.classList.remove('translate-x-full');
+        });
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(function () {
+            panel.classList.add('hidden');
+            overlay.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            currentForm = null;
+            lastTrigger = null;
+        }, 220);
+    }
+
+    function stylePanelFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden') return;
+            el.classList.add('mm-input');
+        });
+    }
+
+    function syncSchedulePreview() {
+        const serviceDate = panelBody.querySelector('#id_service_date');
+        const downtime = panelBody.querySelector('#id_downtime_days');
+        const odometer = panelBody.querySelector('#id_service_km');
+        const cost = panelBody.querySelector('#id_cost');
+        const estimatedReturn = panelBody.querySelector('#estimatedReturnDate');
+        const downtimeWindow = panelBody.querySelector('#downtimeWindow');
+
+        if (!serviceDate && !downtime && !odometer && !cost) {
+            return;
+        }
+
+        function updatePreview() {
+            if (estimatedReturn) {
+                if (serviceDate && serviceDate.value) {
+                    const baseDate = new Date(serviceDate.value + 'T00:00:00');
+                    const days = parseInt(downtime && downtime.value ? downtime.value : '0', 10) || 0;
+                    baseDate.setDate(baseDate.getDate() + days);
+                    estimatedReturn.textContent = baseDate.toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                } else {
+                    estimatedReturn.textContent = '--';
+                }
+            }
+
+            if (downtimeWindow) {
+                const days = parseInt(downtime && downtime.value ? downtime.value : '0', 10) || 0;
+                downtimeWindow.textContent = days + ' day(s)';
+            }
+        }
+
+        [serviceDate, downtime, odometer, cost].forEach(function (field) {
+            if (field) {
+                field.addEventListener('input', updatePreview);
+                field.addEventListener('change', updatePreview);
+            }
+        });
+
+        updatePreview();
+    }
+
+    function clearErrors() {
+        const formError = document.getElementById('maintenance-form-error');
+        if (formError) {
+            formError.classList.add('hidden');
+            formError.textContent = '';
+        }
+        panelBody.querySelectorAll('.field-error').forEach(function (el) {
+            el.textContent = '';
+        });
+        panelBody.querySelectorAll('.mm-input-error').forEach(function (el) {
+            el.classList.remove('mm-input-error');
+        });
+    }
+
+    function showErrors(payload) {
+        const formError = document.getElementById('maintenance-form-error');
+        if (payload.non_field_errors && payload.non_field_errors.length) {
+            if (formError) {
+                formError.classList.remove('hidden');
+                formError.textContent = payload.non_field_errors.join(' ');
+            }
+        }
+
+        if (payload.errors) {
+            Object.keys(payload.errors).forEach(function (field) {
+                const errorTarget = panelBody.querySelector('[data-error-for="' + field + '"]');
+                if (errorTarget) {
+                    errorTarget.textContent = payload.errors[field].join(' ');
+                }
+                const input = panelBody.querySelector('#id_' + field);
+                if (input) {
+                    input.classList.add('mm-input-error');
+                }
+            });
+        }
+    }
+
+    async function refreshListContent() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('partial', 'list');
+        const response = await fetch(url.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const html = await response.text();
+        listContainer.innerHTML = html;
+    }
+
+    async function loadForm(url, title) {
+        openPanel();
+        lastTrigger = url;
+        panel.querySelector('h2').textContent = title;
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        const separator = url.includes('?') ? '&' : '?';
+        const response = await fetch(url + separator + 'partial=form', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        panelBody.innerHTML = await response.text();
+        currentForm = document.getElementById('maintenance-modal-form');
+        stylePanelFields();
+        syncSchedulePreview();
+    }
+
+    addBtn.addEventListener('click', function () {
+        clearErrors();
+        loadForm("{% url 'transport:maintenance:create' %}", 'Add Maintenance Record');
+    });
+
+    listContainer.addEventListener('click', function (event) {
+        const editLink = event.target.closest('.maintenance-edit-btn');
+        if (!editLink) return;
+        event.preventDefault();
+        clearErrors();
+        loadForm(editLink.dataset.editUrl, 'Edit Maintenance Record');
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !panel.classList.contains('hidden')) {
+            closePanel();
+        }
+    });
+    saveBtn.addEventListener('click', async function () {
+        if (!currentForm) return;
+        clearErrors();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        try {
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            const payload = await response.json();
+
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+
+            closePanel();
+            await refreshListContent();
+        } catch (error) {
+            const formError = document.getElementById('maintenance-form-error');
+            if (formError) {
+                formError.classList.remove('hidden');
+                formError.textContent = 'Unable to save right now. Please try again.';
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Maintenance';
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

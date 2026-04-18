@@ -1,0 +1,663 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .settings-card {
+        border-radius: 1rem;
+        border: 1px solid rgb(226 232 240);
+        background: white;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .settings-stat {
+        border-radius: 0.95rem;
+        border: 1px solid rgb(226 232 240);
+        background: white;
+        padding: 1rem;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .theme-swatch {
+        display: inline-flex;
+        height: 1rem;
+        width: 1rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .theme-blue { background: rgb(14 114 150); }
+    .theme-green { background: #15803d; }
+    .theme-purple { background: #7c3aed; }
+    .theme-red { background: #dc2626; }
+    .theme-orange { background: #ea580c; }
+
+    .settings-radio:checked + label {
+        border-color: rgb(21 128 61);
+        background: rgb(240 253 244);
+        box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.12);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">System Settings</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">{{ page_title }}</h1>
+                <p class="mt-1 text-sm text-slate-600">Manage company identity, theme, currency, exchange rates, and localization in one place.</p>
+            </div>
+            <a href="{% url 'accounts:user-list' %}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                <span class="material-symbols-outlined text-[18px] leading-none">group</span>
+                Manage Users
+            </a>
+        </div>
+    </div>
+
+    <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+        <div class="settings-stat">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Company</p>
+                <span class="material-symbols-outlined text-[18px] text-green-700">business</span>
+            </div>
+            <p class="mt-2 text-lg font-bold text-slate-900">{{ settings.company_name }}</p>
+        </div>
+        <div class="settings-stat">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Theme</p>
+                <span class="material-symbols-outlined text-[18px] text-green-700">palette</span>
+            </div>
+            <p class="mt-2 text-lg font-bold text-slate-900">{{ settings.get_primary_color_display }}</p>
+        </div>
+        <div class="settings-stat">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Currency</p>
+                <span class="material-symbols-outlined text-[18px] text-green-700">payments</span>
+            </div>
+            <p class="mt-2 text-lg font-bold text-slate-900">{{ settings.currency }} ({{ settings.currency_symbol }})</p>
+        </div>
+        <div class="settings-stat">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Language</p>
+                <span class="material-symbols-outlined text-[18px] text-green-700">translate</span>
+            </div>
+            <p class="mt-2 text-lg font-bold text-slate-900">{{ settings.get_language_display }}</p>
+        </div>
+    </div>
+
+    <form id="system-settings-form" method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+            <div class="space-y-6 xl:col-span-2">
+                <section class="settings-card overflow-hidden">
+                    <div class="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                        <h2 class="text-sm font-semibold text-slate-900">Company Information</h2>
+                    </div>
+                    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.company_name.label }}</label>
+                            {{ form.company_name }}
+                            {% if form.company_name.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.company_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.company_logo.label }}</label>
+                            {{ form.company_logo }}
+                            {% if form.company_logo.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.company_logo.errors.0 }}</p>
+                            {% endif %}
+                            {% if settings.company_logo %}
+                            <p class="mt-2 text-xs text-slate-500">Current logo available for preview below.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-card overflow-hidden">
+                    <div class="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                        <h2 class="text-sm font-semibold text-slate-900">Appearance</h2>
+                    </div>
+                    <div class="p-5">
+                        <p class="mb-4 text-sm text-slate-600">Choose the default system accent color.</p>
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            {% for value, label in form.primary_color.field.choices %}
+                            <div>
+                                <input type="radio" name="{{ form.primary_color.name }}" value="{{ value }}" id="id_{{ form.primary_color.name }}_{{ forloop.counter0 }}" class="settings-radio sr-only" {% if form.primary_color.value == value %}checked{% endif %}>
+                                <label for="id_{{ form.primary_color.name }}_{{ forloop.counter0 }}" class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 transition hover:border-slate-300">
+                                    <span class="theme-swatch theme-{{ value|lower }}"></span>
+                                    <span class="text-sm font-medium text-slate-800">{{ label }}</span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.primary_color.errors %}
+                        <p class="mt-3 text-sm text-red-600">{{ form.primary_color.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="settings-card overflow-hidden">
+                    <div class="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                        <h2 class="text-sm font-semibold text-slate-900">Financial Settings</h2>
+                    </div>
+                    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.currency.label }}</label>
+                            {{ form.currency }}
+                            {% if form.currency.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.currency.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.currency_symbol.label }}</label>
+                            {{ form.currency_symbol }}
+                            {% if form.currency_symbol.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.currency_symbol.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.usd_bank_name.label }}</label>
+                            {{ form.usd_bank_name }}
+                            {% if form.usd_bank_name.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.usd_bank_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.usd_account_name.label }}</label>
+                            {{ form.usd_account_name }}
+                            {% if form.usd_account_name.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.usd_account_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.usd_account_number.label }}</label>
+                            {{ form.usd_account_number }}
+                            {% if form.usd_account_number.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.usd_account_number.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.rwf_bank_name.label }}</label>
+                            {{ form.rwf_bank_name }}
+                            {% if form.rwf_bank_name.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.rwf_bank_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.rwf_account_name.label }}</label>
+                            {{ form.rwf_account_name }}
+                            {% if form.rwf_account_name.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.rwf_account_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.rwf_account_number.label }}</label>
+                            {{ form.rwf_account_number }}
+                            {% if form.rwf_account_number.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.rwf_account_number.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">Petrol Unit Price / Liter</label>
+                            {{ form.petrol_unit_price }}
+                            {% if form.petrol_unit_price.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.petrol_unit_price.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">Diesel Unit Price / Liter</label>
+                            {{ form.diesel_unit_price }}
+                            {% if form.diesel_unit_price.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.diesel_unit_price.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-card overflow-hidden">
+                    <div class="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h2 class="text-sm font-semibold text-slate-900">Live Exchange Rates</h2>
+                                <p class="mt-1 text-xs text-slate-500">Refresh market rates and use the quick converter.</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span id="rates-status" class="text-xs text-slate-400"></span>
+                                <button type="button" id="refresh-rates-btn" onclick="fetchExchangeRates()" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50">
+                                    <svg id="refresh-icon" class="mr-1.5 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Refresh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div id="rates-grid" class="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            <div id="rates-loading" class="col-span-full flex items-center justify-center py-8 text-slate-400">
+                                <svg class="mr-2 h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                                Loading exchange rates...
+                            </div>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <h3 class="mb-3 text-sm font-semibold text-slate-900">Quick Currency Converter</h3>
+                            <div class="flex flex-wrap items-end gap-3">
+                                <div class="min-w-[120px] flex-1">
+                                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">Amount</label>
+                                    <input type="number" id="convert-amount" value="1000" min="0" step="any" class="w-full rounded-xl border-slate-300 bg-white px-4 py-3 text-sm shadow-sm focus:border-green-600 focus:ring-green-600">
+                                </div>
+                                <div class="w-28">
+                                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">From</label>
+                                    <select id="convert-from" class="w-full rounded-xl border-slate-300 bg-white px-4 py-3 text-sm shadow-sm focus:border-green-600 focus:ring-green-600">
+                                        <option value="USD">USD</option>
+                                        <option value="RWF">RWF</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="KES">KES</option>
+                                        <option value="UGX">UGX</option>
+                                        <option value="TZS">TZS</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center pt-4">
+                                    <button type="button" onclick="swapCurrencies()" class="rounded-full p-2 text-slate-500 transition hover:bg-slate-200" title="Swap currencies">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="w-28">
+                                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">To</label>
+                                    <select id="convert-to" class="w-full rounded-xl border-slate-300 bg-white px-4 py-3 text-sm shadow-sm focus:border-green-600 focus:ring-green-600">
+                                        <option value="RWF">RWF</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="KES">KES</option>
+                                        <option value="UGX">UGX</option>
+                                        <option value="TZS">TZS</option>
+                                    </select>
+                                </div>
+                                <div class="min-w-[150px] flex-1">
+                                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">Result</label>
+                                    <div id="convert-result" class="flex min-h-[50px] items-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-card overflow-hidden">
+                    <div class="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                        <h2 class="text-sm font-semibold text-slate-900">Localization Settings</h2>
+                    </div>
+                    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-3">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.timezone_setting.label }}</label>
+                            {{ form.timezone_setting }}
+                            {% if form.timezone_setting.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.timezone_setting.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.date_format.label }}</label>
+                            {{ form.date_format }}
+                            {% if form.date_format.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.date_format.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">{{ form.language.label }}</label>
+                            {{ form.language }}
+                            {% if form.language.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.language.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="space-y-6">
+                <section class="settings-card overflow-hidden">
+                    <div class="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                        <h2 class="text-sm font-semibold text-slate-900">Current Preview</h2>
+                    </div>
+                    <div class="space-y-4 p-5">
+                        {% if settings.company_logo %}
+                        <div class="flex justify-center">
+                            <img src="{{ settings.company_logo.url }}" alt="{{ settings.company_name }}" class="max-h-20 rounded-lg object-contain">
+                        </div>
+                        {% endif %}
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Company</p>
+                            <p class="mt-1 text-lg font-bold text-slate-900">{{ settings.company_name }}</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Theme</p>
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="theme-swatch theme-{{ settings.primary_color|lower }}"></span>
+                                <span class="text-sm font-medium text-slate-900">{{ settings.get_primary_color_display }}</span>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Currency</p>
+                            <p class="mt-1 text-sm font-medium text-slate-900">{{ settings.get_currency_display }} ({{ settings.currency_symbol }})</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Fuel Prices</p>
+                            <p class="mt-1 text-sm font-medium text-slate-900">Petrol: {{ settings.petrol_unit_price|floatformat:2 }} / L</p>
+                            <p class="mt-1 text-sm font-medium text-slate-900">Diesel: {{ settings.diesel_unit_price|floatformat:2 }} / L</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">USD Payment</p>
+                            <p class="mt-1 text-sm font-medium text-slate-900">{{ settings.usd_bank_name|default:"Not set" }}</p>
+                            <p class="mt-1 text-xs text-slate-500">{{ settings.usd_account_name|default:"Account name not set" }}</p>
+                            <p class="mt-1 text-xs text-slate-500">{{ settings.usd_account_number|default:"Account number not set" }}</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">RWF Payment</p>
+                            <p class="mt-1 text-sm font-medium text-slate-900">{{ settings.rwf_bank_name|default:"Not set" }}</p>
+                            <p class="mt-1 text-xs text-slate-500">{{ settings.rwf_account_name|default:"Account name not set" }}</p>
+                            <p class="mt-1 text-xs text-slate-500">{{ settings.rwf_account_number|default:"Account number not set" }}</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Localization</p>
+                            <p class="mt-1 text-sm font-medium text-slate-900">{{ settings.timezone_setting }}</p>
+                            <p class="mt-1 text-xs text-slate-500">{{ settings.get_date_format_display }} Ã‚Â· {{ settings.get_language_display }}</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-card overflow-hidden">
+                    <div class="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                        <h2 class="text-sm font-semibold text-slate-900">Actions</h2>
+                    </div>
+                    <div class="space-y-3 p-5">
+                        <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                            <span class="material-symbols-outlined text-[18px] leading-none">save</span>
+                            Save Settings
+                        </button>
+                        <a href="{% url 'accounts:user-list' %}" class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                            <span class="material-symbols-outlined text-[18px] leading-none">close</span>
+                            Cancel
+                        </a>
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </form>
+</div>
+
+<div id="settings-confirm-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="settings-confirm-title">
+    <button type="button" id="settings-confirm-backdrop" class="absolute inset-0 bg-slate-950/55 backdrop-blur-sm" aria-label="Close confirmation modal"></button>
+    <div class="relative z-[111] w-full max-w-xl overflow-hidden rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(240,253,244,0.88)_0%,rgba(255,255,255,0.98)_18%,rgba(255,255,255,1)_100%)] shadow-[0_24px_80px_rgba(15,23,42,0.18)]">
+        <div class="flex items-start justify-between gap-4 border-b border-slate-200/80 px-6 py-5 sm:px-7">
+            <div class="flex items-start gap-3">
+                <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-700 shadow-inner shadow-amber-200/60">
+                    <span class="material-symbols-outlined text-[24px] leading-none">warning</span>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">System Settings</p>
+                    <h2 id="settings-confirm-title" class="mt-1 text-xl font-bold text-slate-900">Confirm Changes</h2>
+                    <p class="mt-2 max-w-lg text-sm leading-6 text-slate-500">You changed the system settings. These changes may affect the whole system functionality. Do you want to save the changes?</p>
+                </div>
+            </div>
+            <button type="button" id="settings-confirm-close" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 transition duration-200 hover:border-slate-300 hover:bg-white hover:text-slate-700" aria-label="Close confirmation modal">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+        <div class="px-6 py-5 sm:px-7">
+            <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                Saving these updates will apply them across the platform, including finance, reports, invoices, and other shared workflows.
+            </div>
+        </div>
+        <div class="flex items-center justify-end gap-3 border-t border-slate-200 bg-slate-50/80 px-6 py-4 sm:px-7">
+            <button type="button" id="settings-confirm-cancel" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition duration-200 hover:bg-slate-50">
+                Cancel
+            </button>
+            <button type="button" id="settings-confirm-submit" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-green-700 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition duration-200 hover:bg-green-800">
+                <span class="material-symbols-outlined text-[18px] leading-none">save</span>
+                Save Changes
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let cachedRates = {};
+let settingsChangeConfirmed = false;
+let initialSettingsSnapshot = [];
+
+const currencySymbols = {
+    USD: '$', EUR: 'EUR', GBP: 'GBP',
+    RWF: 'FRw', KES: 'KSh', UGX: 'USh', TZS: 'TSh'
+};
+
+const currencyDecimals = {
+    USD: 2, EUR: 2, GBP: 2,
+    RWF: 0, KES: 2, UGX: 0, TZS: 0
+};
+
+function formatRate(value, code) {
+    const decimals = currencyDecimals[code] !== undefined ? currencyDecimals[code] : 2;
+    const symbol = currencySymbols[code] || code;
+    return symbol + ' ' + Number(value).toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+    });
+}
+
+async function fetchExchangeRates() {
+    const statusEl = document.getElementById('rates-status');
+    const gridEl = document.getElementById('rates-grid');
+    const refreshBtn = document.getElementById('refresh-rates-btn');
+    const refreshIcon = document.getElementById('refresh-icon');
+
+    refreshBtn.disabled = true;
+    refreshIcon.classList.add('animate-spin');
+    statusEl.textContent = 'Updating...';
+
+    try {
+        const baseCurrency = document.getElementById('id_currency').value || 'USD';
+        const response = await fetch(`{% url 'accounts:exchange-rates' %}?base=${baseCurrency}`);
+        const data = await response.json();
+
+        if (data.success) {
+            cachedRates = data.rates;
+            let html = '';
+            for (const [code, info] of Object.entries(data.rates)) {
+                if (code === baseCurrency) continue;
+                const displayRate = Number(info.rate).toLocaleString(undefined, {
+                    minimumFractionDigits: Math.min(info.decimals ?? 2, 4),
+                    maximumFractionDigits: 4
+                });
+                html += `
+                <div class="rounded-xl border border-slate-200 bg-white p-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-semibold text-slate-800">${code}</span>
+                        <span class="text-xs text-slate-400">${info.symbol || code}</span>
+                    </div>
+                    <div class="mt-2 text-lg font-bold text-green-700">${displayRate}</div>
+                    <div class="mt-1 text-xs text-slate-400">1 ${baseCurrency} = ${displayRate} ${code}</div>
+                </div>`;
+            }
+            gridEl.innerHTML = html || '<div class="col-span-full py-6 text-center text-slate-400">No rates available</div>';
+            statusEl.textContent = 'Updated ' + new Date().toLocaleTimeString();
+            convertCurrency();
+        } else {
+            gridEl.innerHTML = '<div class="col-span-full py-6 text-center text-red-400">Failed to load exchange rates.</div>';
+            statusEl.textContent = 'Error';
+        }
+    } catch (error) {
+        console.error(error);
+        gridEl.innerHTML = '<div class="col-span-full py-6 text-center text-red-400">Unable to load exchange rates right now.</div>';
+        statusEl.textContent = 'Error';
+    } finally {
+        refreshBtn.disabled = false;
+        refreshIcon.classList.remove('animate-spin');
+    }
+}
+
+function convertCurrency() {
+    const amount = parseFloat(document.getElementById('convert-amount').value) || 0;
+    const from = document.getElementById('convert-from').value;
+    const to = document.getElementById('convert-to').value;
+    const resultEl = document.getElementById('convert-result');
+
+    if (from === to) {
+        resultEl.textContent = formatRate(amount, to);
+        return;
+    }
+
+    const fromRate = cachedRates[from] ? cachedRates[from].rate : null;
+    const toRate = cachedRates[to] ? cachedRates[to].rate : null;
+
+    if (fromRate !== null && toRate !== null) {
+        resultEl.textContent = formatRate((amount / fromRate) * toRate, to);
+    } else if (fromRate === null && toRate !== null) {
+        resultEl.textContent = formatRate(amount * toRate, to);
+    } else if (fromRate !== null && toRate === null) {
+        resultEl.textContent = formatRate(amount / fromRate, to);
+    } else {
+        resultEl.textContent = '-';
+    }
+}
+
+function swapCurrencies() {
+    const fromEl = document.getElementById('convert-from');
+    const toEl = document.getElementById('convert-to');
+    const tmp = fromEl.value;
+    fromEl.value = toEl.value;
+    toEl.value = tmp;
+    convertCurrency();
+}
+
+function buildSettingsSnapshot(form) {
+    return Array.from(new FormData(form).entries())
+        .filter(function (entry) {
+            return entry[0] !== 'csrfmiddlewaretoken';
+        })
+        .map(function (entry) {
+            const key = entry[0];
+            const value = entry[1];
+
+            if (value instanceof File) {
+                return [key, value.name || ''];
+            }
+
+            return [key, String(value)];
+        });
+}
+
+function hasSettingsChanges(form) {
+    const currentSnapshot = buildSettingsSnapshot(form);
+
+    if (currentSnapshot.length !== initialSettingsSnapshot.length) {
+        return true;
+    }
+
+    return currentSnapshot.some(function (entry, index) {
+        return entry[0] !== initialSettingsSnapshot[index][0] || entry[1] !== initialSettingsSnapshot[index][1];
+    });
+}
+
+function openSettingsConfirmModal() {
+    const modal = document.getElementById('settings-confirm-modal');
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeSettingsConfirmModal() {
+    const modal = document.getElementById('settings-confirm-modal');
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const settingsForm = document.getElementById('system-settings-form');
+    const currencySelect = document.getElementById('id_currency');
+    const symbolInput = document.getElementById('id_currency_symbol');
+    const modalCloseIds = [
+        'settings-confirm-backdrop',
+        'settings-confirm-close',
+        'settings-confirm-cancel'
+    ];
+    const confirmSubmitButton = document.getElementById('settings-confirm-submit');
+
+    if (currencySelect && symbolInput) {
+        currencySelect.addEventListener('change', function () {
+            const selectedCurrency = this.value;
+            if (currencySymbols[selectedCurrency]) {
+                symbolInput.value = currencySymbols[selectedCurrency];
+            }
+            fetchExchangeRates();
+        });
+    }
+
+    ['convert-amount', 'convert-from', 'convert-to'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const eventName = id === 'convert-amount' ? 'input' : 'change';
+        el.addEventListener(eventName, convertCurrency);
+    });
+
+    if (settingsForm) {
+        initialSettingsSnapshot = buildSettingsSnapshot(settingsForm);
+
+        settingsForm.addEventListener('submit', function (event) {
+            if (!hasSettingsChanges(settingsForm) || settingsChangeConfirmed) {
+                return;
+            }
+
+            event.preventDefault();
+            openSettingsConfirmModal();
+        });
+    }
+
+    modalCloseIds.forEach(function (id) {
+        const node = document.getElementById(id);
+        if (!node) return;
+        node.addEventListener('click', closeSettingsConfirmModal);
+    });
+
+    if (confirmSubmitButton && settingsForm) {
+        confirmSubmitButton.addEventListener('click', function () {
+            settingsChangeConfirmed = true;
+            closeSettingsConfirmModal();
+            settingsForm.requestSubmit();
+        });
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeSettingsConfirmModal();
+        }
+    });
+
+    fetchExchangeRates();
+});
+</script>
+{% endblock %}

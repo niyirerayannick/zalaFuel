@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm text-slate-500">Job</p>
+            <h1 class="text-3xl font-bold text-slate-900">{{ order.order_number }}</h1>
+        </div>
+        <a href="{% url 'transport:orders:export-pdf' order.pk %}" class="inline-flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100">
+            Export PDF
+        </a>
+    </div>
+    <div class="grid gap-6 lg:grid-cols-2">
+        <section class="rounded-3xl bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-900">Order Details</h2>
+            <div class="mt-4 space-y-3 text-sm">
+                <div class="flex items-center justify-between"><span class="text-slate-500">Customer</span><span>{{ order.customer.company_name }}</span></div>
+                <div class="flex items-center justify-between"><span class="text-slate-500">Status</span><span>{{ order.get_status_display }}</span></div>
+                <div class="flex items-center justify-between"><span class="text-slate-500">Cargo Category</span><span>{{ order.cargo_category|default:"Not set" }}</span></div>
+                <div class="flex items-center justify-between"><span class="text-slate-500">Quantity</span><span>{{ order.display_quantity|default:"Not set" }}</span></div>
+                <div class="flex items-center justify-between"><span class="text-slate-500">Business Unit</span><span>{% if order.unit %}{{ order.total_quantity|floatformat:"-2" }} {{ order.unit.symbol }}{% else %}{{ order.total_quantity|floatformat:"-2" }}{% endif %}</span></div>
+            </div>
+        </section>
+        <section class="rounded-3xl bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-900">Payments</h2>
+            <div class="mt-4 space-y-3 text-sm">
+                <div class="flex items-center justify-between"><span class="text-slate-500">Quoted Price</span><span>{{ order.quoted_price|currency }}</span></div>
+                <div class="flex items-center justify-between"><span class="text-slate-500">Total Payments</span><span>{{ order.total_payments|currency }}</span></div>
+                <div class="flex items-center justify-between font-semibold"><span>Outstanding Balance</span><span>{{ order.outstanding_balance|currency }}</span></div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% if system_settings %}{{ system_settings.company_name }}{% else %}{{ brand_name|default:'ZALA/ECO ENERGY' }}{% endif %} Transport Management System">
+    <meta name="theme-color" content="{% if theme.primary == 'blue' %}#0E7296{% elif theme.primary == 'purple' %}#7C3AED{% elif theme.primary == 'red' %}#DC2626{% elif theme.primary == 'orange' %}#EA580C{% else %}#16A34A{% endif %}">
+    <title>{% block title %}{% if system_settings %}{{ system_settings.company_name }}{% else %}{{ brand_name|default:"ZALA/ECO ENERGY" }}{% endif %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: "#F0FDF4",
+                            100: "#DCFCE7",
+                            200: "#BBF7D0",
+                            300: "#86EFAC",
+                            400: "#4ADE80",
+                            500: "#22C55E",
+                            600: "#16A34A",
+                            700: "#15803D",
+                            800: "#166534",
+                            900: "#14532D",
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.12"></script>
+    <!-- Alpine.js CSP build (compatible with django-csp without unsafe-eval) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/csp@3.x.x/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/frontend.css' %}">
+    <style>
+        :root {
+            --theme-50: {% if theme.primary == 'blue' %}#ECF8FC{% elif theme.primary == 'purple' %}#F5F3FF{% elif theme.primary == 'red' %}#FEF2F2{% elif theme.primary == 'orange' %}#FFF7ED{% else %}#F0FDF4{% endif %};
+            --theme-100: {% if theme.primary == 'blue' %}#D5EEF6{% elif theme.primary == 'purple' %}#EDE9FE{% elif theme.primary == 'red' %}#FEE2E2{% elif theme.primary == 'orange' %}#FFEDD5{% else %}#DCFCE7{% endif %};
+            --theme-300: {% if theme.primary == 'blue' %}#7CC7DD{% elif theme.primary == 'purple' %}#C4B5FD{% elif theme.primary == 'red' %}#FCA5A5{% elif theme.primary == 'orange' %}#FDBA74{% else %}#86EFAC{% endif %};
+            --theme-400: {% if theme.primary == 'blue' %}#3FA8C8{% elif theme.primary == 'purple' %}#A78BFA{% elif theme.primary == 'red' %}#F87171{% elif theme.primary == 'orange' %}#FB923C{% else %}#4ADE80{% endif %};
+            --theme-500: {% if theme.primary == 'blue' %}#168BB3{% elif theme.primary == 'purple' %}#8B5CF6{% elif theme.primary == 'red' %}#EF4444{% elif theme.primary == 'orange' %}#F97316{% else %}#22C55E{% endif %};
+            --theme-600: {% if theme.primary == 'blue' %}#0E7296{% elif theme.primary == 'purple' %}#7C3AED{% elif theme.primary == 'red' %}#DC2626{% elif theme.primary == 'orange' %}#EA580C{% else %}#16A34A{% endif %};
+            --theme-700: {% if theme.primary == 'blue' %}#0C5E7C{% elif theme.primary == 'purple' %}#6D28D9{% elif theme.primary == 'red' %}#B91C1C{% elif theme.primary == 'orange' %}#C2410C{% else %}#15803D{% endif %};
+            --theme-800: {% if theme.primary == 'blue' %}#0B4D66{% elif theme.primary == 'purple' %}#5B21B6{% elif theme.primary == 'red' %}#991B1B{% elif theme.primary == 'orange' %}#9A3412{% else %}#166534{% endif %};
+            --theme-900: {% if theme.primary == 'blue' %}#07384D{% elif theme.primary == 'purple' %}#3B0764{% elif theme.primary == 'red' %}#7F1D1D{% elif theme.primary == 'orange' %}#7C2D12{% else %}#14532D{% endif %};
+        }
+        [x-cloak] { display: none !important; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .theme-shell {
+            background: var(--theme-900);
+            color: rgba(255,255,255,0.92);
+            border-color: rgba(255,255,255,0.08);
+        }
+        .theme-shell-soft { background: rgba(255,255,255,0.06); }
+        .theme-shell-strong { background: rgba(0,0,0,0.16); }
+        .theme-shell-border { border-color: rgba(255,255,255,0.12); }
+        .theme-shell-link { color: rgba(255,255,255,0.78); }
+        .theme-shell-link:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .theme-shell-link-active {
+            background: var(--theme-600);
+            color: #fff;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+        }
+        .theme-shell-link-open {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .theme-shell-sub-active {
+            color: var(--theme-300);
+            background: rgba(255,255,255,0.08);
+            font-weight: 600;
+        }
+        .theme-shell-sub { color: rgba(255,255,255,0.62); }
+        .theme-shell-sub:hover { color: rgba(255,255,255,0.92); background: rgba(255,255,255,0.06); }
+        .theme-accent-text { color: var(--theme-400); }
+        .theme-accent-soft { background: var(--theme-100); color: var(--theme-700); }
+        .theme-accent-btn {
+            background: var(--theme-600);
+            color: #fff;
+        }
+        .theme-accent-btn:hover { background: var(--theme-700); }
+        .theme-accent-ring:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.7), 0 0 0 4px var(--theme-500);
+        }
+        .theme-accent-border:focus {
+            border-color: var(--theme-500) !important;
+            box-shadow: 0 0 0 1px var(--theme-500);
+        }
+        .theme-accent-badge {
+            background: var(--theme-50);
+            color: var(--theme-700);
+            border: 1px solid var(--theme-100);
+        }
+        body.theme-dynamic .bg-green-50 { background-color: var(--theme-50) !important; }
+        body.theme-dynamic .bg-green-100 { background-color: var(--theme-100) !important; }
+        body.theme-dynamic .bg-green-600 { background-color: var(--theme-600) !important; }
+        body.theme-dynamic .bg-green-700 { background-color: var(--theme-700) !important; }
+        body.theme-dynamic .bg-green-800 { background-color: var(--theme-800) !important; }
+        body.theme-dynamic .bg-green-900 { background-color: var(--theme-900) !important; }
+        body.theme-dynamic .text-green-100 { color: color-mix(in srgb, white 92%, var(--theme-100) 8%) !important; }
+        body.theme-dynamic .text-green-300 { color: var(--theme-300) !important; }
+        body.theme-dynamic .text-green-400 { color: var(--theme-400) !important; }
+        body.theme-dynamic .text-green-500 { color: var(--theme-500) !important; }
+        body.theme-dynamic .text-green-600 { color: var(--theme-600) !important; }
+        body.theme-dynamic .text-green-700 { color: var(--theme-700) !important; }
+        body.theme-dynamic .text-green-800 { color: var(--theme-800) !important; }
+        body.theme-dynamic .border-green-100 { border-color: var(--theme-100) !important; }
+        body.theme-dynamic .border-green-200 { border-color: color-mix(in srgb, var(--theme-100) 72%, white 28%) !important; }
+        body.theme-dynamic .border-green-300 { border-color: color-mix(in srgb, var(--theme-300) 70%, white 30%) !important; }
+        body.theme-dynamic .border-green-500 { border-color: var(--theme-500) !important; }
+        body.theme-dynamic .border-green-600 { border-color: var(--theme-600) !important; }
+        body.theme-dynamic .border-green-700 { border-color: var(--theme-700) !important; }
+        body.theme-dynamic .border-green-800 { border-color: var(--theme-800) !important; }
+        body.theme-dynamic .ring-green-500 { --tw-ring-color: var(--theme-500) !important; }
+        body.theme-dynamic .ring-green-600 { --tw-ring-color: var(--theme-600) !important; }
+        body.theme-dynamic .focus\:ring-green-500:focus { --tw-ring-color: var(--theme-500) !important; }
+        body.theme-dynamic .focus\:ring-green-600:focus { --tw-ring-color: var(--theme-600) !important; }
+        body.theme-dynamic .focus\:ring-green-700:focus { --tw-ring-color: var(--theme-700) !important; }
+        body.theme-dynamic .focus\:border-green-500:focus { border-color: var(--theme-500) !important; }
+        body.theme-dynamic .focus\:border-green-600:focus { border-color: var(--theme-600) !important; }
+        body.theme-dynamic .focus\:border-green-700:focus { border-color: var(--theme-700) !important; }
+        body.theme-dynamic .hover\:bg-green-50:hover { background-color: var(--theme-50) !important; }
+        body.theme-dynamic .hover\:bg-green-100:hover { background-color: var(--theme-100) !important; }
+        body.theme-dynamic .hover\:bg-green-700:hover { background-color: var(--theme-700) !important; }
+        body.theme-dynamic .hover\:bg-green-800:hover { background-color: var(--theme-800) !important; }
+        body.theme-dynamic .hover\:text-green-100:hover { color: color-mix(in srgb, white 92%, var(--theme-100) 8%) !important; }
+        body.theme-dynamic .hover\:text-green-300:hover { color: var(--theme-300) !important; }
+        body.theme-dynamic .hover\:text-green-700:hover { color: var(--theme-700) !important; }
+        body.theme-dynamic .hover\:text-green-800:hover { color: var(--theme-800) !important; }
+        body.theme-dynamic .from-green-500 { --tw-gradient-from: var(--theme-500) var(--tw-gradient-from-position) !important; --tw-gradient-to: color-mix(in srgb, var(--theme-500) 0%, transparent) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+        body.theme-dynamic .from-green-700 { --tw-gradient-from: var(--theme-700) var(--tw-gradient-from-position) !important; --tw-gradient-to: color-mix(in srgb, var(--theme-700) 0%, transparent) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+        body.theme-dynamic .to-green-50 { --tw-gradient-to: var(--theme-50) var(--tw-gradient-to-position) !important; }
+        body.theme-dynamic .to-green-600 { --tw-gradient-to: var(--theme-600) var(--tw-gradient-to-position) !important; }
+        body.theme-dynamic .to-green-700 { --tw-gradient-to: var(--theme-700) var(--tw-gradient-to-position) !important; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="theme-dynamic bg-slate-50 text-slate-800 antialiased">
+    <div class="min-h-screen flex">
+        <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden" onclick="toggleSidebar(false)"></div>
+
+        <aside id="sidebar" class="fixed lg:sticky lg:top-0 lg:h-screen z-40 inset-y-0 left-0 w-72 bg-white border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto">
+            {% include "components/sidebar.html" %}
+        </aside>
+
+        <div class="flex-1 flex flex-col min-w-0">
+            {% include "components/navbar.html" %}
+
+            <main class="flex-1 p-4 sm:p-6 lg:p-8">
+                {% include "components/flash_messages.html" %}
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer class="border-t border-slate-200 bg-white px-4 sm:px-6 lg:px-8 py-4 text-sm text-slate-500">
+                <div class="flex items-center justify-between">
+                    <span>Ã‚Â© {% now "Y" %} {% if system_settings %}{{ system_settings.company_name }}{% else %}{{ brand_name|default:"ZALA/ECO ENERGY" }}{% endif %}</span>
+                    <span>System version v1.0.0</span>
+                </div>
+            </footer>
+        </div>
+</div>
+
+    <div id="modal-container" class="relative z-[100]"></div>
+    <div id="global-loader" class="fixed inset-0 z-[140] hidden items-center justify-center bg-slate-950/35 backdrop-blur-sm">
+        <div class="mx-4 w-full max-w-xs rounded-3xl border border-white/30 bg-white/90 px-6 py-7 text-center shadow-2xl shadow-slate-900/20">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-50">
+                <div class="h-8 w-8 animate-spin rounded-full border-[3px] border-green-200 border-t-green-700"></div>
+            </div>
+            <p class="mt-4 text-base font-semibold text-slate-900">Processing...</p>
+            <p id="global-loader-message" class="mt-1 text-sm text-slate-500">Please wait while we complete your request.</p>
+        </div>
+    </div>
+
+    <script src="{% static 'js/frontend.js' %}" defer></script>
+    <script>
+        const appToastIcons = {
+            success: 'check_circle',
+            warning: 'warning',
+            error: 'error',
+            info: 'info'
+        };
+
+        window.showAppToast = function (message, level = 'success') {
+            const containerId = 'flash-messages';
+            let container = document.getElementById(containerId);
+            if (!container) {
+                container = document.createElement('div');
+                container.id = containerId;
+                container.className = 'fixed top-4 right-4 z-[120] flex w-full max-w-sm flex-col gap-3';
+                document.body.appendChild(container);
+            }
+
+            const palette = {
+                success: 'bg-green-50 border-green-200 text-green-800',
+                warning: 'bg-amber-50 border-amber-200 text-amber-800',
+                error: 'bg-red-50 border-red-200 text-red-800',
+                info: 'bg-blue-50 border-blue-200 text-blue-800'
+            };
+
+            const item = document.createElement('div');
+            item.className = `flash-message rounded-2xl border px-4 py-3 text-sm font-medium shadow-lg transition-opacity duration-300 ${palette[level] || palette.info}`;
+            item.innerHTML = `
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-base leading-none mt-0.5">${appToastIcons[level] || appToastIcons.info}</span>
+                        <span>${message}</span>
+                    </div>
+                    <button type="button" class="rounded p-0.5 opacity-70 hover:opacity-100" aria-label="Dismiss message">
+                        <span class="material-symbols-outlined text-base leading-none">close</span>
+                    </button>
+                </div>
+            `;
+            item.querySelector('button').addEventListener('click', () => item.remove());
+            container.appendChild(item);
+            window.setTimeout(function () {
+                item.classList.add('opacity-0');
+                window.setTimeout(function () { item.remove(); }, 300);
+            }, 3200);
+        };
+
+        window.closeAppModal = function () {
+            const modalContainer = document.getElementById('modal-container');
+            if (modalContainer) {
+                modalContainer.innerHTML = '';
+            }
+            document.body.classList.remove('overflow-hidden');
+        };
+
+        (function () {
+            let loaderCounter = 0;
+            let activeLoaderButton = null;
+
+            function loaderElements() {
+                return {
+                    overlay: document.getElementById('global-loader'),
+                    message: document.getElementById('global-loader-message')
+                };
+            }
+
+            function setButtonLoading(button) {
+                if (!button || button.dataset.loadingApplied === 'true') {
+                    return;
+                }
+                button.dataset.loadingApplied = 'true';
+                button.dataset.originalDisabled = button.disabled ? 'true' : 'false';
+                button.disabled = true;
+                if (!button.classList.contains('btn-loading')) {
+                    return;
+                }
+                button.dataset.originalHtml = button.innerHTML;
+                button.innerHTML = `
+                    <span class="inline-flex items-center justify-center gap-2">
+                        <span class="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current"></span>
+                        <span>Processing...</span>
+                    </span>
+                `;
+                activeLoaderButton = button;
+            }
+
+            function resetButtonLoading(button) {
+                if (!button || button.dataset.loadingApplied !== 'true') {
+                    return;
+                }
+                if (button.classList.contains('btn-loading') && button.dataset.originalHtml) {
+                    button.innerHTML = button.dataset.originalHtml;
+                }
+                if (button.dataset.originalDisabled !== 'true') {
+                    button.disabled = false;
+                }
+                delete button.dataset.loadingApplied;
+                delete button.dataset.originalHtml;
+                delete button.dataset.originalDisabled;
+                if (activeLoaderButton === button) {
+                    activeLoaderButton = null;
+                }
+            }
+
+            function showGlobalLoader(message) {
+                const { overlay, message: messageElement } = loaderElements();
+                if (!overlay) {
+                    return;
+                }
+                loaderCounter += 1;
+                if (messageElement && message) {
+                    messageElement.textContent = message;
+                }
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                document.body.classList.add('cursor-progress');
+            }
+
+            function hideGlobalLoader(force = false) {
+                const { overlay, message: messageElement } = loaderElements();
+                if (!overlay) {
+                    return;
+                }
+                loaderCounter = force ? 0 : Math.max(loaderCounter - 1, 0);
+                if (loaderCounter > 0) {
+                    return;
+                }
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+                document.body.classList.remove('cursor-progress');
+                if (messageElement) {
+                    messageElement.textContent = 'Please wait while we complete your request.';
+                }
+                resetButtonLoading(activeLoaderButton);
+            }
+
+            function shouldHandleNavigation(link, event) {
+                if (!link || event.defaultPrevented) {
+                    return false;
+                }
+                const href = link.getAttribute('href') || '';
+                if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+                    return false;
+                }
+                if (link.hasAttribute('download') || link.target === '_blank' || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                    return false;
+                }
+                if (link.hasAttribute('data-no-loader') || link.hasAttribute('hx-get') || link.hasAttribute('hx-post') || link.hasAttribute('hx-put') || link.hasAttribute('hx-delete')) {
+                    return false;
+                }
+                const url = new URL(link.href, window.location.origin);
+                return url.origin === window.location.origin;
+            }
+
+            function shouldShowLoaderForFetch(resource, options) {
+                const requestOptions = options || {};
+                const method = String(requestOptions.method || 'GET').toUpperCase();
+                const headers = new Headers(requestOptions.headers || {});
+                return method !== 'GET'
+                    || headers.has('X-Requested-With')
+                    || headers.has('HX-Request');
+            }
+
+            window.appLoader = {
+                show(message = 'Please wait while we complete your request.') {
+                    showGlobalLoader(message);
+                },
+                hide() {
+                    hideGlobalLoader();
+                },
+                hideAll() {
+                    hideGlobalLoader(true);
+                }
+            };
+
+            const originalFetch = window.fetch ? window.fetch.bind(window) : null;
+            if (originalFetch) {
+                window.fetch = function (resource, options) {
+                    const shouldShow = shouldShowLoaderForFetch(resource, options);
+                    if (shouldShow) {
+                        showGlobalLoader('Processing...');
+                    }
+                    return originalFetch(resource, options).finally(function () {
+                        if (shouldShow) {
+                            hideGlobalLoader();
+                        }
+                    });
+                };
+            }
+
+            document.addEventListener('click', function (event) {
+                const loaderButton = event.target.closest('.btn-loading');
+                if (loaderButton && !loaderButton.disabled) {
+                    setButtonLoading(loaderButton);
+                }
+
+                const link = event.target.closest('a[href]');
+                if (shouldHandleNavigation(link, event)) {
+                    showGlobalLoader('Loading next page...');
+                }
+            }, true);
+
+            document.addEventListener('submit', function (event) {
+                const form = event.target;
+                if (!(form instanceof HTMLFormElement) || form.hasAttribute('data-no-loader')) {
+                    return;
+                }
+
+                const submitter = event.submitter || form.querySelector('button[type="submit"], input[type="submit"]');
+                if (submitter) {
+                    setButtonLoading(submitter);
+                }
+
+                form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach(function (button) {
+                    button.disabled = true;
+                });
+
+                showGlobalLoader('Processing...');
+            }, true);
+
+        document.body.addEventListener('htmx:afterSwap', function (event) {
+            if (event.detail.target.id === 'modal-container' && event.detail.target.innerHTML.trim()) {
+                document.body.classList.add('overflow-hidden');
+            }
+        });
+
+        document.body.addEventListener('htmx:beforeRequest', function () {
+            showGlobalLoader('Processing...');
+        });
+
+        document.body.addEventListener('htmx:afterRequest', function () {
+            hideGlobalLoader();
+        });
+
+        document.body.addEventListener('htmx:responseError', function () {
+            hideGlobalLoader(true);
+        });
+
+        document.body.addEventListener('htmx:sendError', function () {
+            hideGlobalLoader(true);
+        });
+
+        document.body.addEventListener('htmx:beforeSwap', function (event) {
+            const redirectHeader = event.detail.xhr.getResponseHeader('HX-Redirect');
+            const triggerHeader = event.detail.xhr.getResponseHeader('HX-Trigger');
+            if (triggerHeader) {
+                try {
+                    const parsed = JSON.parse(triggerHeader);
+                    if (parsed.showToast && parsed.showToast.message) {
+                        showAppToast(parsed.showToast.message, parsed.showToast.level || 'success');
+                    }
+                    if (parsed.financeListRefresh && parsed.financeListRefresh.url && parsed.financeListRefresh.target) {
+                        htmx.ajax('GET', parsed.financeListRefresh.url, {
+                            target: parsed.financeListRefresh.target,
+                            swap: 'outerHTML'
+                        });
+                        closeAppModal();
+                    }
+                } catch (error) {
+                    // Ignore malformed trigger payloads.
+                }
+            }
+            if (event.detail.target.id === 'modal-container' && !event.detail.xhr.responseText.trim() && !redirectHeader) {
+                closeAppModal();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeAppModal();
+            }
+        });
+
+        window.addEventListener('pageshow', function () {
+            hideGlobalLoader(true);
+        });
+
+        (function () {
+            const rootStyles = getComputedStyle(document.documentElement);
+            const tone = (name) => rootStyles.getPropertyValue(name).trim();
+            const toRgb = (hex) => {
+                const normalized = hex.replace('#', '');
+                if (normalized.length !== 6) {
+                    return '22, 163, 74';
+                }
+                const bigint = parseInt(normalized, 16);
+                return `${(bigint >> 16) & 255}, ${(bigint >> 8) & 255}, ${bigint & 255}`;
+            };
+
+            const primary600 = tone('--theme-600') || '#16A34A';
+            const primary700 = tone('--theme-700') || '#15803D';
+            const primary400 = tone('--theme-400') || '#4ADE80';
+            const primary100 = tone('--theme-100') || '#DCFCE7';
+            const primary50 = tone('--theme-50') || '#F0FDF4';
+            const primaryRgb = toRgb(primary600);
+            const primary700Rgb = toRgb(primary700);
+            const primary400Rgb = toRgb(primary400);
+
+            window.atmsTheme = {
+                primary: primary600,
+                primaryDark: primary700,
+                primaryLight: primary400,
+                surface: primary50,
+                soft: primary100,
+                alpha(hex, opacity) {
+                    return `rgba(${toRgb(hex)}, ${opacity})`;
+                },
+                chart: {
+                    primary: primary600,
+                    primaryDark: primary700,
+                    primaryLight: primary400,
+                    primaryFill: `rgba(${primaryRgb}, 0.14)`,
+                    primarySoftFill: `rgba(${primaryRgb}, 0.08)`,
+                    highlight: '#F59E0B',
+                    highlightFill: 'rgba(245, 158, 11, 0.12)',
+                    danger: '#DC2626',
+                    dangerFill: 'rgba(220, 38, 38, 0.08)',
+                    neutral: '#64748B',
+                    neutralSoft: 'rgba(100, 116, 139, 0.14)',
+                    info: '#0EA5E9',
+                    infoFill: 'rgba(14, 165, 233, 0.12)',
+                    success: primary600,
+                    successFill: `rgba(${primaryRgb}, 0.12)`,
+                    successStrongFill: `rgba(${primary700Rgb}, 0.16)`,
+                    successSoftFill: `rgba(${primary400Rgb}, 0.18)`,
+                    palette: [
+                        primary600,
+                        '#0EA5E9',
+                        '#F59E0B',
+                        '#EF4444',
+                        '#8B5CF6',
+                        '#14B8A6',
+                        '#F97316',
+                        '#EC4899',
+                    ],
+                    paletteAlpha: [
+                        `rgba(${primaryRgb}, 0.82)`,
+                        'rgba(14, 165, 233, 0.82)',
+                        'rgba(245, 158, 11, 0.82)',
+                        'rgba(239, 68, 68, 0.82)',
+                        'rgba(139, 92, 246, 0.82)',
+                        'rgba(20, 184, 166, 0.82)',
+                        'rgba(249, 115, 22, 0.82)',
+                        'rgba(236, 72, 153, 0.82)',
+                    ],
+                    grid: '#E2E8F0',
+                    tick: '#64748B',
+                    legend: '#334155',
+                }
+            };
+        })();
+
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

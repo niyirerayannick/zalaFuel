@@ -1,0 +1,7 @@
+<form id="expense-modal-form" method="post" action="{{ request.path }}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div id="expense-form-error" class="mb-4 hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"></div>
+    <div class="space-y-5">
+        {% include "transport/finance/_expense_form_fields.html" %}
+    </div>
+</form>

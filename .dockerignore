@@ -1,0 +1,44 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.egg-info
+.venv
+venv
+env
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local dev files
+db.sqlite3
+.env
+*.log
+
+# Node (if any)
+node_modules
+
+# Media uploads (use cloud storage in prod)
+media/
+
+# Build artifacts
+dist
+build
+*.egg
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+Codex.dmg
+get-pip.py
+README.md

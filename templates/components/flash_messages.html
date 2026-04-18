@@ -1,0 +1,31 @@
+{% if messages %}
+<div id="flash-messages" class="fixed top-4 right-4 z-50 flex w-full max-w-sm flex-col gap-3">
+    {% for message in messages %}
+        <div class="flash-message rounded-lg border px-4 py-3 text-sm font-medium shadow-sm transition-opacity duration-300
+            {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800
+            {% elif message.tags == 'warning' %}bg-amber-50 border-amber-200 text-amber-800
+            {% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800
+            {% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}"
+            role="alert"
+            aria-live="polite">
+            <div class="flex items-start justify-between gap-3">
+                <span>{{ message }}</span>
+                <button type="button" class="rounded p-0.5 opacity-70 hover:opacity-100" aria-label="Dismiss message" onclick="this.closest('.flash-message').remove()">
+                    <span class="material-symbols-outlined text-base leading-none" aria-hidden="true">close</span>
+                </button>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    window.setTimeout(function () {
+        const container = document.getElementById('flash-messages');
+        if (!container) return;
+        container.querySelectorAll('.flash-message').forEach(function (item) {
+            item.classList.add('opacity-0');
+            window.setTimeout(function () { item.remove(); }, 300);
+        });
+    }, 4500);
+</script>
+{% endif %}

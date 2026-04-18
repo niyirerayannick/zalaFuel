@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Inventory Reports | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div class="rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Reports</p>
+        <h1 class="mt-1 text-2xl font-bold text-slate-900">Inventory Reports</h1>
+        <p class="mt-1 text-sm text-slate-600">Tank balances and inventory movement history.</p>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Tank</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Station</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Fuel</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Current Stock</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Capacity</th></tr></thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                {% for tank in tanks %}
+                <tr class="hover:bg-slate-50/80 transition"><td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ tank.name }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ tank.station.name }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ tank.get_fuel_type_display }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ tank.current_volume_liters|floatformat:2 }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ tank.capacity_liters|floatformat:2 }}</td></tr>
+                {% empty %}
+                <tr><td colspan="5" class="px-6 py-8 text-center text-sm text-slate-500">No tanks found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Movement</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Tank</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Quantity</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Balance</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Date</th></tr></thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                {% for row in movements %}
+                <tr class="hover:bg-slate-50/80 transition"><td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ row.get_movement_type_display }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ row.tank.name }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ row.quantity }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ row.balance_after }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ row.created_at|date:"Y-m-d H:i" }}</td></tr>
+                {% empty %}
+                <tr><td colspan="5" class="px-6 py-8 text-center text-sm text-slate-500">No movement history found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">gas_meter</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Nozzle Details</h3>
+            <p class="text-xs text-slate-500">Link nozzle to pump and tank.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="md:col-span-2">
+            <label for="{{ form.pump.id_for_label }}" class="driver-label">Pump <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">local_gas_station</span>
+                {{ form.pump }}
+            </div>
+            <p class="driver-error" data-error-for="pump">{% if form.pump.errors %}{{ form.pump.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.fuel_type.id_for_label }}" class="driver-label">Fuel Type</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">local_fire_department</span>
+                {{ form.fuel_type }}
+            </div>
+            <p class="driver-error" data-error-for="fuel_type">{% if form.fuel_type.errors %}{{ form.fuel_type.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.tank.id_for_label }}" class="driver-label">Tank</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">inventory_2</span>
+                {{ form.tank }}
+            </div>
+            <p class="driver-error" data-error-for="tank">{% if form.tank.errors %}{{ form.tank.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.meter_start.id_for_label }}" class="driver-label">Meter Start</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">counter_1</span>
+                {{ form.meter_start }}
+            </div>
+            <p class="driver-error" data-error-for="meter_start">{% if form.meter_start.errors %}{{ form.meter_start.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.meter_end.id_for_label }}" class="driver-label">Meter End</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">counter_2</span>
+                {{ form.meter_end }}
+            </div>
+            <p class="driver-error" data-error-for="meter_end">{% if form.meter_end.errors %}{{ form.meter_end.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">check_circle</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Status</h3>
+            <p class="text-xs text-slate-500">Control availability of this nozzle.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5">
+        <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            {{ form.is_active }}
+            <label for="{{ form.is_active.id_for_label }}" class="text-sm font-semibold text-slate-800">Active</label>
+            <p class="text-xs text-slate-500">Inactive nozzles are hidden from POS.</p>
+        </div>
+    </div>
+</section>

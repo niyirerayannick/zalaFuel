@@ -1,0 +1,10 @@
+<form id="pos-form"
+      method="post"
+      action=""
+      class="space-y-4 bg-white"
+      data-has-open-shifts="{{ open_shifts|length|yesno:'1,0' }}"
+      {% if active_shift %}data-active-shift-id="{{ active_shift.id }}" data-active-station="{{ active_shift.station_id }}"{% endif %}>
+    {% csrf_token %}
+    <div id="pos-alert" class="hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"></div>
+    {% include "sales/_sales_form_fields.html" %}
+</form>

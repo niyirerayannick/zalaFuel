@@ -1,0 +1,375 @@
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const shiftSelect = document.getElementById('pos-shift');
+    const stationSelect = document.getElementById('pos-station');
+    const attendantInput = document.getElementById('pos-attendant');
+    const shiftTypeInput = document.getElementById('pos-shift-type');
+    const pumpSelect = document.getElementById('pos-pump');
+    const nozzleSelect = document.getElementById('pos-nozzle');
+    const openingInput = document.getElementById('pos-opening');
+    const closingInput = document.getElementById('pos-closing');
+    const qtyInput = document.getElementById('pos-quantity');
+    const priceInput = document.getElementById('pos-price');
+    const totalInput = document.getElementById('pos-total');
+    const alertBox = document.getElementById('pos-alert');
+    const tankName = document.getElementById('pos-tank-name');
+    const tankFuel = document.getElementById('pos-tank-fuel');
+    const fuelBadge = document.getElementById('pos-fuel-badge');
+    const tankStock = document.getElementById('pos-tank-stock');
+    const tankCap = document.getElementById('pos-tank-capacity');
+    const tankThresh = document.getElementById('pos-tank-threshold');
+    const tankAlert = document.getElementById('pos-tank-alert');
+    const form = document.getElementById('pos-form');
+    const submitBtn = document.getElementById('sale-save-btn');
+    const overlay = document.getElementById('sale-overlay');
+    const panel = document.getElementById('sale-panel');
+    const openBtn = document.getElementById('sale-add-btn');
+    const closeBtn = document.getElementById('sale-close-btn');
+    const cancelBtn = document.getElementById('sale-cancel-btn');
+    const paymentSelect = document.getElementById('pos-method');
+    const creditWrapper = document.getElementById('credit-customer-wrapper');
+    const hasOpenShifts = form?.dataset.hasOpenShifts === '1';
+    const defaultShiftId = form?.dataset.activeShiftId;
+    const summaryTotal = document.getElementById('pos-summary-total');
+    const summaryFuel = document.getElementById('pos-summary-fuel');
+    const summaryPump = document.getElementById('pos-summary-pump');
+    const summaryLiters = document.getElementById('pos-summary-liters');
+    const summaryPayment = document.getElementById('pos-summary-payment');
+    const summaryTank = document.getElementById('pos-summary-tank');
+    const summaryStock = document.getElementById('pos-summary-stock');
+    const summaryCapacity = document.getElementById('pos-summary-capacity');
+    const summaryThreshold = document.getElementById('pos-summary-threshold');
+
+    function setAlert(message, isError = true) {
+        if (!alertBox) return;
+        alertBox.textContent = message;
+        alertBox.classList.remove('hidden');
+        alertBox.classList.toggle('border-green-200', !isError);
+        alertBox.classList.toggle('bg-green-50', !isError);
+        alertBox.classList.toggle('text-green-700', !isError);
+        alertBox.classList.toggle('border-red-200', isError);
+        alertBox.classList.toggle('bg-red-50', isError);
+        alertBox.classList.toggle('text-red-700', isError);
+    }
+
+    function clearAlert() {
+        alertBox?.classList.add('hidden');
+    }
+
+    function selectedLabel(selectEl, fallback = '--') {
+        if (!selectEl || !selectEl.value) return fallback;
+        return selectEl.options[selectEl.selectedIndex]?.textContent?.trim() || fallback;
+    }
+
+    function setText(el, value) {
+        if (el) el.textContent = value;
+    }
+
+    function populateSelect(selectEl, items, placeholder) {
+        if (!selectEl) return;
+        selectEl.innerHTML = '';
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = placeholder;
+        selectEl.appendChild(option);
+        items.forEach(function (item) {
+            const choice = document.createElement('option');
+            choice.value = item.id;
+            choice.textContent = item.label;
+            selectEl.appendChild(choice);
+        });
+        selectEl.disabled = items.length === 0;
+    }
+
+    async function fetchJSON(url) {
+        const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!response.ok) throw new Error('Network error');
+        return response.json();
+    }
+
+    function getSelectedShiftOption() {
+        return shiftSelect && shiftSelect.selectedIndex >= 0 ? shiftSelect.options[shiftSelect.selectedIndex] : null;
+    }
+
+    function getSelectedShiftStationId() {
+        return getSelectedShiftOption()?.dataset.stationId || '';
+    }
+
+    function resetTankInfo() {
+        setText(tankName, '--');
+        setText(tankFuel, '--');
+        setText(tankStock, '-- L');
+        setText(tankCap, '-- L');
+        setText(tankThresh, '-- L');
+        setText(summaryTank, 'No nozzle selected');
+        fuelBadge?.classList.add('hidden');
+        tankAlert?.classList.add('hidden');
+        if (openingInput) {
+            openingInput.value = '';
+            openingInput.dataset.source = '';
+        }
+        if (priceInput) {
+            priceInput.value = '';
+            priceInput.dataset.source = '';
+        }
+    }
+
+    async function loadPumpsForShiftStation(stationId) {
+        clearAlert();
+        populateSelect(pumpSelect, [], 'Select pump');
+        populateSelect(nozzleSelect, [], 'Select nozzle');
+        if (pumpSelect) pumpSelect.disabled = true;
+        if (nozzleSelect) nozzleSelect.disabled = true;
+        resetTankInfo();
+        recompute();
+        updateSummary();
+        if (!stationId) {
+            validateForm();
+            return;
+        }
+        try {
+            const data = await fetchJSON(`/sales/api/pumps/?station=${stationId}`);
+            populateSelect(pumpSelect, data.results, 'Select pump');
+        } catch (error) {
+            setAlert('Unable to load pumps for this shift station.');
+        } finally {
+            validateForm();
+        }
+    }
+
+    async function syncShiftSelection() {
+        const option = getSelectedShiftOption();
+        const stationId = option?.dataset.stationId || '';
+        const attendantName = option?.dataset.attendantName || '';
+        const shiftType = option?.dataset.shiftType || '';
+
+        if (stationSelect) {
+            stationSelect.value = stationId;
+        }
+        if (attendantInput) {
+            attendantInput.value = attendantName;
+        }
+        if (shiftTypeInput) {
+            shiftTypeInput.value = shiftType;
+        }
+        await loadPumpsForShiftStation(stationId);
+        updateSummary();
+    }
+
+    shiftSelect?.addEventListener('change', function () {
+        syncShiftSelection();
+    });
+
+    pumpSelect?.addEventListener('change', async function () {
+        clearAlert();
+        populateSelect(nozzleSelect, [], 'Select nozzle');
+        if (nozzleSelect) nozzleSelect.disabled = true;
+        resetTankInfo();
+        const pumpId = this.value;
+        updateSummary();
+        if (!pumpId) {
+            validateForm();
+            return;
+        }
+        try {
+            const data = await fetchJSON(`/sales/api/nozzles/?pump=${pumpId}`);
+            populateSelect(nozzleSelect, data.results, 'Select nozzle');
+        } catch (error) {
+            setAlert('Unable to load nozzles.');
+        } finally {
+            validateForm();
+        }
+    });
+
+    nozzleSelect?.addEventListener('change', async function () {
+        clearAlert();
+        const nozzleId = this.value;
+        if (!nozzleId) {
+            resetTankInfo();
+            updateSummary();
+            validateForm();
+            return;
+        }
+        try {
+            const data = await fetchJSON(`/sales/api/nozzle/${nozzleId}/tank/`);
+            setText(tankName, data.tank);
+            setText(tankFuel, data.fuel_type);
+            fuelBadge?.classList.remove('hidden');
+            setText(fuelBadge, data.fuel_type);
+            if (fuelBadge) {
+                fuelBadge.className = 'inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold';
+            }
+            if ((data.fuel_type || '').toLowerCase().includes('diesel')) {
+                fuelBadge?.classList.add('bg-amber-100', 'text-amber-800');
+            } else {
+                fuelBadge?.classList.add('bg-emerald-100', 'text-emerald-700');
+            }
+            setText(tankStock, `${data.current_stock} L`);
+            setText(tankCap, `${data.capacity} L`);
+            setText(tankThresh, `${data.low_level_threshold} L`);
+            if (openingInput) {
+                openingInput.value = Number(data.opening_meter || 0).toFixed(2);
+                openingInput.dataset.source = data.opening_meter_source || '';
+            }
+            if (priceInput) {
+                priceInput.value = Number(data.unit_price || 0).toFixed(2);
+                priceInput.dataset.source = 'settings';
+            }
+            tankAlert?.classList.toggle('hidden', !(data.low_level_threshold && data.current_stock <= data.low_level_threshold));
+        } catch (error) {
+            setAlert('No tank linked to this nozzle.', true);
+            resetTankInfo();
+        }
+        recompute();
+        updateSummary();
+        validateForm();
+    });
+
+    function recompute() {
+        const opening = parseFloat(openingInput?.value || '0');
+        const closing = parseFloat(closingInput?.value || '0');
+        const qty = closing - opening;
+        if (qtyInput) {
+            qtyInput.value = qty > 0 ? qty.toFixed(2) : '';
+        }
+        const price = parseFloat(priceInput?.value || '0');
+        if (totalInput) {
+            totalInput.value = qty > 0 && price > 0 ? (qty * price).toFixed(2) : '';
+        }
+        updateSummary();
+        validateForm();
+    }
+
+    [openingInput, closingInput, priceInput].forEach(function (el) {
+        el?.addEventListener('input', recompute);
+    });
+
+    function updateSummary() {
+        const qty = parseFloat(qtyInput?.value || '0') || 0;
+        const total = parseFloat(totalInput?.value || '0') || 0;
+        const paymentLabel = selectedLabel(paymentSelect, 'Cash');
+        const pumpLabel = selectedLabel(pumpSelect, '');
+        const nozzleLabel = selectedLabel(nozzleSelect, '');
+        const pumpNozzle = pumpLabel && nozzleLabel ? `${pumpLabel} / ${nozzleLabel}` : (pumpLabel || nozzleLabel || '--');
+
+        setText(summaryTotal, total > 0 ? total.toFixed(2) : '0.00');
+        setText(summaryFuel, tankFuel?.textContent?.trim() && tankFuel.textContent.trim() !== '--' ? tankFuel.textContent.trim() : '--');
+        setText(summaryPump, pumpNozzle);
+        setText(summaryLiters, `${qty > 0 ? qty.toFixed(2) : '0.00'} L`);
+        setText(summaryPayment, paymentLabel);
+        setText(summaryTank, tankName?.textContent?.trim() && tankName.textContent.trim() !== '--' ? tankName.textContent.trim() : 'No nozzle selected');
+        setText(summaryStock, tankStock?.textContent?.trim() || '-- L');
+        setText(summaryCapacity, tankCap?.textContent?.trim() || '-- L');
+        setText(summaryThreshold, tankThresh?.textContent?.trim() || '-- L');
+    }
+
+    function toggleCredit() {
+        if (!paymentSelect) return;
+        const isCredit = paymentSelect.value === 'credit';
+        creditWrapper?.classList.toggle('hidden', !isCredit);
+    }
+
+    paymentSelect?.addEventListener('change', function () {
+        toggleCredit();
+        updateSummary();
+        validateForm();
+    });
+    toggleCredit();
+
+    function validateForm() {
+        const qty = parseFloat(qtyInput?.value || '0');
+        const tankBalance = parseFloat((tankStock?.textContent || '0').split(' ')[0]) || 0;
+        const isCredit = paymentSelect && paymentSelect.value === 'credit';
+        const creditSelected = !creditWrapper || creditWrapper.classList.contains('hidden') || document.getElementById('pos-credit-customer')?.value;
+        const validBase = !!(shiftSelect?.value && pumpSelect?.value && nozzleSelect?.value && qty > 0 && (!isCredit || creditSelected));
+        if (submitBtn) submitBtn.disabled = !validBase;
+        if (tankBalance < qty && qty > 0) {
+            setAlert('Insufficient stock in tank.');
+        } else if (!shiftSelect?.value) {
+            setAlert(hasOpenShifts ? 'Select an open shift before recording sales.' : 'Open a shift before recording sales.');
+        } else if (submitBtn?.disabled) {
+            clearAlert();
+        }
+    }
+
+    form?.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        clearAlert();
+        const formData = new FormData(form);
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+        }
+        try {
+            const response = await fetch('/sales/api/sales/', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                setAlert(payload.error || 'Unable to save sale.');
+                return;
+            }
+            setAlert(`Sale recorded. ${payload.volume} L sold.`, false);
+            setText(tankStock, `${payload.tank_balance} L`);
+            form.reset();
+            populateSelect(pumpSelect, [], 'Select pump');
+            populateSelect(nozzleSelect, [], 'Select nozzle');
+            if (pumpSelect) pumpSelect.disabled = true;
+            if (nozzleSelect) nozzleSelect.disabled = true;
+            if (qtyInput) qtyInput.value = '';
+            if (totalInput) totalInput.value = '';
+            if (defaultShiftId && shiftSelect) {
+                shiftSelect.value = defaultShiftId;
+            }
+            await syncShiftSelection();
+            updateSummary();
+            validateForm();
+            window.location.reload();
+        } catch (err) {
+            setAlert('Something went wrong. Please try again.');
+        } finally {
+            if (submitBtn) {
+                submitBtn.textContent = 'Save Sale';
+                validateForm();
+            }
+        }
+    });
+
+    function openPanel() {
+        overlay?.classList.remove('hidden');
+        panel?.classList.remove('hidden');
+        requestAnimationFrame(function () {
+            panel?.classList.remove('translate-x-full');
+        });
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePanel() {
+        panel?.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(function () {
+            overlay?.classList.add('hidden');
+            panel?.classList.add('hidden');
+        }, 220);
+    }
+
+    openBtn?.addEventListener('click', openPanel);
+    closeBtn?.addEventListener('click', closePanel);
+    overlay?.addEventListener('click', closePanel);
+    cancelBtn?.addEventListener('click', closePanel);
+    submitBtn?.addEventListener('click', function () {
+        form?.requestSubmit();
+    });
+
+    if (defaultShiftId && shiftSelect) {
+        shiftSelect.value = defaultShiftId;
+    }
+    if (shiftSelect) {
+        syncShiftSelection();
+    }
+    updateSummary();
+    validateForm();
+});
+</script>

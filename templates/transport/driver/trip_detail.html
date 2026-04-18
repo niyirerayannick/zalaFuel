@@ -1,0 +1,56 @@
+{% extends "transport/driver_base.html" %}
+{% load currency_tags %}
+
+{% block title %}Trip {{ trip.order_number }} | Driver{% endblock %}
+
+{% block driver_content %}
+<section data-section="trips" class="space-y-4">
+    <article class="rounded-[30px] border border-white/10 bg-white/10 p-5 shadow-app backdrop-blur-xl">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.26em] text-emerald-200/75">Trip</p>
+                <h1 class="mt-2 text-2xl font-semibold text-white">{{ trip.order_number }}</h1>
+                <p class="mt-2 text-sm text-emerald-50/75">{{ trip.route.origin }} to {{ trip.route.destination }}</p>
+            </div>
+            <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white">{{ trip.get_status_display }}</span>
+        </div>
+    </article>
+
+    <article class="rounded-[28px] bg-white p-5 shadow-app">
+        <h2 class="text-lg font-semibold text-slate-900">Trip details</h2>
+        <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+            <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Customer</p>
+                <p class="mt-1 font-semibold text-slate-900">{{ trip.customer.company_name }}</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Vehicle</p>
+                <p class="mt-1 font-semibold text-slate-900">{{ trip.vehicle.plate_number }}</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Odometer Start</p>
+                <p class="mt-1 font-semibold text-slate-900">{% if trip.km_start > 0 %}{{ trip.km_start|floatformat:0 }} km{% else %}Pending{% endif %}</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Odometer End</p>
+                <p class="mt-1 font-semibold text-slate-900">{% if trip.km_end > 0 %}{{ trip.km_end|floatformat:0 }} km{% else %}Pending{% endif %}</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Fuel Cost</p>
+                <p class="mt-1 font-semibold text-slate-900">{{ trip.fuel_cost|currency }}</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Created</p>
+                <p class="mt-1 font-semibold text-slate-900">{{ trip.created_at|date:"M d, Y" }}</p>
+            </div>
+        </div>
+    </article>
+
+    <article class="rounded-[28px] bg-white p-5 shadow-app">
+        <a href="{% url 'transport:driver_trips' %}" class="inline-flex items-center gap-2 text-sm font-semibold text-driver-700">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            Back to Trips
+        </a>
+    </article>
+</section>
+{% endblock %}

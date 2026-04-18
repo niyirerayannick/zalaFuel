@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Fuel Requests | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fleet Operations</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Fuel Requests</h1>
+                <p class="mt-1 text-sm text-slate-600">Review and approve driver-submitted fuel requests from one dashboard queue.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="{% url 'transport:fuel:analytics' %}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                    <span class="material-symbols-outlined text-[18px] leading-none">insights</span>
+                    Analytics
+                </a>
+                <button type="button" disabled class="inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-green-700/60 px-4 py-2 text-sm font-semibold text-white" title="Fuel log creation is not available in the current backend; drivers submit fuel requests through the existing driver workflow.">
+                    <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                    Add Fuel Log
+                </button>
+            </div>
+        </div>
+        <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            The current backend exposes fuel request review on this page. New fuel submissions still come from the existing driver request flow.
+        </div>
+    </div>
+
+    <div id="fuel-list-content">
+        {% include "transport/fuel/_staff_list_content.html" %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}User Detail | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl bg-gradient-to-r from-[#0c5069] via-[#0f7ea6] to-[#1a6a87] p-6 text-white shadow-lg">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex items-center gap-4">
+                {% if managed_user.profile_photo %}
+                    <img src="{{ managed_user.profile_photo.url }}" alt="" class="h-16 w-16 rounded-2xl object-cover ring-2 ring-white/40">
+                {% else %}
+                    <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 text-2xl font-bold">{{ managed_user.full_name|default:managed_user.email|first|upper }}</div>
+                {% endif %}
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/75">Staff Profile</p>
+                    <h1 class="mt-1 text-2xl font-bold">{{ managed_user.full_name|default:"No name" }}</h1>
+                    <p class="mt-1 text-sm text-white/80">{{ managed_user.email }} Ã‚Â· {{ managed_user.system_role }}</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="{% url 'accounts:user-update' managed_user.pk %}" class="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#0c5069] transition hover:bg-slate-100">Edit</a>
+                {% if can_change_lifecycle %}
+                <form method="post" action="{% url 'accounts:user-toggle-active' managed_user.pk %}">
+                    {% csrf_token %}
+                    <button class="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/20" type="submit">{% if managed_user.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+                </form>
+                <form method="post" action="{% url 'accounts:user-reset-password' managed_user.pk %}">
+                    {% csrf_token %}
+                    <button class="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/20" type="submit">Reset Password</button>
+                </form>
+                {% endif %}
+                <a href="{% url 'accounts:user-list' %}" class="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/20">Back</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Account Information</h2>
+            <div class="mt-5 grid gap-4 md:grid-cols-2">
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Full Name</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">{{ managed_user.full_name|default:"-" }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Email</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">{{ managed_user.email }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Phone</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">{{ managed_user.phone|default:"-" }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Staff ID</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">{{ managed_user.staff_id|default:"-" }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Role</p>
+                    <p class="mt-1 text-sm font-semibold text-[#0c5069]">{{ managed_user.system_role }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Assigned Station</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">{{ managed_user.assigned_station.name|default:"Unassigned" }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Status</p>
+                    <p class="mt-1 text-sm font-semibold {% if managed_user.is_active %}text-emerald-700{% else %}text-amber-700{% endif %}">{% if managed_user.is_active %}Active{% else %}Inactive{% endif %}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Last Login</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">{% if managed_user.last_login %}{{ managed_user.last_login|date:"M j, Y H:i" }}{% else %}Never{% endif %}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Created</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">{{ managed_user.created_at|date:"M j, Y" }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Must Change Password</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">{% if managed_user.must_change_password %}Yes{% else %}No{% endif %}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Lifecycle</h2>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Prefer deactivation for staff with shift, sales, delivery, payment, or audit records. Deactivated users cannot log in, but records remain linked.</p>
+            {% if can_change_lifecycle %}
+            <div class="mt-5 space-y-3">
+                <form method="post" action="{% url 'accounts:user-toggle-active' managed_user.pk %}">
+                    {% csrf_token %}
+                    <button class="w-full rounded-xl border {% if managed_user.is_active %}border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100{% else %}border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100{% endif %} px-4 py-2.5 text-sm font-semibold" type="submit">{% if managed_user.is_active %}Deactivate Account{% else %}Activate Account{% endif %}</button>
+                </form>
+                <form method="post" action="{% url 'accounts:user-reset-password' managed_user.pk %}">
+                    {% csrf_token %}
+                    <button class="w-full rounded-xl border border-[#0f7ea6]/30 bg-[#0f7ea6]/10 px-4 py-2.5 text-sm font-semibold text-[#0c5069] hover:bg-[#0f7ea6]/15" type="submit">Send Password Reset</button>
+                </form>
+                <form method="post" action="{% url 'accounts:user-delete' managed_user.pk %}" onsubmit="return confirm('Delete this user only if they have no operational records. Continue?');">
+                    {% csrf_token %}
+                    <button class="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100" type="submit">Delete if Safe</button>
+                </form>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Profile Details</h2>
+            <div class="mt-5 grid gap-4 md:grid-cols-2">
+                <div class="rounded-xl bg-slate-50 p-4 md:col-span-2">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Address</p>
+                    <p class="mt-1 text-sm text-slate-900">{{ managed_user.profile.address|default:"-" }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">National ID</p>
+                    <p class="mt-1 text-sm text-slate-900">{{ managed_user.profile.national_id|default:"-" }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Emergency Contact</p>
+                    <p class="mt-1 text-sm text-slate-900">{{ managed_user.profile.emergency_contact|default:"-" }}</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">License Number</p>
+                    <p class="mt-1 text-sm text-slate-900">{{ managed_user.profile.license_number|default:"-" }}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Recent Activity</h2>
+            <div class="mt-5 space-y-3">
+                {% for log in recent_activity %}
+                    <div class="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                        <p class="text-xs font-semibold uppercase text-slate-500">{{ log.get_action_display }} Ã‚Â· {{ log.created_at|date:"M j, Y H:i" }}</p>
+                        <p class="mt-1 text-sm text-slate-700">{{ log.description }}</p>
+                    </div>
+                {% empty %}
+                    <p class="text-sm text-slate-500">No activity recorded yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

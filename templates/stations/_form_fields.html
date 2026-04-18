@@ -1,0 +1,65 @@
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">local_gas_station</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Station Details</h3>
+            <p class="text-xs text-slate-500">Name, code, and location for this station.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="md:col-span-2">
+            <label for="{{ form.name.id_for_label }}" class="driver-label">Name <span class="text-red-500">*</span></label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">badge</span>
+                {{ form.name }}
+            </div>
+            <p class="driver-error" data-error-for="name">{% if form.name.errors %}{{ form.name.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.code.id_for_label }}" class="driver-label">Code</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">qr_code_2</span>
+                {{ form.code }}
+            </div>
+            <p class="driver-help">Auto-generated when left blank.</p>
+            <p class="driver-error" data-error-for="code">{% if form.code.errors %}{{ form.code.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.location.id_for_label }}" class="driver-label">Location</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">location_on</span>
+                {{ form.location }}
+            </div>
+            <p class="driver-error" data-error-for="location">{% if form.location.errors %}{{ form.location.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">group</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Manager & Status</h3>
+            <p class="text-xs text-slate-500">Assign a manager and control visibility.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="md:col-span-2">
+            <label for="{{ form.manager.id_for_label }}" class="driver-label">Station Manager</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">supervisor_account</span>
+                {{ form.manager }}
+            </div>
+            <p class="driver-error" data-error-for="manager">{% if form.manager.errors %}{{ form.manager.errors.0 }}{% endif %}</p>
+        </div>
+        <div class="md:col-span-2 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            {{ form.is_active }}
+            <label for="{{ form.is_active.id_for_label }}" class="text-sm font-semibold text-slate-800">Active</label>
+            <p class="text-xs text-slate-500">Inactive stations are hidden from selection but remain in records.</p>
+        </div>
+    </div>
+</section>

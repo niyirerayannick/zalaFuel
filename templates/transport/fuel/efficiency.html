@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Fuel Efficiency per Vehicle | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Fuel Efficiency per Vehicle</h1>
+                <p class="mt-2 text-sm text-gray-600">Compare km/L, cost per km, and consumption across fleet vehicles</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'transport:fuel:analytics' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="{% url 'transport:fuel:trends' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Trends
+                </a>
+                <a href="{% url 'transport:fuel:alerts' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Alerts
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fleet Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Total Vehicles -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                        <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Vehicles Tracked</dt>
+                            <dd class="text-2xl font-bold text-gray-900">{{ vehicle_count }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avg Fleet Efficiency -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
+                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Avg Fleet Efficiency</dt>
+                            <dd class="text-2xl font-bold text-gray-900">{{ fleet_avg_efficiency }} km/L</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avg Cost/KM -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-amber-100 rounded-md p-3">
+                        <svg class="h-6 w-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Avg Cost/KM</dt>
+                            <dd class="text-2xl font-bold text-gray-900">{{ fleet_avg_cpk|currency }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Best Vehicle -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-teal-100 rounded-md p-3">
+                        <svg class="h-6 w-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Most Efficient</dt>
+                            {% if best_vehicle %}
+                            <dd class="text-lg font-bold text-gray-900">{{ best_vehicle.plate_number }}</dd>
+                            <dd class="text-xs text-green-600">{{ best_vehicle.efficiency }} km/L</dd>
+                            {% else %}
+                            <dd class="text-lg font-bold text-gray-400">Ã¢â‚¬â€</dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white shadow rounded-lg p-4 mb-8">
+        <form method="get" class="flex flex-wrap items-center gap-4">
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Vehicle Type</label>
+                <select name="vehicle_type" class="rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">All Types</option>
+                    {% for code, label in vehicle_types %}
+                    <option value="{{ code }}" {% if selected_type == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Sort By</label>
+                <select name="sort" class="rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="efficiency" {% if selected_sort == 'efficiency' %}selected{% endif %}>Efficiency (km/L)</option>
+                    <option value="cost_per_km" {% if selected_sort == 'cost_per_km' %}selected{% endif %}>Cost per KM</option>
+                    <option value="liters" {% if selected_sort == 'liters' %}selected{% endif %}>Total Liters</option>
+                    <option value="cost" {% if selected_sort == 'cost' %}selected{% endif %}>Total Cost</option>
+                    <option value="plate" {% if selected_sort == 'plate' %}selected{% endif %}>Plate Number</option>
+                </select>
+            </div>
+            <div class="pt-5">
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                    Apply
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Efficiency Chart -->
+    <div class="bg-white shadow rounded-lg p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Efficiency Comparison (Top 15 Vehicles)</h3>
+        <canvas id="efficiencyChart" height="200"></canvas>
+    </div>
+
+    <!-- Vehicle Table -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Vehicle Fuel Efficiency Details</h3>
+            <p class="text-sm text-gray-500 mt-1">{{ vehicle_count }} vehicle{{ vehicle_count|pluralize }} tracked</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehicle</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Efficiency</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cost/KM</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Liters</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Cost</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Distance</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Trips</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Entries</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Period</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for v in vehicles %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm text-gray-500">{{ forloop.counter }}</td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ v.plate_number }}</td>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">{{ v.vehicle_type }}</span>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-right">
+                            {% if v.efficiency > 0 %}
+                            <span class="font-semibold {% if v.efficiency >= fleet_avg_efficiency %}text-green-600{% else %}text-red-600{% endif %}">
+                                {{ v.efficiency }} km/L
+                            </span>
+                            {% else %}
+                            <span class="text-gray-400">Ã¢â‚¬â€</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-right">
+                            {% if v.cost_per_km > 0 %}
+                            <span class="{% if v.cost_per_km <= fleet_avg_cpk %}text-green-600{% else %}text-red-600{% endif %}">
+                                {{ v.cost_per_km|currency }}
+                            </span>
+                            {% else %}
+                            <span class="text-gray-400">Ã¢â‚¬â€</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900 text-right">{{ v.total_liters|floatformat:1 }} L</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 text-right">{{ v.total_cost|currency }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 text-right">{{ v.total_distance|floatformat:0 }} km</td>
+                        <td class="px-4 py-3 text-sm text-gray-500 text-right">{{ v.trip_count }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-500 text-right">{{ v.entry_count }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-500 text-center">
+                            {% if v.first_entry %}
+                            {{ v.first_entry|date:"d/m/y" }} Ã¢â‚¬â€œ {{ v.last_entry|date:"d/m/y" }}
+                            {% else %}
+                            Ã¢â‚¬â€
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="11" class="px-4 py-8 text-center text-gray-500">
+                            <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            <p class="text-sm font-medium">No vehicle fuel data available</p>
+                            <p class="text-xs mt-1">Add fuel entries linked to trips to see efficiency data</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if worst_vehicle %}
+    <!-- Efficiency Insight Banner -->
+    <div class="mt-8 bg-amber-50 border border-amber-200 rounded-lg p-6">
+        <div class="flex">
+            <svg class="h-6 w-6 text-amber-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <div>
+                <h4 class="text-sm font-semibold text-amber-800">Efficiency Insight</h4>
+                <p class="text-sm text-amber-700 mt-1">
+                    Least efficient vehicle: <strong>{{ worst_vehicle.plate_number }}</strong> at {{ worst_vehicle.efficiency }} km/L
+                    (fleet average: {{ fleet_avg_efficiency }} km/L).
+                    Improving this vehicle's efficiency could save significant fuel costs.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const effCtx = document.getElementById('efficiencyChart');
+    if (effCtx) {
+        const chartTheme = (window.atmsTheme && window.atmsTheme.chart) || {};
+        const labels = {{ chart_labels|safe }};
+        const effData = {{ chart_efficiency|safe }};
+        const cpkData = {{ chart_cpk|safe }};
+        const avgEff = {{ fleet_avg_efficiency }};
+
+        new Chart(effCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Efficiency (km/L)',
+                        data: effData,
+                        backgroundColor: effData.map(v => v >= avgEff ? (chartTheme.successStrongFill || 'rgba(16, 185, 129, 0.7)') : (chartTheme.dangerFill || 'rgba(239, 68, 68, 0.7)')),
+                        borderRadius: 4,
+                        yAxisID: 'y',
+                    },
+                    {
+                        label: 'Cost/KM',
+                        data: cpkData,
+                        type: 'line',
+                        borderColor: chartTheme.highlight || 'rgba(245, 158, 11, 0.9)',
+                        backgroundColor: chartTheme.highlightFill || 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.3,
+                        yAxisID: 'y1',
+                        pointRadius: 4,
+                    },
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'top' },
+                    annotation: {
+                        annotations: {
+                            avgLine: {
+                                type: 'line',
+                                yMin: avgEff,
+                                yMax: avgEff,
+                                borderColor: chartTheme.neutralSoft || 'rgba(107, 114, 128, 0.5)',
+                                borderDash: [5, 5],
+                                borderWidth: 2,
+                                label: { display: true, content: 'Fleet Avg', position: 'start' }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { position: 'left', title: { display: true, text: 'km/L' }, beginAtZero: true },
+                    y1: { position: 'right', title: { display: true, text: 'Cost/KM' }, beginAtZero: true, grid: { drawOnChartArea: false } },
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% load currency_tags %}
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Attendant</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Station</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Shift Type</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Opening Cash</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Opening Readings</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Actual Sales</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Liters</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Variance</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Start</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">End</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for shift in shifts %}
+            <tr>
+                <td class="px-4 py-3 text-sm text-slate-800">{{ shift.attendant.full_name|default:shift.attendant }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ shift.station.name }}</td>
+                <td class="px-4 py-3 text-sm">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700">
+                        {{ shift.get_shift_type_display }}
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-sm font-semibold text-slate-800">{{ shift.opening_cash|floatformat:2 }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ shift.readings_count|default:0 }} nozzles</td>
+                <td class="px-4 py-3 text-sm font-semibold text-slate-800">{{ shift.actual_sales|default:0|currency }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ shift.actual_liters|default:0|floatformat:2 }}</td>
+                <td class="px-4 py-3 text-sm">
+                    {% if shift.status == 'closed' %}
+                    <span class="{% if shift.variance_amount == 0 %}text-emerald-700{% elif shift.variance_amount > 0 %}text-amber-700{% else %}text-red-700{% endif %} font-semibold">{{ shift.variance_amount|currency }}</span>
+                    {% else %}
+                    <span class="text-slate-400">Pending</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ shift.opened_at }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ shift.closed_at|default:"--" }}</td>
+                <td class="px-4 py-3 text-sm">
+                    {% if shift.status == 'open' %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Open</span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Closed</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-600">
+                    <div class="flex gap-2">
+                        <a href="{% url 'sales:shifts-detail' shift.pk %}" class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">View</a>
+                        {% if shift.status == 'open' %}
+                        <button data-close-url="{% url 'sales:shifts-close' shift.pk %}" class="shift-close-btn rounded-lg border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-50">Close</button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="12" class="px-4 py-6 text-center text-sm text-slate-500">No shifts found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

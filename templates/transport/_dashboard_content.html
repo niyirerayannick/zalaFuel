@@ -1,0 +1,186 @@
+{% load currency_tags %}
+<div class="space-y-6" id="transport-dashboard-content-inner">
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <a href="{% url 'transport:vehicles:list' %}" class="dashboard-kpi-card transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
+            <div class="dashboard-kpi-icon bg-slate-100 text-slate-800"><span class="material-symbols-outlined">directions_car</span></div>
+            <div>
+                <p class="dashboard-kpi-label">Total Vehicles</p>
+                <p class="dashboard-kpi-value">{{ metrics.total_vehicles }}</p>
+                <p class="dashboard-kpi-note">Full fleet count</p>
+            </div>
+        </a>
+        <a href="{% url 'transport:orders:customer-list' %}" class="dashboard-kpi-card transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
+            <div class="dashboard-kpi-icon bg-emerald-100 text-emerald-800"><span class="material-symbols-outlined">inventory_2</span></div>
+            <div>
+                <p class="dashboard-kpi-label">Total Orders</p>
+                <p class="dashboard-kpi-value">{{ metrics.total_orders }}</p>
+                <p class="dashboard-kpi-note">All transport orders</p>
+            </div>
+        </a>
+        <a href="{% url 'transport:drivers:list' %}" class="dashboard-kpi-card transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
+            <div class="dashboard-kpi-icon bg-violet-100 text-violet-800"><span class="material-symbols-outlined">badge</span></div>
+            <div>
+                <p class="dashboard-kpi-label">Total Drivers</p>
+                <p class="dashboard-kpi-value">{{ metrics.total_drivers }}</p>
+                <p class="dashboard-kpi-note">Registered drivers</p>
+            </div>
+        </a>
+        <a href="{% url 'transport:trips:list' %}" class="dashboard-kpi-card transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
+            <div class="dashboard-kpi-icon bg-indigo-100 text-indigo-800"><span class="material-symbols-outlined">route</span></div>
+            <div>
+                <p class="dashboard-kpi-label">Total Trips</p>
+                <p class="dashboard-kpi-value">{{ metrics.total_trips }}</p>
+                <p class="dashboard-kpi-note">All trip records</p>
+            </div>
+        </a>
+        <a href="{% url 'transport:trips:list' %}?status=IN_TRANSIT" class="dashboard-kpi-card transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
+            <div class="dashboard-kpi-icon bg-lime-100 text-lime-800"><span class="material-symbols-outlined">local_shipping</span></div>
+            <div>
+                <p class="dashboard-kpi-label">Active Trips</p>
+                <p class="dashboard-kpi-value">{{ metrics.active_trips }}</p>
+                <p class="dashboard-kpi-note">Trips currently in motion</p>
+            </div>
+        </a>
+        <a href="{% url 'transport:vehicles:list' %}?status=MAINTENANCE" class="dashboard-kpi-card transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
+            <div class="dashboard-kpi-icon bg-rose-100 text-rose-800"><span class="material-symbols-outlined">construction</span></div>
+            <div>
+                <p class="dashboard-kpi-label">Under Maintenance</p>
+                <p class="dashboard-kpi-value">{{ metrics.vehicles_in_maintenance }}</p>
+                <p class="dashboard-kpi-note">Being serviced now</p>
+            </div>
+        </a>
+        <a href="{% url 'transport:fuel:list' %}" class="dashboard-kpi-card transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
+            <div class="dashboard-kpi-icon bg-cyan-100 text-cyan-800"><span class="material-symbols-outlined">local_gas_station</span></div>
+            <div>
+                <p class="dashboard-kpi-label">Fuel ({{ selected_range_label }})</p>
+                <p class="dashboard-kpi-value">{{ metrics.fuel_this_month_litres|floatformat:2 }} L</p>
+                <p class="dashboard-kpi-note">Total consumption in litres</p>
+            </div>
+        </a>
+        <a href="{% url 'transport:maintenance:list' %}" class="dashboard-kpi-card transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
+            <div class="dashboard-kpi-icon bg-red-100 text-red-800"><span class="material-symbols-outlined">notification_important</span></div>
+            <div>
+                <p class="dashboard-kpi-label">Active Alerts</p>
+                <p class="dashboard-kpi-value">{{ metrics.active_alerts }}</p>
+                <p class="dashboard-kpi-note">Incidents needing attention</p>
+            </div>
+        </a>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div class="dashboard-card overflow-hidden">
+            <div class="dashboard-card-header">
+                <div>
+                    <p class="dashboard-eyebrow">Trip Activity</p>
+                    <h2 class="dashboard-title">Trip activity ({{ selected_range_label }})</h2>
+                </div>
+            </div>
+            <div class="border-t border-slate-200 p-5">
+                <div class="min-h-[280px] rounded-2xl border border-slate-200 bg-white p-4">
+                    <canvas id="dashboardTripActivityChart" data-labels='{{ trend_labels|safe }}' data-counts='{{ trend_count|safe }}'></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card overflow-hidden">
+            <div class="dashboard-card-header">
+                <div>
+                    <p class="dashboard-eyebrow">Revenue vs Expenses</p>
+                    <h2 class="dashboard-title">Financial trend</h2>
+                </div>
+            </div>
+            <div class="border-t border-slate-200 p-5">
+                <div class="min-h-[280px] rounded-2xl border border-slate-200 bg-white p-4">
+                    <canvas id="dashboardRevenueExpenseChart" data-labels='{{ trend_labels|safe }}' data-revenue='{{ trend_revenue|safe }}' data-expenses='{{ trend_cost|safe }}'></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div class="dashboard-card overflow-hidden">
+            <div class="dashboard-card-header">
+                <div>
+                    <p class="dashboard-eyebrow">Active Vehicles</p>
+                    <h2 class="dashboard-title">Fleet availability</h2>
+                </div>
+                <a href="{% url 'transport:vehicles:list' %}" class="dashboard-link">Manage fleet</a>
+            </div>
+            <div class="space-y-3 border-t border-slate-200 p-5">
+                {% for vehicle in vehicle_status_rows %}
+                <div class="dashboard-list-item rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                    <div>
+                        <p class="font-semibold text-slate-900">{{ vehicle.plate_number }}</p>
+                        <p class="text-xs text-slate-500">{{ vehicle.get_vehicle_type_display }} · {{ vehicle.current_odometer }} km</p>
+                    </div>
+                    <span class="dashboard-status-badge {% if vehicle.status == 'ASSIGNED' %}dashboard-status-success{% elif vehicle.status == 'MAINTENANCE' %}dashboard-status-danger{% else %}dashboard-status-neutral{% endif %}">{{ vehicle.get_status_display }}</span>
+                </div>
+                {% empty %}
+                <p class="dashboard-empty">No vehicles available yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="dashboard-card overflow-hidden">
+            <div class="dashboard-card-header">
+                <div>
+                    <p class="dashboard-eyebrow">Driver Status</p>
+                    <h2 class="dashboard-title">Driver activity snapshot</h2>
+                </div>
+                <a href="{% url 'transport:drivers:list' %}" class="dashboard-link">View drivers</a>
+            </div>
+            <div class="space-y-3 border-t border-slate-200 p-5">
+                {% for driver in driver_status_rows %}
+                <div class="dashboard-list-item rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                    <div>
+                        <p class="font-semibold text-slate-900">{{ driver.name }}</p>
+                        <p class="text-xs text-slate-500">{{ driver.route_text }}</p>
+                        <p class="mt-1 text-xs text-slate-400">{{ driver.status }}</p>
+                    </div>
+                    <span class="rounded-full theme-accent-soft px-2.5 py-1 text-xs font-semibold">{{ driver.trips_count }} trips</span>
+                </div>
+                {% empty %}
+                <p class="dashboard-empty">Driver status will appear here once trips are recorded.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboard-card overflow-hidden">
+        <div class="dashboard-card-header">
+            <div>
+                <p class="dashboard-eyebrow">Recent Trips</p>
+                <h2 class="dashboard-title">Latest trip records</h2>
+            </div>
+            <a href="{% url 'transport:trips:list' %}" class="dashboard-link">All trips</a>
+        </div>
+        <div class="overflow-x-auto border-t border-slate-200">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+                <thead class="bg-slate-50">
+                    <tr class="text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                        <th class="px-5 py-4">Vehicle</th>
+                        <th class="px-5 py-4">Route</th>
+                        <th class="px-5 py-4">Driver</th>
+                        <th class="px-5 py-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    {% for trip in recent_trips %}
+                    <tr class="text-slate-700">
+                        <td class="px-5 py-4 font-medium text-slate-900">{{ trip.vehicle.plate_number|default:"Not assigned" }}</td>
+                        <td class="px-5 py-4">{{ trip.route.origin }} to {{ trip.route.destination }}</td>
+                        <td class="px-5 py-4">{{ trip.driver.name|default:"Unassigned" }}</td>
+                        <td class="px-5 py-4">
+                            <span class="dashboard-status-badge {% if trip.status == 'IN_TRANSIT' or trip.status == 'ASSIGNED' %}dashboard-status-success{% elif trip.status == 'DELIVERED' or trip.status == 'CLOSED' %}dashboard-status-info{% elif trip.status == 'DRAFT' or trip.status == 'APPROVED' %}dashboard-status-warning{% else %}dashboard-status-neutral{% endif %}">{{ trip.get_status_display }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-5 py-8 text-center text-sm text-slate-500">No trips available yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

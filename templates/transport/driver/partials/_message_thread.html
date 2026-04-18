@@ -1,0 +1,29 @@
+<div id="driver-message-thread-inner" class="space-y-3">
+    {% for message in messages_thread %}
+    <div data-message-id="{{ message.pk }}" class="flex {% if message.sender_id == request.user.id %}justify-end{% else %}justify-start{% endif %}">
+        <div class="max-w-[86%]">
+            <div class="relative rounded-[18px] px-4 py-2.5 shadow-sm {% if message.sender_id == request.user.id %}rounded-br-sm bg-[#dcf8c6] text-slate-900{% else %}rounded-bl-sm bg-white text-gray-900{% endif %}">
+                <p class="text-sm leading-6">{{ message.body }}</p>
+                <span class="absolute bottom-0 {% if message.sender_id == request.user.id %}right-[-6px] border-l-[#dcf8c6]{% else %}left-[-6px] border-r-white{% endif %} h-0 w-0 border-y-[6px] border-y-transparent {% if message.sender_id == request.user.id %}border-l-[8px]{% else %}border-r-[8px]{% endif %}"></span>
+            </div>
+            <div class="mt-1 flex items-center gap-2 px-1 {% if message.sender_id == request.user.id %}justify-end{% else %}justify-start{% endif %}">
+                {% if message.sender_id != request.user.id %}
+                <p class="text-[11px] font-medium text-[#166534]">{{ message.sender.full_name|default:message.sender.email }}</p>
+                {% endif %}
+                <span class="text-[10px] text-slate-400">{{ message.created_at|date:"H:i" }}</span>
+                {% if message.sender_id == request.user.id %}
+                <span class="material-symbols-outlined text-[14px] text-green-600">done_all</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="rounded-[24px] border border-dashed border-green-200 bg-white/90 px-5 py-8 text-center">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700">
+            <span class="material-symbols-outlined text-[26px]">forum</span>
+        </div>
+        <p class="mt-4 text-sm font-semibold text-slate-900">Start your chat</p>
+        <p class="mt-1 text-sm text-slate-500">Send a message and support will reply here like a normal chat conversation.</p>
+    </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,79 @@
+<section class="space-y-4 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+    <div class="flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-200"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Trip and Driver</p>
+        <div class="h-px flex-1 bg-slate-200"></div>
+    </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Trip</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">route</span>
+                {{ form.trip }}
+            </div>
+            {% if form.trip.errors %}<p class="mt-2 text-sm text-red-600">{{ form.trip.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Driver</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">person</span>
+                {{ form.driver }}
+            </div>
+            {% if form.driver.errors %}<p class="mt-2 text-sm text-red-600">{{ form.driver.errors.0 }}</p>{% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="space-y-4 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+    <div class="flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-200"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Payment Information</p>
+        <div class="h-px flex-1 bg-slate-200"></div>
+    </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+            <label class="block text-sm font-medium text-slate-700">{{ form.amount.label }}</label>
+            <div class="relative">
+                <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-green-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-green-700">{{ currency_symbol }}</span>
+                {{ form.amount }}
+            </div>
+            {% if form.amount.errors %}<p class="mt-2 text-sm text-red-600">{{ form.amount.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Fee Date</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">calendar_month</span>
+                {{ form.fee_date }}
+            </div>
+            {% if form.fee_date.errors %}<p class="mt-2 text-sm text-red-600">{{ form.fee_date.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-slate-700">Payment Status</label>
+            <div class="relative">
+                <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">credit_card</span>
+                {{ form.payment_status }}
+            </div>
+            {% if form.payment_status.errors %}<p class="mt-2 text-sm text-red-600">{{ form.payment_status.errors.0 }}</p>{% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="space-y-4 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+    <div class="flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-200"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Notes</p>
+        <div class="h-px flex-1 bg-slate-200"></div>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-slate-700">Notes</label>
+        <div class="relative">
+            <span class="material-symbols-outlined pointer-events-none absolute left-4 top-4 text-[18px] text-slate-400">edit_note</span>
+            {{ form.notes }}
+        </div>
+        <div class="mt-2 flex items-center justify-between gap-3 text-xs text-slate-500">
+            <span>Use this for approvals, payout exceptions, or finance notes.</span>
+            <span>Optional.</span>
+        </div>
+        {% if form.notes.errors %}<p class="mt-2 text-sm text-red-600">{{ form.notes.errors.0 }}</p>{% endif %}
+    </div>
+</section>

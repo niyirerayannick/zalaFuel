@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}Car Owners | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .owner-panel {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+    .owner-modal-field {
+        width: 100%;
+        min-height: 2.8rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225);
+        background: rgb(248 250 252);
+        color: rgb(15 23 42);
+        transition: all 0.2s ease;
+        padding: 0.78rem 0.95rem;
+    }
+    .owner-modal-field:focus {
+        outline: none;
+        background: white;
+        border-color: rgb(21 128 61);
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+    .owner-modal-error {
+        border-color: rgb(239 68 68) !important;
+        background: rgb(254 242 242) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 sm:p-6 shadow-sm">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-start gap-4">
+                <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-green-700 to-green-600 text-white flex items-center justify-center shadow-md shadow-green-700/20">
+                    <span class="material-symbols-outlined text-[24px] leading-none">groups</span>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fleet Management</p>
+                    <h1 class="mt-1 text-2xl font-bold text-slate-900">{{ page_title }}</h1>
+                    <p class="mt-1 text-sm text-slate-600">Track external vehicle owners and their current fleet assignments.</p>
+                </div>
+            </div>
+            <button type="button" id="owner-add-toggle" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 hover:bg-green-800 transition">
+                <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                Add Car Owner
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Total Owners</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ total_owners }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-slate-500">External Vehicles</p>
+            <p class="mt-2 text-2xl font-bold text-green-700">{{ external_vehicles }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Owners With Vehicles</p>
+            <p class="mt-2 text-2xl font-bold text-emerald-700">{{ owners_with_vehicles }}</p>
+        </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm mb-6">
+        <form method="get" class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2">
+                <label for="search" class="block text-xs font-semibold uppercase tracking-wide text-slate-600">Search</label>
+                <input type="text" name="search" id="search" value="{{ search_query }}" placeholder="Owner name, phone, bank..." class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="w-full rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800 transition">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        {% if owners %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Owner</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Phone</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Bank</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Account</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Vehicles</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    {% for owner in owners %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-5 py-4 text-sm font-semibold text-slate-900">
+                            <a href="{% url 'transport:vehicles:owner-detail' owner.pk %}" class="hover:text-green-700 hover:underline">
+                                {{ owner.name }}
+                            </a>
+                        </td>
+                        <td class="px-5 py-4 text-sm text-slate-700">{{ owner.phone|default:"-" }}</td>
+                        <td class="px-5 py-4 text-sm text-slate-700">{{ owner.bank_name|default:"-" }}</td>
+                        <td class="px-5 py-4 text-sm text-slate-700">{{ owner.bank_account|default:"-" }}</td>
+                        <td class="px-5 py-4 text-sm text-slate-700">
+                            {% with owner.vehicles.all as owned_vehicles %}
+                                {% if owned_vehicles %}
+                                    {% for vehicle in owned_vehicles %}
+                                        <span class="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 mr-1 mb-1">{{ vehicle.plate_number }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-10 text-center">
+            <p class="text-sm font-medium text-slate-800">No car owners found.</p>
+            <p class="mt-1 text-sm text-slate-500">Vehicle owners added through external vehicle setup will appear here.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<div id="owner-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="owner-panel" class="owner-panel fixed inset-y-0 right-0 z-50 hidden w-full max-w-2xl translate-x-full transform shadow-2xl transition-transform duration-300">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                    <span class="material-symbols-outlined text-[20px] leading-none">groups</span>
+                </div>
+                <div>
+                    <h2 class="text-base font-semibold text-slate-900">Add Car Owner</h2>
+                    <p class="text-xs text-slate-500">Fast entry mode for external vehicle owners.</p>
+                </div>
+            </div>
+            <button type="button" id="owner-close-btn" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+        <div id="owner-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+        <div class="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-3 backdrop-blur">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="owner-cancel-btn" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</button>
+                <button type="button" id="owner-save-btn" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">Save Owner</button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('owner-add-toggle');
+    const overlay = document.getElementById('owner-overlay');
+    const panel = document.getElementById('owner-panel');
+    const panelBody = document.getElementById('owner-panel-body');
+    const closeBtn = document.getElementById('owner-close-btn');
+    const cancelBtn = document.getElementById('owner-cancel-btn');
+    const saveBtn = document.getElementById('owner-save-btn');
+    let currentForm = null;
+
+    if (!addBtn || !overlay || !panel || !panelBody || !saveBtn) {
+        return;
+    }
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(function () {
+            panel.classList.remove('translate-x-full');
+        });
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(function () {
+            overlay.classList.add('hidden');
+            panel.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            currentForm = null;
+        }, 220);
+    }
+
+    function styleModalFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden' || el.type === 'checkbox') return;
+            el.classList.add('owner-modal-field');
+        });
+    }
+
+    function clearErrors() {
+        const errorBox = panelBody.querySelector('#owner-form-error');
+        if (errorBox) {
+            errorBox.classList.add('hidden');
+            errorBox.textContent = '';
+        }
+        panelBody.querySelectorAll('[data-error-for]').forEach(function (el) { el.textContent = ''; });
+        panelBody.querySelectorAll('.owner-modal-error').forEach(function (el) { el.classList.remove('owner-modal-error'); });
+    }
+
+    function showErrors(payload) {
+        const errorBox = panelBody.querySelector('#owner-form-error');
+        if (errorBox && payload.message) {
+            errorBox.textContent = payload.message;
+            errorBox.classList.remove('hidden');
+        }
+        if (payload.non_field_errors && payload.non_field_errors.length && errorBox) {
+            errorBox.textContent = payload.non_field_errors.join(' ');
+            errorBox.classList.remove('hidden');
+        }
+        if (payload.errors) {
+            Object.keys(payload.errors).forEach(function (field) {
+                const target = panelBody.querySelector('[data-error-for="' + field + '"]');
+                if (target) target.textContent = payload.errors[field].join(' ');
+                const input = panelBody.querySelector('#id_' + field);
+                if (input) input.classList.add('owner-modal-error');
+            });
+        }
+    }
+
+    async function loadForm() {
+        openPanel();
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        const response = await fetch("{% url 'transport:vehicles:owner-list' %}?partial=form", {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        panelBody.innerHTML = await response.text();
+        currentForm = panelBody.querySelector('#owner-modal-form');
+        styleModalFields();
+    }
+
+    addBtn.addEventListener('click', function () {
+        loadForm();
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+
+    saveBtn.addEventListener('click', async function () {
+        if (!currentForm) return;
+        clearErrors();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        try {
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+            window.location.reload();
+        } catch (_error) {
+            const errorBox = panelBody.querySelector('#owner-form-error');
+            if (errorBox) {
+                errorBox.classList.remove('hidden');
+                errorBox.textContent = 'Unable to save the car owner right now. Please try again.';
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Owner';
+        }
+    });
+});
+</script>
+{% endblock %}

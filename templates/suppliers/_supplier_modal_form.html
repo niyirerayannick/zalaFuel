@@ -1,0 +1,5 @@
+<form id="supplier-modal-form" method="post" action="{{ action|default:request.path }}" class="space-y-4 bg-white">
+    {% csrf_token %}
+    <div id="supplier-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"></div>
+    {% include "suppliers/_supplier_form_fields.html" %}
+</form>

@@ -1,0 +1,162 @@
+<div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-5">
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Total Orders</p>
+            <span class="material-symbols-outlined text-[18px] text-green-700">description</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-slate-900">{{ total_orders }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Draft</p>
+            <span class="material-symbols-outlined text-[18px] text-amber-600">schedule</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-amber-700">{{ draft_orders }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Pending Approval</p>
+            <span class="material-symbols-outlined text-[18px] text-violet-700">pending_actions</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-violet-700">{{ pending_orders }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Active</p>
+            <span class="material-symbols-outlined text-[18px] text-blue-700">bolt</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-blue-700">{{ active_orders }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Completed</p>
+            <span class="material-symbols-outlined text-[18px] text-emerald-700">check_circle</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-emerald-700">{{ completed_orders }}</p>
+    </div>
+</div>
+
+<div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-5 py-4">
+        <h2 class="text-sm font-semibold text-slate-900">Filter Orders</h2>
+    </div>
+    <form method="get" class="p-5">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div>
+                <label for="search" class="block text-xs font-medium uppercase tracking-wide text-slate-600">Search</label>
+                <input type="text" name="search" id="search" value="{{ request.GET.search }}" placeholder="Order #, customer, cargo..." class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+            </div>
+            <div>
+                <label for="status" class="block text-xs font-medium uppercase tracking-wide text-slate-600">Status</label>
+                <select name="status" id="status" class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+                    <option value="">All Statuses</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="md:col-span-2 flex items-end gap-3">
+                <button type="submit" class="w-full rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-800">Apply</button>
+                <a href="{% url 'transport:orders:customer-list' %}" class="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Clear</a>
+            </div>
+        </div>
+    </form>
+    <div class="border-t border-slate-200 px-5 py-4 flex flex-wrap items-center justify-end gap-3 bg-slate-50/60">
+        <a href="{% url 'transport:orders:list-export-pdf' %}?{{ request.GET.urlencode }}" class="inline-flex items-center rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100">Export PDF</a>
+        <a href="{% url 'transport:orders:list-export-excel' %}?{{ request.GET.urlencode }}" class="inline-flex items-center rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100">Export Excel</a>
+    </div>
+</div>
+
+<div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-5 py-4">
+        <h2 class="text-sm font-semibold text-slate-900">Orders Overview</h2>
+    </div>
+    {% if orders %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Order</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Customer</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Route</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Cargo</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                    <th class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Quantity</th>
+                    <th class="px-5 py-3"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                {% for order in orders %}
+                <tr class="transition-colors hover:bg-slate-50">
+                    <td class="px-5 py-4">
+                        <p class="text-sm font-semibold text-slate-900">{{ order.order_number }}</p>
+                        <p class="text-xs text-slate-500">{{ order.created_at|date:"M d, Y" }}</p>
+                    </td>
+                    <td class="px-5 py-4">
+                        <p class="text-sm font-medium text-slate-900">{{ order.customer.company_name }}</p>
+                        <p class="text-xs text-slate-500">{{ order.delivery_contact|default:"No delivery contact" }}</p>
+                    </td>
+                    <td class="px-5 py-4">
+                        <p class="text-sm text-slate-900">{{ order.origin }}</p>
+                        <p class="text-xs text-slate-500">{{ order.destination }}</p>
+                    </td>
+                    <td class="px-5 py-4">
+                        <p class="text-sm text-slate-900">{{ order.cargo_category|default:"Not set" }}</p>
+                        <p class="text-xs text-slate-500">{{ order.get_commodity_type_display }}</p>
+                    </td>
+                    <td class="px-5 py-4">
+                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold
+                            {% if order.status == 'completed' or order.status == 'delivered' %}bg-emerald-100 text-emerald-800
+                            {% elif order.status == 'in_transit' or order.status == 'assigned' %}bg-blue-100 text-blue-800
+                            {% elif order.status == 'approved' %}bg-violet-100 text-violet-800
+                            {% elif order.status == 'pending_approval' %}bg-amber-100 text-amber-800
+                            {% else %}bg-slate-100 text-slate-700{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-4 text-right text-sm font-semibold text-slate-900">{{ order.display_quantity }}</td>
+                    <td class="px-5 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                        {% if can_edit_orders %}
+                        <button
+                            type="button"
+                            class="order-edit-btn inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                            data-edit-url="{% url 'transport:orders:edit' order.pk %}"
+                        >
+                            <span class="material-symbols-outlined text-[15px] leading-none">edit</span>
+                            Edit
+                        </button>
+                        {% endif %}
+                        <a href="{% url 'transport:orders:detail' order.pk %}" class="inline-flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-800 transition hover:border-green-300 hover:bg-green-100">
+                            <span class="material-symbols-outlined text-[15px] leading-none">visibility</span>
+                            View
+                        </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if is_paginated %}
+    <div class="border-t border-slate-200 px-5 py-4">
+        <div class="flex items-center justify-between text-sm text-slate-600">
+            <div>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
+            <div class="flex gap-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}" class="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50">Previous</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}" class="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50">Next</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="p-10 text-center">
+        <p class="text-sm font-medium text-slate-800">No orders found.</p>
+        <p class="mt-1 text-sm text-slate-500">Use Create Order to capture your first job record.</p>
+    </div>
+    {% endif %}
+</div>

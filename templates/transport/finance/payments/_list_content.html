@@ -1,0 +1,83 @@
+{% load currency_tags %}
+
+<div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Total Revenue</p>
+            <span class="material-symbols-outlined text-[18px] text-green-700">payments</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-green-700">{{ total_amount|currency }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Paid Revenue</p>
+            <span class="material-symbols-outlined text-[18px] text-emerald-700">task_alt</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-emerald-700">{{ paid_revenue_total|currency }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Pending Revenue</p>
+            <span class="material-symbols-outlined text-[18px] text-amber-600">schedule</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-amber-700">{{ pending_revenue_total|currency }}</p>
+        <p class="mt-1 text-xs text-slate-500">Pending and partial invoices</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Entries</p>
+            <span class="material-symbols-outlined text-[18px] text-slate-500">receipt_long</span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-slate-900">{{ total_payments|default:0 }}</p>
+        <p class="mt-1 text-xs text-slate-500">Total transactions in this view</p>
+    </div>
+</div>
+
+<div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-5 py-4">
+        <h2 class="text-sm font-semibold text-slate-900">Filter Revenue</h2>
+    </div>
+    <form method="get" class="p-5">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-5">
+            <div>
+                <label for="search" class="block text-xs font-medium uppercase tracking-wide text-slate-600">Search</label>
+                <input type="text" name="search" id="search" value="{{ current_search|default:'' }}" placeholder="Trip or customer..." class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+            </div>
+            <div>
+                <label for="date_from" class="block text-xs font-medium uppercase tracking-wide text-slate-600">From</label>
+                <input type="date" name="date_from" id="date_from" value="{{ current_date_from|default:'' }}" class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+            </div>
+            <div>
+                <label for="date_to" class="block text-xs font-medium uppercase tracking-wide text-slate-600">To</label>
+                <input type="date" name="date_to" id="date_to" value="{{ current_date_to|default:'' }}" class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+            </div>
+            <div>
+                <label for="min_amount" class="block text-xs font-medium uppercase tracking-wide text-slate-600">Min Amount ({{ currency_code }})</label>
+                <input type="number" name="min_amount" id="min_amount" step="0.01" value="{{ current_min_amount|default:'' }}" placeholder="{{ currency_symbol }} 0.00" class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+            </div>
+            <div class="flex items-end gap-3">
+                <button type="submit" class="w-full rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-800">Apply</button>
+                <a href="{% url 'transport:finance:payment-list' %}" class="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Clear</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-5 py-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 class="text-sm font-semibold text-slate-900">Revenue Overview</h2>
+            <div class="flex items-center gap-2">
+                <a href="{% url 'transport:finance:payment-export-excel' %}?{{ request.GET.urlencode }}" class="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100">
+                    <span class="material-symbols-outlined text-[15px] leading-none">table_view</span>
+                    Excel
+                </a>
+                <a href="{% url 'transport:finance:payment-export-pdf' %}?{{ request.GET.urlencode }}" class="inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-800 transition hover:border-rose-300 hover:bg-rose-100">
+                    <span class="material-symbols-outlined text-[15px] leading-none">picture_as_pdf</span>
+                    PDF
+                </a>
+            </div>
+        </div>
+    </div>
+    {% include "transport/finance/payments/_table.html" %}
+</div>

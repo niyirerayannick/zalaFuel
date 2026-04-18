@@ -1,0 +1,903 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}{{ page_title }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    #transport-dashboard-content .dashboard-shell,
+    #transport-dashboard-content .dashboard-card,
+    #transport-dashboard-panel .dashboard-card,
+    #transport-dashboard-panel .vehicle-modal-card {
+        backdrop-filter: blur(12px);
+    }
+
+    #transport-dashboard-content .dashboard-card,
+    #transport-dashboard-panel .dashboard-card {
+        border-radius: 26px;
+        border: 1px solid #e2e8f0;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+    }
+
+    #transport-dashboard-content .dashboard-card-header,
+    #transport-dashboard-panel .dashboard-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.25rem 1.25rem 1rem;
+    }
+
+    #transport-dashboard-content .dashboard-eyebrow,
+    #transport-dashboard-panel .dashboard-eyebrow {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--theme-700);
+    }
+
+    #transport-dashboard-content .dashboard-title,
+    #transport-dashboard-panel .dashboard-title {
+        margin-top: 0.25rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    #transport-dashboard-content .dashboard-link,
+    #transport-dashboard-panel .dashboard-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: var(--theme-700);
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    #transport-dashboard-content .dashboard-link:hover,
+    #transport-dashboard-panel .dashboard-link:hover {
+        color: var(--theme-900);
+    }
+
+    #transport-dashboard-content .dashboard-kpi-card,
+    #transport-dashboard-panel .dashboard-kpi-card {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        border-radius: 24px;
+        border: 1px solid #e2e8f0;
+        background: rgba(255, 255, 255, 0.96);
+        padding: 1.25rem;
+        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
+    }
+
+    #transport-dashboard-content .dashboard-kpi-icon,
+    #transport-dashboard-panel .dashboard-kpi-icon {
+        display: inline-flex;
+        height: 3rem;
+        width: 3rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 1rem;
+        flex-shrink: 0;
+    }
+
+    #transport-dashboard-content .dashboard-kpi-icon .material-symbols-outlined,
+    #transport-dashboard-panel .dashboard-kpi-icon .material-symbols-outlined {
+        font-size: 1.4rem;
+    }
+
+    #transport-dashboard-content .dashboard-kpi-label,
+    #transport-dashboard-panel .dashboard-kpi-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #64748b;
+    }
+
+    #transport-dashboard-content .dashboard-kpi-value,
+    #transport-dashboard-panel .dashboard-kpi-value {
+        margin-top: 0.25rem;
+        font-size: clamp(1.35rem, 1.45vw, 1.7rem);
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.1;
+    }
+
+    #transport-dashboard-content .dashboard-kpi-note,
+    #transport-dashboard-panel .dashboard-kpi-note,
+    #transport-dashboard-content .dashboard-panel-note,
+    #transport-dashboard-panel .dashboard-panel-note,
+    #transport-dashboard-content .dashboard-empty,
+    #transport-dashboard-panel .dashboard-empty {
+        margin-top: 0.35rem;
+        font-size: 0.82rem;
+        color: #64748b;
+    }
+
+    #transport-dashboard-content .dashboard-list-item,
+    #transport-dashboard-panel .dashboard-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    #transport-dashboard-content .dashboard-status-badge,
+    #transport-dashboard-panel .dashboard-status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        border-radius: 999px;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .dashboard-status-success { background: var(--theme-100); color: var(--theme-700); }
+    .dashboard-status-info { background: var(--theme-100); color: var(--theme-700); }
+    .dashboard-status-warning { background: #fef3c7; color: #92400e; }
+    .dashboard-status-danger { background: #fee2e2; color: #b91c1c; }
+    .dashboard-status-neutral { background: #e2e8f0; color: #475569; }
+
+    #transport-dashboard-content .dashboard-icon-link,
+    #transport-dashboard-panel .dashboard-icon-link {
+        display: inline-flex;
+        height: 2rem;
+        width: 2rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid #dbeafe;
+        color: var(--theme-700);
+        background: #ffffff;
+        transition: all 0.2s ease;
+    }
+
+    #transport-dashboard-content .dashboard-icon-link:hover,
+    #transport-dashboard-panel .dashboard-icon-link:hover {
+        border-color: var(--theme-300);
+        background: var(--theme-50);
+    }
+
+    #transport-dashboard-content .dashboard-metric-panel,
+    #transport-dashboard-panel .dashboard-metric-panel {
+        border-radius: 22px;
+        border: 1px solid #e2e8f0;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        padding: 1rem 1.1rem;
+    }
+
+    #transport-dashboard-content .dashboard-panel-label,
+    #transport-dashboard-panel .dashboard-panel-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #64748b;
+    }
+
+    #transport-dashboard-content .dashboard-panel-value,
+    #transport-dashboard-panel .dashboard-panel-value {
+        margin-top: 0.3rem;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    #transport-dashboard-content .dashboard-timeline,
+    #transport-dashboard-panel .dashboard-timeline {
+        position: relative;
+        display: grid;
+        gap: 1rem;
+    }
+
+    #transport-dashboard-content .dashboard-timeline::before,
+    #transport-dashboard-panel .dashboard-timeline::before {
+        content: "";
+        position: absolute;
+        left: 0.45rem;
+        top: 0.25rem;
+        bottom: 0.25rem;
+        width: 2px;
+        background: linear-gradient(180deg, var(--theme-300) 0%, var(--theme-100) 100%);
+    }
+
+    #transport-dashboard-content .dashboard-timeline-item,
+    #transport-dashboard-panel .dashboard-timeline-item {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1rem 1fr;
+        gap: 1rem;
+        padding-left: 0.15rem;
+    }
+
+    #transport-dashboard-content .dashboard-timeline-dot,
+    #transport-dashboard-panel .dashboard-timeline-dot {
+        position: relative;
+        z-index: 1;
+        margin-top: 0.35rem;
+        height: 0.85rem;
+        width: 0.85rem;
+        border-radius: 999px;
+        box-shadow: 0 0 0 4px var(--theme-50);
+    }
+
+    #transport-dashboard-content .dashboard-map-panel,
+    #transport-dashboard-panel .dashboard-map-panel {
+        position: relative;
+        height: 16rem;
+        overflow: hidden;
+        border-radius: 24px;
+        border: 1px solid var(--theme-100);
+        background: radial-gradient(circle at top left, var(--theme-100), #f8fafc 55%, #ecfeff 100%);
+    }
+
+    #transport-dashboard-content .dashboard-map-grid,
+    #transport-dashboard-panel .dashboard-map-grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+        background-size: 40px 40px;
+        opacity: 0.4;
+    }
+
+    #transport-dashboard-content .dashboard-map-route,
+    #transport-dashboard-panel .dashboard-map-route {
+        position: absolute;
+        border-top: 3px dashed var(--theme-600);
+        opacity: 0.75;
+        transform-origin: left center;
+    }
+
+    #transport-dashboard-content .dashboard-map-route-a,
+    #transport-dashboard-panel .dashboard-map-route-a {
+        left: 16%;
+        top: 34%;
+        width: 48%;
+        transform: rotate(12deg);
+    }
+
+    #transport-dashboard-content .dashboard-map-route-b,
+    #transport-dashboard-panel .dashboard-map-route-b {
+        left: 42%;
+        top: 54%;
+        width: 28%;
+        transform: rotate(-18deg);
+    }
+
+    #transport-dashboard-content .dashboard-map-node,
+    #transport-dashboard-panel .dashboard-map-node {
+        position: absolute;
+        display: flex;
+        height: 2rem;
+        width: 2rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: var(--theme-700);
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        box-shadow: 0 10px 25px color-mix(in srgb, var(--theme-700) 30%, transparent);
+    }
+
+    .dashboard-map-node-a { left: 14%; top: 28%; }
+    .dashboard-map-node-b { left: 61%; top: 37%; }
+    .dashboard-map-node-c { left: 68%; top: 58%; }
+
+    .dashboard-quick-action {
+        display: inline-flex;
+        min-height: 4.25rem;
+        align-items: center;
+        gap: 0.7rem;
+        justify-content: flex-start;
+        border-radius: 1.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.95rem 1rem;
+        text-align: left;
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #f0fdf4;
+        transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .dashboard-quick-action:hover {
+        transform: translateY(-1px);
+        border-color: rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.16);
+    }
+
+    .dashboard-quick-action .material-symbols-outlined {
+        font-size: 1.35rem;
+    }
+
+    .dashboard-quick-action-muted {
+        background: rgba(15, 23, 42, 0.18);
+    }
+
+    .dashboard-filter-bar {
+        backdrop-filter: blur(10px);
+    }
+
+    .dashboard-filter-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid #d1d5db;
+        background: #f8fafc;
+        padding: 0.7rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #475569;
+        transition: all 0.2s ease;
+    }
+
+    .dashboard-filter-chip:hover {
+        border-color: var(--theme-300);
+        background: var(--theme-50);
+        color: var(--theme-700);
+    }
+
+    .dashboard-filter-chip-active {
+        border-color: var(--theme-700);
+        background: var(--theme-700);
+        color: #ffffff;
+        box-shadow: 0 10px 24px color-mix(in srgb, var(--theme-700) 18%, transparent);
+    }
+
+    .dashboard-modal-shell {
+        transform: translateX(100%);
+        transition: transform 0.28s ease;
+    }
+
+    .dashboard-modal-shell.is-open {
+        transform: translateX(0);
+    }
+
+    .period-wrap { position: relative; display: inline-flex; align-items: center; }
+    .period-select {
+      appearance: none; background:#fff; border:1px solid #e2e8f0; border-radius:9px;
+      padding:8px 36px 8px 14px; font-size:13px; font-weight:500;
+      font-family:inherit; color:#0f1f2e; cursor:pointer; outline:none;
+      transition:border-color .15s;
+    }
+    .period-select:hover { border-color:#1a7a4a; }
+    .period-select:focus { border-color:#1a7a4a; box-shadow:0 0 0 3px rgba(26,122,74,.1); }
+    .period-chevron { position:absolute; right:11px; pointer-events:none; color:#64748b; }
+
+    .dashboard-modal-backdrop {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.28s ease;
+    }
+
+    .dashboard-modal-backdrop.is-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    #transport-dashboard-panel .field-label,
+    #transport-dashboard-panel .trip-label,
+    #transport-dashboard-panel .driver-label,
+    #transport-dashboard-panel .vehicle-label {
+        display: block;
+        margin-bottom: 0.45rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #475569;
+    }
+
+    #transport-dashboard-panel .field-help,
+    #transport-dashboard-panel .trip-help,
+    #transport-dashboard-panel .driver-help {
+        margin-top: 0.45rem;
+        font-size: 0.76rem;
+        color: #64748b;
+    }
+
+    #transport-dashboard-panel .field-error,
+    #transport-dashboard-panel .trip-error,
+    #transport-dashboard-panel .driver-error,
+    #transport-dashboard-panel .vehicle-field-error {
+        min-height: 1rem;
+        margin-top: 0.35rem;
+        font-size: 0.76rem;
+        color: #dc2626;
+    }
+
+    #transport-dashboard-panel .input-shell,
+    #transport-dashboard-panel .trip-input-shell,
+    #transport-dashboard-panel .driver-input-shell,
+    #transport-dashboard-panel .vehicle-input-wrap,
+    #transport-dashboard-panel .driver-file-shell {
+        position: relative;
+    }
+
+    #transport-dashboard-panel .field-icon,
+    #transport-dashboard-panel .trip-field-icon,
+    #transport-dashboard-panel .driver-field-icon,
+    #transport-dashboard-panel .vehicle-input-icon {
+        position: absolute;
+        left: 0.95rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--theme-700);
+        font-size: 1.15rem;
+        pointer-events: none;
+    }
+
+    #transport-dashboard-panel .driver-file-shell .driver-field-icon {
+        top: 1rem;
+        transform: none;
+    }
+
+    #transport-dashboard-panel .input-shell input,
+    #transport-dashboard-panel .input-shell select,
+    #transport-dashboard-panel .input-shell textarea,
+    #transport-dashboard-panel .trip-input-shell input,
+    #transport-dashboard-panel .trip-input-shell select,
+    #transport-dashboard-panel .trip-input-shell textarea,
+    #transport-dashboard-panel .driver-input-shell input,
+    #transport-dashboard-panel .driver-input-shell select,
+    #transport-dashboard-panel .driver-input-shell textarea,
+    #transport-dashboard-panel .vehicle-input-wrap input,
+    #transport-dashboard-panel .vehicle-input-wrap select,
+    #transport-dashboard-panel .vehicle-input-wrap textarea,
+    #transport-dashboard-panel .driver-file-shell input,
+    #transport-dashboard-panel .vehicle-input,
+    #transport-dashboard-panel .maint-field {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        padding: 0.9rem 1rem 0.9rem 2.9rem;
+        font-size: 0.95rem;
+        color: #0f172a;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    #transport-dashboard-panel .driver-file-shell input {
+        padding-top: 0.95rem;
+        padding-bottom: 0.95rem;
+    }
+
+    #transport-dashboard-panel .input-shell input:focus,
+    #transport-dashboard-panel .input-shell select:focus,
+    #transport-dashboard-panel .input-shell textarea:focus,
+    #transport-dashboard-panel .trip-input-shell input:focus,
+    #transport-dashboard-panel .trip-input-shell select:focus,
+    #transport-dashboard-panel .trip-input-shell textarea:focus,
+    #transport-dashboard-panel .driver-input-shell input:focus,
+    #transport-dashboard-panel .driver-input-shell select:focus,
+    #transport-dashboard-panel .driver-input-shell textarea:focus,
+    #transport-dashboard-panel .vehicle-input-wrap input:focus,
+    #transport-dashboard-panel .vehicle-input-wrap select:focus,
+    #transport-dashboard-panel .vehicle-input-wrap textarea:focus,
+    #transport-dashboard-panel .driver-file-shell input:focus,
+    #transport-dashboard-panel .maint-field:focus {
+        outline: none;
+        border-color: var(--theme-700);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-700) 12%, transparent);
+        background: #fafffc;
+    }
+
+    #transport-dashboard-panel .trip-input-shell textarea,
+    #transport-dashboard-panel .driver-input-shell textarea,
+    #transport-dashboard-panel .input-shell textarea {
+        min-height: 7rem;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-quick-action {
+            min-height: 3.8rem;
+            padding: 0.85rem 0.95rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
+    <div id="transport-dashboard-content">
+        {% include "transport/_dashboard_content.html" %}
+    </div>
+</div>
+
+<div id="dashboard-modal-backdrop" class="dashboard-modal-backdrop fixed inset-0 z-40 bg-slate-950/45"></div>
+<aside id="dashboard-modal-shell" class="dashboard-modal-shell fixed inset-y-0 right-0 z-50 flex w-full max-w-2xl flex-col border-l border-slate-200 bg-slate-50 shadow-[0_0_60px_rgba(15,23,42,0.24)]">
+    <div class="flex items-start justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Quick Action</p>
+            <h2 id="dashboard-modal-title" class="mt-1 text-xl font-bold text-slate-900">Action</h2>
+            <p id="dashboard-modal-subtitle" class="mt-1 text-sm text-slate-500">Complete this workflow without leaving the dashboard.</p>
+        </div>
+        <button type="button" id="dashboard-modal-close" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div id="dashboard-modal-alert" class="hidden mx-6 mt-5 rounded-2xl border p-4 text-sm"></div>
+    <div id="transport-dashboard-panel" class="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+        <div class="dashboard-card p-5 text-sm text-slate-500">Choose a quick action to get started.</div>
+    </div>
+    <div class="border-t border-slate-200 bg-white px-6 py-4">
+        <div class="flex items-center justify-end gap-3">
+            <button type="button" id="dashboard-modal-cancel" class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</button>
+            <button type="button" id="dashboard-modal-submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">
+                <span class="material-symbols-outlined text-[18px] leading-none">check</span>
+                <span id="dashboard-modal-submit-label">Save</span>
+            </button>
+        </div>
+    </div>
+</aside>
+
+<script>
+(function () {
+    let tripActivityChart = null;
+    let revenueExpenseChart = null;
+    let activeForm = null;
+    let activeSubmitLabel = 'Save';
+    let activeActionType = 'form';
+    let currentRange = '{{ selected_range|default:"month" }}';
+
+    const contentEl = document.getElementById('transport-dashboard-content');
+    const modalShell = document.getElementById('dashboard-modal-shell');
+    const modalBackdrop = document.getElementById('dashboard-modal-backdrop');
+    const modalClose = document.getElementById('dashboard-modal-close');
+    const modalCancel = document.getElementById('dashboard-modal-cancel');
+    const modalTitle = document.getElementById('dashboard-modal-title');
+    const modalSubtitle = document.getElementById('dashboard-modal-subtitle');
+    const modalPanel = document.getElementById('transport-dashboard-panel');
+    const modalSubmit = document.getElementById('dashboard-modal-submit');
+    const modalSubmitLabel = document.getElementById('dashboard-modal-submit-label');
+    const modalAlert = document.getElementById('dashboard-modal-alert');
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+        }
+        return '';
+    }
+
+    function showAlert(message, kind) {
+        const kindClasses = kind === 'error'
+            ? 'border-red-200 bg-red-50 text-red-700'
+            : 'border-green-200 bg-green-50 text-green-700';
+        modalAlert.className = `mx-6 mt-5 rounded-2xl border p-4 text-sm ${kindClasses}`;
+        modalAlert.textContent = message;
+        modalAlert.classList.remove('hidden');
+    }
+
+    function hideAlert() {
+        modalAlert.classList.add('hidden');
+        modalAlert.textContent = '';
+    }
+
+    function openModal() {
+        modalBackdrop.classList.add('is-open');
+        modalShell.classList.add('is-open');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeModal() {
+        modalBackdrop.classList.remove('is-open');
+        modalShell.classList.remove('is-open');
+        document.body.classList.remove('overflow-hidden');
+        modalPanel.innerHTML = '<div class="dashboard-card p-5 text-sm text-slate-500">Choose a quick action to get started.</div>';
+        activeForm = null;
+        activeActionType = 'form';
+        modalSubmit.disabled = false;
+        hideAlert();
+    }
+
+    function initializeCharts() {
+        if (typeof Chart === 'undefined') {
+            return;
+        }
+
+        const tripCanvas = document.getElementById('dashboardTripActivityChart');
+        const revenueCanvas = document.getElementById('dashboardRevenueExpenseChart');
+
+        if (tripActivityChart) {
+            tripActivityChart.destroy();
+            tripActivityChart = null;
+        }
+        if (revenueExpenseChart) {
+            revenueExpenseChart.destroy();
+            revenueExpenseChart = null;
+        }
+
+        if (tripCanvas) {
+            const labels = JSON.parse(tripCanvas.dataset.labels || '[]');
+            const counts = JSON.parse(tripCanvas.dataset.counts || '[]');
+            const chartTheme = (window.atmsTheme && window.atmsTheme.chart) || {};
+            tripActivityChart = new Chart(tripCanvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Trips',
+                            data: counts,
+                            borderRadius: 10,
+                            backgroundColor: chartTheme.primary || '#16a34a',
+                            hoverBackgroundColor: chartTheme.primaryDark || '#166534',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: chartTheme.tick || '#64748b' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: chartTheme.grid || '#e2e8f0' },
+                            ticks: {
+                                color: chartTheme.tick || '#64748b',
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        if (revenueCanvas) {
+            const labels = JSON.parse(revenueCanvas.dataset.labels || '[]');
+            const revenue = JSON.parse(revenueCanvas.dataset.revenue || '[]');
+            const expenses = JSON.parse(revenueCanvas.dataset.expenses || '[]');
+            const chartTheme = (window.atmsTheme && window.atmsTheme.chart) || {};
+            revenueExpenseChart = new Chart(revenueCanvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: revenue,
+                            borderColor: chartTheme.primaryDark || '#166534',
+                            backgroundColor: chartTheme.primaryFill || 'rgba(22, 101, 52, 0.12)',
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 3,
+                            pointBackgroundColor: chartTheme.primaryDark || '#166534'
+                        },
+                        {
+                            label: 'Expenses',
+                            data: expenses,
+                            borderColor: chartTheme.highlight || '#f59e0b',
+                            backgroundColor: chartTheme.highlightFill || 'rgba(245, 158, 11, 0.08)',
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 3,
+                            pointBackgroundColor: chartTheme.highlight || '#f59e0b'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                color: chartTheme.legend || '#334155'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: chartTheme.tick || '#64748b' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: chartTheme.grid || '#e2e8f0' },
+                            ticks: { color: chartTheme.tick || '#64748b' }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function wireQuickActions() {
+        contentEl.querySelectorAll('[data-dashboard-modal-url], [data-dashboard-modal-type]').forEach((button) => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const actionType = button.dataset.dashboardModalType || 'form';
+                const title = button.dataset.dashboardModalTitle || 'Quick Action';
+                const submitLabel = button.dataset.dashboardModalSubmit || 'Save';
+
+                modalTitle.textContent = title;
+                modalSubmitLabel.textContent = submitLabel;
+                activeSubmitLabel = submitLabel;
+                activeActionType = actionType;
+                hideAlert();
+                openModal();
+
+                if (actionType === 'info') {
+                    modalSubtitle.textContent = 'This action keeps the current backend flow intact.';
+                    modalPanel.innerHTML = `
+                        <div class="dashboard-card p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+                                    <span class="material-symbols-outlined">info</span>
+                                </div>
+                                <div class="space-y-3">
+                                    <h3 class="text-lg font-semibold text-slate-900">Fuel log creation is not available on the current staff backend</h3>
+                                    <p class="text-sm text-slate-600">The existing system exposes fuel request review on the staff side and submission through the current fuel request flow. I kept that logic unchanged here.</p>
+                                    <a href="{% url 'transport:fuel:list' %}" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800">
+                                        <span class="material-symbols-outlined text-[18px] leading-none">open_in_new</span>
+                                        Open Fuel Module
+                                    </a>
+                                </div>
+                            </div>
+                        </div>`;
+                    modalSubmitLabel.textContent = 'Close';
+                    return;
+                }
+
+                const url = `${button.dataset.dashboardModalUrl}?partial=form`;
+                modalSubtitle.textContent = 'Complete the form and save without leaving the dashboard.';
+                modalPanel.innerHTML = '<div class="dashboard-card p-5 text-sm text-slate-500">Loading form...</div>';
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then((response) => response.text())
+                    .then((html) => {
+                        modalPanel.innerHTML = html;
+                        activeForm = modalPanel.querySelector('form');
+                        if (!activeForm) {
+                            throw new Error('Form markup was not found in the response.');
+                        }
+                    })
+                    .catch((error) => {
+                        modalPanel.innerHTML = '<div class="dashboard-card p-5 text-sm text-red-600">Unable to load this form right now.</div>';
+                        showAlert(error.message, 'error');
+                    });
+            });
+        });
+
+        contentEl.querySelectorAll('[data-dashboard-refresh="true"]').forEach((button) => {
+            button.addEventListener('click', function () {
+                refreshDashboardContent(currentRange);
+            });
+        });
+
+        const sel = document.getElementById('periodSelect');
+        const sub = document.querySelector('.analytics-sub span');
+        if (sel) {
+            sel.addEventListener('change', () => {
+                if (sub) {
+                    const selectedLabel = sel.options[sel.selectedIndex]?.text || sel.value;
+                    sub.textContent = selectedLabel;
+                }
+                refreshDashboardContent(sel.value, true);
+            });
+        }
+    }
+
+    function applyFieldErrors(form, errors) {
+        form.querySelectorAll('input, select, textarea').forEach((node) => {
+            node.classList.remove('border-red-300');
+        });
+        form.querySelectorAll('.field-error, .trip-error, .driver-error, .vehicle-field-error').forEach((node) => {
+            node.textContent = '';
+        });
+
+        Object.entries(errors || {}).forEach(([field, messages]) => {
+            const message = Array.isArray(messages) ? messages[0] : messages;
+            const errorNode = form.querySelector(`[data-error-for="${field}"]`);
+            if (errorNode) {
+                errorNode.textContent = message;
+            }
+            const input = form.querySelector(`[name="${field}"]`);
+            if (input) {
+                input.classList.add('border-red-300');
+            }
+        });
+    }
+
+    function refreshDashboardContent(range = currentRange, pushState = false) {
+        currentRange = range || 'month';
+        const params = new URLSearchParams(window.location.search);
+        params.set('partial', 'content');
+        params.set('range', currentRange);
+        if (pushState) {
+            const browserParams = new URLSearchParams(window.location.search);
+            browserParams.set('range', currentRange);
+            window.history.replaceState({}, '', `${window.location.pathname}?${browserParams.toString()}`);
+        }
+
+        return fetch(`${window.location.pathname}?${params.toString()}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then((response) => response.text())
+            .then((html) => {
+                contentEl.innerHTML = html;
+                initializeCharts();
+                wireQuickActions();
+            });
+    }
+
+    modalSubmit.addEventListener('click', function () {
+        if (activeActionType === 'info') {
+            closeModal();
+            return;
+        }
+
+        if (!activeForm) {
+            return;
+        }
+
+        const formData = new FormData(activeForm);
+        modalSubmit.disabled = true;
+        hideAlert();
+
+        fetch(activeForm.action || window.location.pathname, {
+            method: (activeForm.method || 'post').toUpperCase(),
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data.success) {
+                    applyFieldErrors(activeForm, data.errors || {});
+                    showAlert(data.error || data.message || 'Please check the form fields and try again.', 'error');
+                    return;
+                }
+                showAlert(data.message || `${activeSubmitLabel} successful.`, 'success');
+                refreshDashboardContent(currentRange).finally(() => {
+                    window.setTimeout(closeModal, 250);
+                });
+            })
+            .catch(() => {
+                showAlert('Unable to save this form right now. Please try again.', 'error');
+            })
+            .finally(() => {
+                modalSubmit.disabled = false;
+            });
+    });
+
+    [modalBackdrop, modalClose, modalCancel].forEach((node) => {
+        node.addEventListener('click', closeModal);
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modalShell.classList.contains('is-open')) {
+            closeModal();
+        }
+    });
+
+    window.addEventListener('popstate', function () {
+        const params = new URLSearchParams(window.location.search);
+        currentRange = params.get('range') || 'month';
+        refreshDashboardContent(currentRange);
+    });
+
+    initializeCharts();
+    wireQuickActions();
+})();
+</script>
+{% endblock %}

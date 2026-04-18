@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="px-6 py-6 space-y-4">
+  <div class="rounded-2xl bg-gradient-to-r from-[#0c5069] via-[#0f7ea6] to-[#1a6a87] text-white p-6 shadow-lg">
+    <h1 class="text-2xl font-semibold">{{ page_title|default:'' }}</h1>
+    <p class="text-sm text-white/80">Fuel station management workspace. UI reused from the existing system.</p>
+  </div>
+  <div class="bg-white shadow rounded-2xl p-6">
+    <p class="text-slate-600">This section is ready for data wiring. No backend logic was removed from authentication or theming.</p>
+  </div>
+</div>
+{% endblock %}

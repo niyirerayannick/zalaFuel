@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Monthly Fuel Trends | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Monthly Fuel Trends</h1>
+                <p class="mt-2 text-sm text-gray-600">Month-over-month consumption, cost trends, and comparisons</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'transport:fuel:analytics' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Dashboard
+                </a>
+                <a href="{% url 'transport:fuel:efficiency' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Efficiency
+                </a>
+                <a href="{% url 'transport:fuel:alerts' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Alerts
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Year Filter -->
+    <div class="bg-white shadow rounded-lg p-4 mb-8">
+        <form method="get" class="flex items-center gap-4">
+            <label class="text-sm font-medium text-gray-700">Filter by Year:</label>
+            <select name="year" class="rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="">All Years</option>
+                {% for yr in available_years %}
+                <option value="{{ yr }}" {% if selected_year == yr %}selected{% endif %}>{{ yr }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                Apply
+            </button>
+        </form>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                        <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Liters</dt>
+                            <dd class="text-2xl font-bold text-gray-900">{{ grand_total_liters|floatformat:0 }} L</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
+                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Cost</dt>
+                            <dd class="text-2xl font-bold text-gray-900">{{ grand_total_cost|currency }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-amber-100 rounded-md p-3">
+                        <svg class="h-6 w-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Monthly Avg Liters</dt>
+                            <dd class="text-2xl font-bold text-gray-900">{{ monthly_avg_liters|floatformat:0 }} L</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-purple-100 rounded-md p-3">
+                        <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Monthly Avg Cost</dt>
+                            <dd class="text-2xl font-bold text-gray-900">{{ monthly_avg_cost|currency }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Highlight Banners -->
+    {% if peak_month %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <svg class="h-5 w-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                </svg>
+                <span class="text-sm font-semibold text-red-800">Peak Consumption</span>
+            </div>
+            <p class="mt-1 text-lg font-bold text-red-900">{{ peak_month.month_label }}</p>
+            <p class="text-sm text-red-700">{{ peak_month.liters|floatformat:0 }} L &bull; {{ peak_month.count }} entries</p>
+        </div>
+
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <svg class="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+                <span class="text-sm font-semibold text-green-800">Lowest Consumption</span>
+            </div>
+            <p class="mt-1 text-lg font-bold text-green-900">{{ lowest_month.month_label }}</p>
+            <p class="text-sm text-green-700">{{ lowest_month.liters|floatformat:0 }} L &bull; {{ lowest_month.count }} entries</p>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <svg class="h-5 w-5 text-amber-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+                <span class="text-sm font-semibold text-amber-800">Highest Cost Month</span>
+            </div>
+            <p class="mt-1 text-lg font-bold text-amber-900">{{ highest_cost_month.month_label }}</p>
+            <p class="text-sm text-amber-700">{{ highest_cost_month.cost|currency }} &bull; {{ highest_cost_month.count }} entries</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Cost & Liters Trend -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Monthly Liters & Cost</h3>
+            <canvas id="monthlyMainChart" height="280"></canvas>
+        </div>
+
+        <!-- Avg Price Trend -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Average Price per Liter Trend</h3>
+            <canvas id="priceChart" height="280"></canvas>
+        </div>
+    </div>
+
+    <!-- Weekly Trend -->
+    <div class="bg-white shadow rounded-lg p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Weekly Trend (Last 12 Weeks)</h3>
+        <canvas id="weeklyChart" height="180"></canvas>
+    </div>
+
+    <!-- Monthly Data Table -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Monthly Breakdown</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Month</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Entries</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Liters</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Liters ÃŽâ€</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Cost</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cost ÃŽâ€</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Avg Price/L</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Min Price</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Max Price</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stations</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Avg/Entry</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for m in months_data reversed %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ m.month_label }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600 text-right">{{ m.count }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ m.liters|floatformat:0 }} L</td>
+                        <td class="px-4 py-3 text-sm text-right">
+                            {% if m.liters_change != None %}
+                                {% if m.liters_change > 0 %}
+                                <span class="inline-flex items-center text-red-600">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                                    +{{ m.liters_change }}%
+                                </span>
+                                {% elif m.liters_change < 0 %}
+                                <span class="inline-flex items-center text-green-600">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                    {{ m.liters_change }}%
+                                </span>
+                                {% else %}
+                                <span class="text-gray-400">0%</span>
+                                {% endif %}
+                            {% else %}
+                            <span class="text-gray-400">Ã¢â‚¬â€</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ m.cost|currency }}</td>
+                        <td class="px-4 py-3 text-sm text-right">
+                            {% if m.cost_change != None %}
+                                {% if m.cost_change > 0 %}
+                                <span class="inline-flex items-center text-red-600">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                                    +{{ m.cost_change }}%
+                                </span>
+                                {% elif m.cost_change < 0 %}
+                                <span class="inline-flex items-center text-green-600">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                    {{ m.cost_change }}%
+                                </span>
+                                {% else %}
+                                <span class="text-gray-400">0%</span>
+                                {% endif %}
+                            {% else %}
+                            <span class="text-gray-400">Ã¢â‚¬â€</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900 text-right">{{ m.avg_price|currency }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-500 text-right">{{ m.min_price|currency }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-500 text-right">{{ m.max_price|currency }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-500 text-right">{{ m.stations }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-500 text-right">{{ m.avg_cost_per_entry|currency }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="11" class="px-4 py-8 text-center text-gray-500">
+                            <p class="text-sm font-medium">No monthly data available</p>
+                            <p class="text-xs mt-1">Add fuel entries to see monthly trends</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chartTheme = (window.atmsTheme && window.atmsTheme.chart) || {};
+    const colors = {
+        blue: chartTheme.primaryDark || '#2563EB',
+        blueBg: chartTheme.primaryFill || 'rgba(37, 99, 235, 0.12)',
+        green: chartTheme.primary || '#16A34A',
+        greenBg: chartTheme.successFill || 'rgba(22, 163, 74, 0.12)',
+        amber: chartTheme.highlight || '#F59E0B',
+        amberBg: chartTheme.highlightFill || 'rgba(245, 158, 11, 0.12)',
+        red: chartTheme.danger || '#EF4444',
+    };
+
+    // Monthly Main Chart (Liters bar + Cost line)
+    const monthlyCtx = document.getElementById('monthlyMainChart');
+    if (monthlyCtx) {
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_labels|safe }},
+                datasets: [
+                    {
+                        label: 'Total Cost',
+                        data: {{ chart_cost|safe }},
+                        backgroundColor: colors.blueBg,
+                        borderColor: colors.blue,
+                        borderWidth: 2,
+                        type: 'line',
+                        yAxisID: 'y1',
+                        tension: 0.3,
+                        fill: true,
+                    },
+                    {
+                        label: 'Liters',
+                        data: {{ chart_liters|safe }},
+                        backgroundColor: colors.green,
+                        borderRadius: 4,
+                        yAxisID: 'y',
+                    },
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    y: { position: 'left', title: { display: true, text: 'Liters' }, beginAtZero: true },
+                    y1: { position: 'right', title: { display: true, text: 'Cost' }, beginAtZero: true, grid: { drawOnChartArea: false } },
+                }
+            }
+        });
+    }
+
+    // Price Trend Chart
+    const priceCtx = document.getElementById('priceChart');
+    if (priceCtx) {
+        new Chart(priceCtx, {
+            type: 'line',
+            data: {
+                labels: {{ chart_labels|safe }},
+                datasets: [{
+                    label: 'Avg Price/Liter',
+                    data: {{ chart_avg_price|safe }},
+                    borderColor: colors.amber,
+                    backgroundColor: colors.amberBg,
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 5,
+                    pointBackgroundColor: colors.amber,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { beginAtZero: false } },
+            }
+        });
+    }
+
+    // Weekly Chart
+    const weeklyCtx = document.getElementById('weeklyChart');
+    if (weeklyCtx) {
+        new Chart(weeklyCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ weekly_labels|safe }},
+                datasets: [
+                    {
+                        label: 'Weekly Cost',
+                        data: {{ weekly_cost|safe }},
+                        type: 'line',
+                        borderColor: colors.blue,
+                        backgroundColor: colors.blueBg,
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y1',
+                    },
+                    {
+                        label: 'Weekly Liters',
+                        data: {{ weekly_liters|safe }},
+                        backgroundColor: colors.green,
+                        borderRadius: 4,
+                        yAxisID: 'y',
+                    },
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    y: { position: 'left', title: { display: true, text: 'Liters' }, beginAtZero: true },
+                    y1: { position: 'right', title: { display: true, text: 'Cost' }, beginAtZero: true, grid: { drawOnChartArea: false } },
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

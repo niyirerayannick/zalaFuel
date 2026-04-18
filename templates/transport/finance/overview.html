@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Finance Control Center | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-[92rem] px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Finance Dashboard</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Financial control center</h1>
+                <p class="mt-2 max-w-3xl text-sm text-slate-600">{{ financial_summary_note }}</p>
+            </div>
+            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide {% if financial_summary_tone == 'emerald' %}bg-emerald-100 text-emerald-700{% elif financial_summary_tone == 'amber' %}bg-amber-100 text-amber-700{% else %}bg-rose-100 text-rose-700{% endif %}">
+                {{ financial_summary_title }}
+            </span>
+        </div>
+        <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+            {% for item in financial_summary_points %}
+            <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{{ item.label }}</p>
+                <p class="mt-2 text-xl font-bold text-slate-900">{{ item.value }}</p>
+                <p class="mt-1 text-xs text-slate-500">{{ item.hint }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form method="get" class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Date From</label>
+                <input type="date" name="date_from" value="{{ selected_date_from }}" class="mt-2 block w-full rounded-xl border-slate-300 bg-slate-50 px-3 py-2.5 text-sm focus:border-green-700 focus:bg-white focus:ring-green-700">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Date To</label>
+                <input type="date" name="date_to" value="{{ selected_date_to }}" class="mt-2 block w-full rounded-xl border-slate-300 bg-slate-50 px-3 py-2.5 text-sm focus:border-green-700 focus:bg-white focus:ring-green-700">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Vehicle</label>
+                <select name="vehicle" class="mt-2 block w-full rounded-xl border-slate-300 bg-slate-50 px-3 py-2.5 text-sm focus:border-green-700 focus:bg-white focus:ring-green-700">
+                    <option value="">All vehicles</option>
+                    {% for vehicle in vehicles %}
+                    <option value="{{ vehicle.pk }}" {% if selected_vehicle == vehicle.pk|stringformat:'s' %}selected{% endif %}>{{ vehicle.plate_number }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Driver</label>
+                <select name="driver" class="mt-2 block w-full rounded-xl border-slate-300 bg-slate-50 px-3 py-2.5 text-sm focus:border-green-700 focus:bg-white focus:ring-green-700">
+                    <option value="">All drivers</option>
+                    {% for driver in drivers %}
+                    <option value="{{ driver.pk }}" {% if selected_driver == driver.pk|stringformat:'s' %}selected{% endif %}>{{ driver.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Customer</label>
+                <select name="customer" class="mt-2 block w-full rounded-xl border-slate-300 bg-slate-50 px-3 py-2.5 text-sm focus:border-green-700 focus:bg-white focus:ring-green-700">
+                    <option value="">All customers</option>
+                    {% for customer in customers %}
+                    <option value="{{ customer.pk }}" {% if selected_customer == customer.pk|stringformat:'s' %}selected{% endif %}>{{ customer.company_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="md:col-span-2 xl:col-span-5 flex items-center justify-end gap-3 pt-2">
+                <a href="{% url 'transport:finance:analysis-export-excel' %}?{{ request.GET.urlencode }}" class="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100">
+                    <span class="material-symbols-outlined text-[18px] leading-none">table_view</span>
+                    Excel
+                </a>
+                <a href="{% url 'transport:finance:analysis-export-pdf' %}?{{ request.GET.urlencode }}" class="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-800 transition hover:bg-rose-100">
+                    <span class="material-symbols-outlined text-[18px] leading-none">picture_as_pdf</span>
+                    PDF
+                </a>
+                <a href="{% url 'transport:finance:overview' %}" class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Reset</a>
+                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                    <span class="material-symbols-outlined text-[18px] leading-none">filter_alt</span>
+                    Apply Filters
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Total Revenue</p>
+                <span class="material-symbols-outlined text-[18px] text-green-700">payments</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-green-700">{{ total_revenue|currency }}</p>
+            <p class="mt-1 text-xs text-slate-500">Trip and manual revenue combined</p>
+        </article>
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Collected Payments</p>
+                <span class="material-symbols-outlined text-[18px] text-emerald-700">task_alt</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-emerald-700">{{ collected_payments|currency }}</p>
+            <p class="mt-1 text-xs text-slate-500">Money already received</p>
+        </article>
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Total Expenses</p>
+                <span class="material-symbols-outlined text-[18px] text-red-600">receipt_long</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-red-600">{{ total_expenses|currency }}</p>
+            <p class="mt-1 text-xs text-slate-500">Operating costs in this view</p>
+        </article>
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Net Profit</p>
+                <span class="material-symbols-outlined text-[18px] {% if net_profit >= 0 %}text-green-700{% else %}text-red-600{% endif %}">monitoring</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold {% if net_profit >= 0 %}text-green-700{% else %}text-red-600{% endif %}">{{ net_profit|currency }}</p>
+            <p class="mt-1 text-xs text-slate-500">Margin {{ profit_margin_percentage|floatformat:1 }}%</p>
+        </article>
+    </section>
+
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Pending Revenue</p>
+                <span class="material-symbols-outlined text-[18px] text-amber-600">hourglass_top</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-amber-700">{{ pending_revenue|currency }}</p>
+            <p class="mt-1 text-xs text-slate-500">Invoices still waiting to be collected</p>
+        </article>
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Operating Gap</p>
+                <span class="material-symbols-outlined text-[18px] {% if operating_gap >= 0 %}text-green-700{% else %}text-red-600{% endif %}">compare_arrows</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold {% if operating_gap >= 0 %}text-green-700{% else %}text-red-600{% endif %}">{{ operating_gap|currency }}</p>
+            <p class="mt-1 text-xs text-slate-500">Collected payments minus total expenses</p>
+        </article>
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Revenue Entries</p>
+                <span class="material-symbols-outlined text-[18px] text-slate-600">receipt_long</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ payment_count }}</p>
+            <p class="mt-1 text-xs text-slate-500">Tracked payments in this filtered view</p>
+        </article>
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Average Payment</p>
+                <span class="material-symbols-outlined text-[18px] text-blue-700">query_stats</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-blue-700">{{ avg_payment|currency }}</p>
+            <p class="mt-1 text-xs text-slate-500">Average payment value in the current range</p>
+        </article>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-[1.3fr_0.7fr]">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Revenue vs Expenses</p>
+                <h2 class="mt-1 text-lg font-bold text-slate-900">Monthly movement</h2>
+            </div>
+            <div class="mt-4 h-[240px]"><canvas id="financeRevenueExpenseChart"></canvas></div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Payments vs Expenses</p>
+            <h2 class="mt-1 text-lg font-bold text-slate-900">Collection comparison</h2>
+            <div class="mt-4 h-[240px]"><canvas id="financePaymentExpenseChart"></canvas></div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Expense Breakdown</p>
+            <h2 class="mt-1 text-lg font-bold text-slate-900">Cost mix</h2>
+            <div class="mt-4 h-[240px]"><canvas id="financeExpenseBreakdownChart"></canvas></div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Financial Analysis</p>
+            <h2 class="mt-1 text-lg font-bold text-slate-900">Current position</h2>
+            <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Pending Revenue</p>
+                    <p class="mt-2 text-xl font-bold text-amber-700">{{ pending_revenue|currency }}</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Operating Gap</p>
+                    <p class="mt-2 text-xl font-bold {% if operating_gap >= 0 %}text-green-700{% else %}text-red-600{% endif %}">{{ operating_gap|currency }}</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Expense Coverage Ratio</p>
+                    <p class="mt-2 text-xl font-bold text-slate-900">{{ expense_coverage_ratio|floatformat:1 }}%</p>
+                    <p class="mt-1 text-xs text-slate-500">Collected payments vs expenses</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Cost Drivers</p>
+                    <p class="mt-2 text-sm font-semibold text-slate-900">Fuel {{ fuel_expenses|currency }}</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">Driver Fees {{ driver_fees|currency }}</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">Maintenance {{ maintenance_cost|currency }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Recent Revenue</p>
+                    <h2 class="mt-1 text-lg font-bold text-slate-900">Latest entries</h2>
+                </div>
+                <a href="{% url 'transport:finance:payment-list' %}" class="text-sm font-semibold text-green-700 hover:text-green-800">View all</a>
+            </div>
+            <div class="divide-y divide-slate-100">
+                {% for payment in payments %}
+                <div class="flex items-start justify-between gap-4 px-5 py-4 hover:bg-slate-50">
+                    <div>
+                        <p class="font-semibold text-slate-900">{% if payment.trip %}{{ payment.trip.order_number }}{% else %}Manual Revenue{% endif %}</p>
+                        <p class="text-xs text-slate-500">{{ payment.customer.company_name|default:payment.trip.customer.company_name|default:'Unassigned customer' }} and {{ payment.payment_method|title }}</p>
+                        <p class="mt-1 text-xs text-slate-400">{{ payment.payment_date|date:"d M Y" }}</p>
+                    </div>
+                    <div class="text-right"><p class="font-semibold text-green-700">{{ payment.amount|currency }}</p><a href="{% url 'transport:finance:payment-detail' payment.pk %}" class="mt-1 inline-block text-xs font-medium text-slate-500 hover:text-slate-700">Open</a></div>
+                </div>
+                {% empty %}
+                <div class="px-5 py-8 text-center text-slate-500">No revenue entries recorded yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div class="border-b border-slate-200 px-5 py-4"><p class="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">Recent Costs</p><h2 class="mt-1 text-lg font-bold text-slate-900">Latest expenses</h2></div>
+            <div class="divide-y divide-slate-100">
+                {% for expense in recent_expenses %}
+                <div class="px-5 py-4"><div class="flex items-start justify-between gap-4"><div><p class="font-semibold text-slate-900">{{ expense.category }}</p><p class="text-xs text-slate-500">{{ expense.expense_date|date:"d M Y" }}</p></div><p class="font-semibold text-red-600">{{ expense.amount|currency }}</p></div></div>
+                {% empty %}
+                <div class="px-5 py-8 text-center text-slate-500">No expenses recorded yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const chartTheme = (window.atmsTheme && window.atmsTheme.chart) || {};
+    const labels = {{ monthly_labels|safe }};
+    const revenueSeries = {{ monthly_revenue_series|safe }};
+    const expenseSeries = {{ monthly_expense_series|safe }};
+    const expenseLabels = {{ expense_breakdown_labels|safe }};
+    const expenseValues = {{ expense_breakdown_values|safe }};
+    const paymentExpenseLabels = {{ payment_expense_comparison_labels|safe }};
+    const paymentExpenseValues = {{ payment_expense_comparison_values|safe }};
+
+    new Chart(document.getElementById('financeRevenueExpenseChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Revenue', data: revenueSeries, borderColor: chartTheme.primaryDark || '#166534', backgroundColor: chartTheme.primaryFill || 'rgba(22,101,52,0.12)', fill: true, tension: 0.35 },
+                { label: 'Expenses', data: expenseSeries, borderColor: chartTheme.danger || '#dc2626', backgroundColor: chartTheme.dangerFill || 'rgba(220,38,38,0.04)', fill: true, tension: 0.35 }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: chartTheme.legend || '#334155' } } }, scales: { x: { grid: { display: false }, ticks: { color: chartTheme.tick || '#64748b' } }, y: { ticks: { color: chartTheme.tick || '#64748b' }, grid: { color: chartTheme.grid || '#e2e8f0' } } } }
+    });
+
+    new Chart(document.getElementById('financeExpenseBreakdownChart'), {
+        type: 'doughnut',
+        data: { labels: expenseLabels, datasets: [{ data: expenseValues, backgroundColor: (chartTheme.paletteAlpha || ['#f59e0b', '#0ea5e9', '#ef4444', '#64748b']).slice(0, Math.max(expenseValues.length, 4)), borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: chartTheme.legend || '#334155', usePointStyle: true } } }, cutout: '68%' }
+    });
+
+    new Chart(document.getElementById('financePaymentExpenseChart'), {
+        type: 'bar',
+        data: {
+            labels: paymentExpenseLabels,
+            datasets: [{
+                label: 'Amount',
+                data: paymentExpenseValues,
+                backgroundColor: [chartTheme.primary || '#16a34a', chartTheme.highlight || '#f59e0b', chartTheme.danger || '#dc2626'],
+                borderRadius: 12
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: chartTheme.tick || '#64748b' } },
+                y: { ticks: { color: chartTheme.tick || '#64748b' }, grid: { color: chartTheme.grid || '#e2e8f0' } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

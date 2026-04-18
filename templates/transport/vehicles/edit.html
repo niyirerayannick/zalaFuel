@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Vehicle | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .field-label { display:block; margin-bottom:.375rem; font-size:.75rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:rgb(51 65 85); }
+    .input-shell { position:relative; }
+    .field-icon { position:absolute; left:.75rem; top:50%; transform:translateY(-50%); font-size:1rem; line-height:1; color:rgb(71 85 105); pointer-events:none; transition:color .2s ease; }
+    .input-shell:focus-within .field-icon { color:rgb(21 128 61); }
+    .vehicle-field { width:100%; min-height:2.75rem; border:1px solid rgb(203 213 225); background:rgb(248 250 252); border-radius:.75rem; padding:.7rem .875rem .7rem 2.4rem; font-size:.9rem; line-height:1.25rem; color:rgb(15 23 42); transition:all .22s ease; box-shadow:inset 0 1px 0 rgba(255,255,255,.5); }
+    select.vehicle-field { appearance:none; background-image:linear-gradient(45deg, transparent 50%, rgb(71 85 105) 50%), linear-gradient(135deg, rgb(71 85 105) 50%, transparent 50%); background-position:calc(100% - 18px) calc(1.1em), calc(100% - 13px) calc(1.1em); background-size:5px 5px, 5px 5px; background-repeat:no-repeat; padding-right:2.2rem; }
+    .vehicle-field:focus { outline:none; background:#fff; border-color:rgb(21 128 61); box-shadow:0 0 0 4px rgba(21,128,61,.15), 0 8px 20px rgba(21,128,61,.08); }
+    .vehicle-field-error { border-color:rgb(239 68 68)!important; background-color:rgb(254 242 242)!important; box-shadow:0 0 0 3px rgba(239,68,68,.12)!important; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% url 'transport:vehicles:detail' vehicle.pk as vehicle_detail_url %}
+{% include "transport/vehicles/_form.html" with form_title="Edit Vehicle" form_subtitle="Update vehicle profile and technical information." back_url=vehicle_detail_url cancel_url=vehicle_detail_url %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const fieldIds = ['id_plate_number','id_vehicle_model','id_vehicle_type','id_year','id_fuel_type','id_engine_capacity','id_color','id_capacity','id_ownership_type','id_owner','id_new_owner_name','id_new_owner_phone','id_new_owner_bank_name','id_new_owner_bank_account','id_current_odometer','id_status','id_insurance_expiry','id_inspection_expiry','id_service_interval_km','id_last_service_km'];
+    fieldIds.forEach((id) => { const el = document.getElementById(id); if (el) el.classList.add('vehicle-field'); });
+
+    const plate = document.getElementById('id_plate_number');
+    const model = document.getElementById('id_vehicle_model');
+    const type = document.getElementById('id_vehicle_type');
+    const ownership = document.getElementById('id_ownership_type');
+    const owner = document.getElementById('id_owner');
+    const odo = document.getElementById('id_current_odometer');
+
+    const syncOwnershipFields = () => {
+        const isExternal = ownership && ownership.value === 'external';
+        ['vehicle-owner-select-block','vehicle-owner-name-block','vehicle-owner-phone-block','vehicle-owner-bank-name-block','vehicle-owner-bank-account-block'].forEach((id) => {
+            const block = document.getElementById(id);
+            if (block) block.style.display = isExternal ? '' : 'none';
+        });
+        if (!isExternal && owner) owner.value = '';
+    };
+
+    const updatePreview = () => {
+        const plateText = (plate?.value || '--').toUpperCase();
+        const modelText = model?.value?.trim() || '--';
+        const typeText = type?.options?.[type.selectedIndex]?.text || '--';
+        const ownershipText = ownership?.options?.[ownership.selectedIndex]?.text || '--';
+        const odoText = odo?.value ? Number(odo.value).toLocaleString() + ' km' : '--';
+        document.getElementById('vehiclePlatePreview').textContent = plateText;
+        document.getElementById('vehicleModelPreview').textContent = modelText;
+        document.getElementById('vehicleTypePreview').textContent = typeText;
+        document.getElementById('vehicleOwnershipPreview').textContent = ownershipText;
+        document.getElementById('vehicleOdoPreview').textContent = odoText;
+    };
+
+    if (plate) plate.addEventListener('input', function(e){ e.target.value = e.target.value.toUpperCase(); updatePreview(); });
+    if (model) model.addEventListener('input', updatePreview);
+    if (type) type.addEventListener('change', updatePreview);
+    if (ownership) ownership.addEventListener('change', function () { syncOwnershipFields(); updatePreview(); });
+    if (odo) odo.addEventListener('input', updatePreview);
+    syncOwnershipFields();
+    updatePreview();
+});
+</script>
+{% endblock %}

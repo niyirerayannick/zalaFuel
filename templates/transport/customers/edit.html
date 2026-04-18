@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Customer - {{ customer.company_name }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .customer-label {
+        display: block;
+        margin-bottom: 0.45rem;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgb(51 65 85);
+    }
+
+    .customer-help {
+        margin-top: 0.45rem;
+        font-size: 0.75rem;
+        color: rgb(100 116 139);
+    }
+
+    .customer-error {
+        min-height: 1rem;
+        margin-top: 0.45rem;
+        font-size: 0.75rem;
+        color: rgb(220 38 38);
+    }
+
+    .customer-input-shell {
+        position: relative;
+    }
+
+    .customer-field-icon {
+        position: absolute;
+        left: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgb(100 116 139);
+        font-size: 1.05rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+
+    .customer-input-shell:focus-within .customer-field-icon {
+        color: rgb(21 128 61);
+    }
+
+    .customer-field {
+        width: 100%;
+        min-height: 2.8rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225);
+        background: rgb(248 250 252);
+        color: rgb(15 23 42);
+        transition: all 0.2s ease;
+    }
+
+    .customer-field:not(textarea) {
+        padding: 0.78rem 0.95rem 0.78rem 2.75rem;
+    }
+
+    textarea.customer-field {
+        padding: 0.9rem 0.95rem 0.9rem 2.75rem;
+    }
+
+    .customer-field::placeholder {
+        color: rgb(148 163 184);
+    }
+
+    .customer-field:focus {
+        outline: none;
+        border-color: rgb(21 128 61);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+
+    .customer-field-error {
+        border-color: rgb(239 68 68) !important;
+        background: rgb(254 242 242) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+    }
+
+    select.customer-field {
+        appearance: none;
+        padding-right: 2rem;
+        background-image: linear-gradient(45deg, transparent 50%, rgb(71 85 105) 50%), linear-gradient(135deg, rgb(71 85 105) 50%, transparent 50%);
+        background-position: calc(100% - 18px) 18px, calc(100% - 13px) 18px;
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include "transport/customers/_form_page.html" with form_title="Edit Customer" form_subtitle="Update customer records while preserving the existing client workflow." back_url=cancel_url submit_label="Save Customer" %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('customer-record-form');
+    const submitBtn = document.getElementById('customer-submit-btn');
+    const alertBox = document.getElementById('customer-form-alert');
+
+    function styleFields(scope) {
+        scope.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden' || el.type === 'checkbox') return;
+            el.classList.add('customer-field');
+        });
+    }
+
+    function parseAddressParts(address) {
+        if (!address) return ['Not detected', 'Not detected'];
+        const parts = address.split(',').map(function (item) { return item.trim(); }).filter(Boolean);
+        if (parts.length === 1) return [parts[0], 'Not detected'];
+        return [parts[parts.length - 2] || 'Not detected', parts[parts.length - 1] || 'Not detected'];
+    }
+
+    function syncPreview(scope) {
+        const address = scope.querySelector('#id_address');
+        const status = scope.querySelector('#id_status');
+        const cityPreview = scope.querySelector('#customer-city-preview');
+        const countryPreview = scope.querySelector('#customer-country-preview');
+        const citySide = scope.querySelector('#customer-city-side');
+        const countrySide = scope.querySelector('#customer-country-side');
+        const statusPreview = scope.querySelector('#customer-status-preview');
+
+        function update() {
+            const value = address ? address.value : '';
+            const parsed = parseAddressParts(value);
+            if (cityPreview) cityPreview.textContent = parsed[0];
+            if (countryPreview) countryPreview.textContent = parsed[1];
+            if (citySide) citySide.textContent = parsed[0];
+            if (countrySide) countrySide.textContent = parsed[1];
+            if (statusPreview && status) statusPreview.textContent = status.options[status.selectedIndex] ? status.options[status.selectedIndex].text : '--';
+        }
+
+        if (address) {
+            address.addEventListener('input', update);
+            address.addEventListener('change', update);
+        }
+        if (status) {
+            status.addEventListener('input', update);
+            status.addEventListener('change', update);
+        }
+        update();
+    }
+
+    function clearErrors(scope) {
+        scope.querySelectorAll('.customer-error').forEach(function (el) { el.textContent = ''; });
+        scope.querySelectorAll('.customer-field-error').forEach(function (el) { el.classList.remove('customer-field-error'); });
+    }
+
+    styleFields(document);
+    syncPreview(document);
+
+    if (!form) return;
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        clearErrors(document);
+        if (alertBox) alertBox.classList.add('hidden');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
+
+        try {
+            const response = await fetch(form.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                if (payload.non_field_errors && alertBox) {
+                    alertBox.className = 'rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700';
+                    alertBox.textContent = payload.non_field_errors.join(' ');
+                    alertBox.classList.remove('hidden');
+                }
+                if (payload.errors) {
+                    Object.keys(payload.errors).forEach(function (field) {
+                        const input = document.getElementById('id_' + field);
+                        const error = document.querySelector('[data-error-for="' + field + '"]');
+                        if (input) input.classList.add('customer-field-error');
+                        if (error) error.textContent = payload.errors[field].join(' ');
+                    });
+                }
+                return;
+            }
+
+            window.location.href = payload.detail_url || "{% url 'transport:customers:list' %}";
+        } catch (error) {
+            if (alertBox) {
+                alertBox.className = 'rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700';
+                alertBox.textContent = 'Unable to save the customer right now. Please try again.';
+                alertBox.classList.remove('hidden');
+            }
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] leading-none">check</span>Save Customer';
+        }
+    });
+});
+</script>
+{% endblock %}

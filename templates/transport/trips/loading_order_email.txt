@@ -1,0 +1,16 @@
+Dear {{ customer.company_name }},
+
+Please find attached the loading order for trip {{ trip.order_number }}.
+
+Summary:
+- Loading order date: {{ loading_order_date|date:"d/m/Y" }}
+- Product: {{ product }}
+- Quantity: {{ quantity }}
+- Destination: {{ destination }}
+- Truck plates: {{ truck_plates }}
+- Driver names: {{ driver_names }}
+
+If you have any questions, please contact ZALA/ECO ENERGY.
+
+Regards,
+ZALA/ECO ENERGY

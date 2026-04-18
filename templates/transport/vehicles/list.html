@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .vehicle-modal-card {
+        border: 1px solid rgb(226 232 240);
+        border-radius: 0.75rem;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .vehicle-modal-title {
+        color: rgb(30 41 59);
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+    .vehicle-label {
+        display:block;
+        margin-bottom:.35rem;
+        font-size:.75rem;
+        font-weight:700;
+        letter-spacing:.04em;
+        text-transform:uppercase;
+        color:rgb(51 65 85);
+    }
+    .vehicle-input-wrap { position:relative; }
+    .vehicle-input-icon {
+        position:absolute;
+        left:.75rem;
+        top:50%;
+        transform:translateY(-50%);
+        font-size:1rem;
+        color:rgb(71 85 105);
+        pointer-events:none;
+    }
+    .vehicle-input {
+        width:100%;
+        min-height:2.7rem;
+        border:1px solid rgb(203 213 225);
+        border-radius:.62rem;
+        background:rgb(248 250 252);
+        padding:.68rem .9rem .68rem 2.4rem;
+        color:rgb(15 23 42);
+        font-size:.9rem;
+        transition:all .2s ease;
+    }
+    select.vehicle-input {
+        appearance:none;
+        padding-right:2rem;
+        background-image:linear-gradient(45deg, transparent 50%, rgb(71 85 105) 50%), linear-gradient(135deg, rgb(71 85 105) 50%, transparent 50%);
+        background-position:calc(100% - 18px) 17px, calc(100% - 13px) 17px;
+        background-size:5px 5px, 5px 5px;
+        background-repeat:no-repeat;
+    }
+    .vehicle-input:focus {
+        outline:none;
+        background:#fff;
+        border-color:rgb(21 128 61);
+        box-shadow:0 0 0 3px rgba(21, 128, 61, .16), 0 8px 20px rgba(21, 128, 61, .08);
+    }
+    .vehicle-input-error {
+        border-color:rgb(239 68 68)!important;
+        background-color:rgb(254 242 242)!important;
+        box-shadow:0 0 0 2px rgba(239, 68, 68, .12)!important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 sm:p-6 shadow-sm">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-start gap-4">
+                <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-green-700 to-green-600 text-white flex items-center justify-center shadow-md shadow-green-700/20">
+                    <span class="material-symbols-outlined text-[24px] leading-none">directions_car</span>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fleet Management</p>
+                    <h1 class="mt-1 text-2xl font-bold text-slate-900">{{ page_title }}</h1>
+                    <p class="mt-1 text-sm text-slate-600">Manage your fleet with fast create/edit interactions.</p>
+                </div>
+            </div>
+            {% if can_manage_fleet %}
+            <button id="vehicle-add-btn" type="button" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 hover:bg-green-800 transition">
+                <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                Add Vehicle
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="vehicle-list-content">
+        {% include "transport/vehicles/_list_content.html" %}
+    </div>
+</div>
+
+{% if can_manage_fleet %}
+<div id="vehicle-panel-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="vehicle-panel" class="fixed inset-y-0 right-0 z-50 hidden w-full max-w-2xl transform bg-white shadow-2xl transition-transform duration-300 translate-x-full">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-white/95 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="h-9 w-9 rounded-lg bg-green-100 text-green-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px] leading-none">directions_car</span>
+                </div>
+                <div>
+                    <h2 id="vehicle-panel-title" class="text-base font-semibold text-slate-900">Add Vehicle</h2>
+                    <p class="text-xs text-slate-500">Create and edit vehicles instantly.</p>
+                </div>
+            </div>
+            <button type="button" id="vehicle-panel-close" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+
+        <div id="vehicle-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+
+        <div class="border-t border-slate-200 px-5 py-4 bg-white">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="vehicle-panel-cancel" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
+                <button type="button" id="vehicle-panel-save" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800 disabled:opacity-60 disabled:cursor-not-allowed">Save Vehicle</button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if can_manage_fleet %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('vehicle-add-btn');
+    const listContainer = document.getElementById('vehicle-list-content');
+    const overlay = document.getElementById('vehicle-panel-overlay');
+    const panel = document.getElementById('vehicle-panel');
+    const panelTitle = document.getElementById('vehicle-panel-title');
+    const panelBody = document.getElementById('vehicle-panel-body');
+    const closeBtn = document.getElementById('vehicle-panel-close');
+    const cancelBtn = document.getElementById('vehicle-panel-cancel');
+    const saveBtn = document.getElementById('vehicle-panel-save');
+
+    if (!listContainer || !overlay || !panel || !panelBody || !saveBtn) return;
+
+    let currentForm = null;
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(() => panel.classList.remove('translate-x-full'));
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(() => {
+            panel.classList.add('hidden');
+            overlay.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            currentForm = null;
+        }, 220);
+    }
+
+    function stylePanelFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach((el) => {
+            if (el.type === 'hidden') return;
+            el.classList.add('vehicle-input');
+        });
+    }
+
+    function syncOwnershipFields() {
+        const ownership = panelBody.querySelector('#id_ownership_type');
+        const owner = panelBody.querySelector('#id_owner');
+        const isExternal = ownership && ownership.value === 'external';
+        ['vehicle-owner-select-block','vehicle-owner-name-block','vehicle-owner-phone-block','vehicle-owner-bank-name-block','vehicle-owner-bank-account-block'].forEach((id) => {
+            const block = panelBody.querySelector('#' + id);
+            if (block) block.style.display = isExternal ? '' : 'none';
+        });
+        if (ownership) {
+            ownership.addEventListener('change', function () {
+                syncOwnershipFields();
+            });
+        }
+        if (!isExternal && owner) {
+            owner.value = '';
+        }
+    }
+
+    async function refreshList() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('partial', 'list');
+        const response = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        listContainer.innerHTML = await response.text();
+    }
+
+    async function loadForm(url, title) {
+        panelTitle.textContent = title;
+        openPanel();
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        const separator = url.includes('?') ? '&' : '?';
+        const response = await fetch(url + separator + 'partial=form', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        panelBody.innerHTML = await response.text();
+        currentForm = document.getElementById('vehicle-modal-form');
+        stylePanelFields();
+        syncOwnershipFields();
+    }
+
+    function clearErrors() {
+        const errorBox = document.getElementById('vehicle-form-error');
+        if (errorBox) {
+            errorBox.classList.add('hidden');
+            errorBox.textContent = '';
+        }
+        panelBody.querySelectorAll('.vehicle-field-error').forEach((el) => el.textContent = '');
+        panelBody.querySelectorAll('.vehicle-input-error').forEach((el) => el.classList.remove('vehicle-input-error'));
+    }
+
+    function showErrors(payload) {
+        const errorBox = document.getElementById('vehicle-form-error');
+        if (errorBox && payload.message) {
+            errorBox.textContent = payload.message;
+            errorBox.classList.remove('hidden');
+        }
+        if (payload.non_field_errors && payload.non_field_errors.length && errorBox) {
+            errorBox.textContent = payload.non_field_errors.join(' ');
+            errorBox.classList.remove('hidden');
+        }
+        if (payload.errors) {
+            Object.keys(payload.errors).forEach((field) => {
+                const target = panelBody.querySelector('[data-error-for="' + field + '"]');
+                if (target) target.textContent = payload.errors[field].join(' ');
+                const input = panelBody.querySelector('#id_' + field);
+                if (input) input.classList.add('vehicle-input-error');
+            });
+        }
+    }
+
+    async function submitForm() {
+        if (!currentForm) return;
+        clearErrors();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        try {
+            const csrfToken = currentForm.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    ...(csrfToken ? { 'X-CSRFToken': csrfToken } : {})
+                }
+            });
+            const responseText = await response.text();
+            let payload = {};
+            try {
+                payload = responseText ? JSON.parse(responseText) : {};
+            } catch (_parseError) {
+                payload = {
+                    success: false,
+                    message: responseText && responseText.trim()
+                        ? responseText.trim()
+                        : 'Unable to save right now. Please try again.'
+                };
+            }
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+            closePanel();
+            await refreshList();
+        } catch (_e) {
+            const errorBox = document.getElementById('vehicle-form-error');
+            if (errorBox) {
+                errorBox.textContent = 'Unable to save right now. Please try again.';
+                errorBox.classList.remove('hidden');
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Vehicle';
+        }
+    }
+
+    if (addBtn) {
+        addBtn.addEventListener('click', () => loadForm("{% url 'transport:vehicles:create' %}", 'Add Vehicle'));
+    }
+
+    listContainer.addEventListener('click', function (event) {
+        const editBtn = event.target.closest('.vehicle-edit-btn');
+        if (editBtn) {
+            event.preventDefault();
+            loadForm(editBtn.dataset.editUrl, 'Edit Vehicle');
+        }
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+    saveBtn.addEventListener('click', submitForm);
+});
+</script>
+{% endif %}
+{% endblock %}

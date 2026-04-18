@@ -1,0 +1,128 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4 mb-6">
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">Total Vehicles</p>
+        <p class="mt-2 text-2xl font-bold text-slate-900">{{ total_vehicles }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">External Vehicles</p>
+        <p class="mt-2 text-2xl font-bold text-sky-700">{{ external_vehicles }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">Company Vehicles</p>
+        <p class="mt-2 text-2xl font-bold text-slate-900">{{ company_vehicles }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">Available</p>
+        <p class="mt-2 text-2xl font-bold text-green-700">{{ available_vehicles }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">In Service</p>
+        <p class="mt-2 text-2xl font-bold text-amber-700">{{ assigned_vehicles }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">Maintenance</p>
+        <p class="mt-2 text-2xl font-bold text-red-700">{{ maintenance_vehicles }}</p>
+    </div>
+</div>
+
+<div class="rounded-2xl border border-slate-200 bg-white shadow-sm mb-6">
+    <form method="GET" class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+            <label for="search" class="block text-xs font-semibold uppercase tracking-wide text-slate-600">Search</label>
+            <input type="text" name="search" id="search" value="{{ search_query }}" placeholder="Plate number, vehicle type..." class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+        </div>
+        <div>
+            <label for="status" class="block text-xs font-semibold uppercase tracking-wide text-slate-600">Status</label>
+            <select name="status" id="status" class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-green-700 focus:ring-green-700">
+                <option value="">All Statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="flex items-end">
+            <button type="submit" class="w-full rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800 transition">Apply Filters</button>
+        </div>
+    </form>
+    <div class="border-t border-slate-200 px-5 py-4 flex flex-wrap items-center justify-end gap-3 bg-slate-50/60">
+        <a href="{% url 'transport:vehicles:export-pdf' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}" class="inline-flex items-center rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100 transition">Export PDF</a>
+        <a href="{% url 'transport:vehicles:export-excel' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}" class="inline-flex items-center rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100 transition">Export Excel</a>
+    </div>
+</div>
+
+<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    {% if vehicles %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Vehicle</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Type & Capacity</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Odometer</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Next Service</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                {% for vehicle in vehicles %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-5 py-4">
+                        <p class="text-sm font-semibold text-slate-900">{{ vehicle.plate_number }}</p>
+                    </td>
+                    <td class="px-5 py-4">
+                        <p class="text-sm text-slate-800">{{ vehicle.vehicle_type }}</p>
+                        <p class="text-xs text-slate-500">Load Capacity: {{ vehicle.capacity|floatformat:1 }} tons</p>
+                        <p class="text-xs text-slate-500">
+                            {{ vehicle.get_ownership_type_display }}
+                            {% if vehicle.owner %}· {{ vehicle.owner.name }}{% endif %}
+                        </p>
+                    </td>
+                    <td class="px-5 py-4">
+                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold {% if vehicle.status == 'AVAILABLE' %}bg-green-100 text-green-700{% elif vehicle.status == 'ASSIGNED' %}bg-amber-100 text-amber-700{% elif vehicle.status == 'MAINTENANCE' %}bg-red-100 text-red-700{% else %}bg-slate-100 text-slate-700{% endif %}">
+                            {{ vehicle.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-4 text-sm text-slate-700">{{ vehicle.current_odometer|floatformat:0 }} km</td>
+                    <td class="px-5 py-4 text-sm text-slate-700">{{ vehicle.next_service_km|floatformat:0 }} km</td>
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-2">
+                            <a href="{% url 'transport:vehicles:detail' vehicle.pk %}" class="inline-flex items-center rounded-md border border-slate-300 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">View</a>
+                            {% if can_manage_fleet %}
+                            <button type="button" class="vehicle-edit-btn inline-flex items-center rounded-md border border-green-200 px-2.5 py-1.5 text-xs font-medium text-green-700 hover:bg-green-50" data-edit-url="{% url 'transport:vehicles:edit' vehicle.pk %}">Edit</button>
+                            <button type="button" class="inline-flex items-center rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-medium text-red-400 cursor-not-allowed" disabled title="Delete route is not configured yet">Delete</button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="p-10 text-center">
+        <p class="text-sm font-medium text-slate-800">No vehicles found.</p>
+        <p class="mt-1 text-sm text-slate-500">Add your first vehicle to start tracking fleet operations.</p>
+    </div>
+    {% endif %}
+</div>
+{% if is_paginated %}
+<div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-sm text-slate-600">Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+    <div class="flex flex-wrap items-center gap-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Previous</a>
+        {% endif %}
+        {% for page_number in page_obj.paginator.page_range %}
+            {% if page_number == page_obj.number %}
+            <span class="inline-flex items-center rounded-lg bg-green-700 px-3 py-2 text-sm font-semibold text-white">{{ page_number }}</span>
+            {% elif page_number >= page_obj.number|add:'-2' and page_number <= page_obj.number|add:'2' %}
+            <a href="?page={{ page_number }}&search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">{{ page_number }}</a>
+            {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Next</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

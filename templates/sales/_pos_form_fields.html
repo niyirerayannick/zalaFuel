@@ -1,0 +1,199 @@
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">local_atm</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Sale Details</h3>
+            <p class="text-xs text-slate-500">Select station, pump, nozzle, and payment method.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div>
+            <label class="driver-label">Station</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">warehouse</span>
+                <select id="pos-station" name="station" class="driver-modal-field">
+                    <option value="">Select station</option>
+                    {% for station in stations %}
+                        <option value="{{ station.id }}">{{ station.name }} ({{ station.code }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">Pump</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">local_gas_station</span>
+                <select id="pos-pump" name="pump" class="driver-modal-field" disabled>
+                    <option value="">Select pump</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">Nozzle</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">gas_meter</span>
+                <select id="pos-nozzle" name="nozzle" class="driver-modal-field" disabled>
+                    <option value="">Select nozzle</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">Payment method</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">credit_card</span>
+                <select id="pos-method" name="payment_method" class="driver-modal-field">
+                    {% for choice, label in form_payment_methods %}
+                    <option value="{{ choice }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">functions</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Meters & Quantity</h3>
+            <p class="text-xs text-slate-500">Auto-calculate liters and total.</p>
+        </div>
+    </div>
+    <div class="grid gap-4 p-5 md:grid-cols-3">
+        <div>
+            <label class="driver-label">Opening meter</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">counter_1</span>
+                <input type="number" step="0.01" id="pos-opening" name="opening_meter" class="driver-modal-field" placeholder="0.00">
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">Closing meter</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">counter_2</span>
+                <input type="number" step="0.01" id="pos-closing" name="closing_meter" class="driver-modal-field" placeholder="0.00">
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">Quantity (auto)</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">scale</span>
+                <input type="number" step="0.01" id="pos-quantity" name="volume_liters" class="driver-modal-field" placeholder="0.00" readonly>
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">Unit price</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">payments</span>
+                <input type="number" step="0.01" id="pos-price" name="unit_price" class="driver-modal-field" placeholder="0.00">
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">Total (auto)</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">attach_money</span>
+                <input type="number" step="0.01" id="pos-total" class="driver-modal-field" placeholder="0.00" readonly>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">person</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Customer & Credit</h3>
+            <p class="text-xs text-slate-500">Optional details and credit selection.</p>
+        </div>
+    </div>
+    <div class="grid gap-4 p-5 md:grid-cols-2">
+        <div>
+            <label class="driver-label">Customer</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">person</span>
+                <input type="text" id="pos-customer" name="customer_name" class="driver-modal-field" placeholder="Walk-in">
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">Receipt #</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">receipt</span>
+                <input type="text" id="pos-receipt" name="receipt_number" class="driver-modal-field" placeholder="Auto/Manual">
+            </div>
+        </div>
+        <div id="credit-customer-wrapper" class="md:col-span-2 hidden">
+            <label class="driver-label">Credit Customer</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">account_balance_wallet</span>
+                <select id="pos-credit-customer" name="customer" class="driver-modal-field">
+                    <option value="">Select credit customer</option>
+                    {% for c in credit_customers %}
+                    <option value="{{ c.id }}">{{ c.name }} (Limit: {{ c.credit_limit }}, Balance: {{ c.current_balance }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Shown only for credit sales.</p>
+        </div>
+    </div>
+</section>
+
+<section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">payments</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Payment Breakdown</h3>
+            <p class="text-xs text-slate-500">Optional split amounts; keep totals aligned.</p>
+        </div>
+    </div>
+    <div class="grid gap-4 p-5 md:grid-cols-2">
+        <div>
+            <label class="driver-label">Cash</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">attach_money</span>
+                <input type="number" step="0.01" name="cash_amount" class="driver-modal-field" placeholder="0.00">
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">MoMo</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">smartphone</span>
+                <input type="number" step="0.01" name="momo_amount" class="driver-modal-field" placeholder="0.00">
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">POS</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">credit_card</span>
+                <input type="number" step="0.01" name="pos_amount" class="driver-modal-field" placeholder="0.00">
+            </div>
+        </div>
+        <div>
+            <label class="driver-label">Credit</label>
+            <div class="driver-input-shell">
+                <span class="material-symbols-outlined driver-field-icon">account_balance</span>
+                <input type="number" step="0.01" name="credit_amount" class="driver-modal-field" placeholder="0.00">
+            </div>
+        </div>
+    </div>
+    <div class="px-5 pb-5">
+        <p class="text-xs text-slate-500">Breakdown is optional; totals are still validated server side.</p>
+    </div>
+</section>
+
+<div class="flex items-center justify-between pt-2">
+    <button type="button" id="pos-cancel" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+        Cancel
+    </button>
+    <button type="submit" id="pos-submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0f7ea6] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0c5069] disabled:opacity-60 disabled:cursor-not-allowed">
+        <span class="material-symbols-outlined text-[18px] leading-none">local_atm</span>
+        Record Sale
+    </button>
+</div>

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Reports | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div class="rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Reports</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Reports Dashboard</h1>
+                <p class="mt-1 text-sm text-slate-600">Jump into sales, inventory, shifts, and financial reporting.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Sales Total</p><h3 class="mt-1 text-2xl font-bold text-slate-900">{{ sales_total|floatformat:2 }}</h3></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Inventory Stock</p><h3 class="mt-1 text-2xl font-bold text-slate-900">{{ inventory_total|floatformat:2 }}</h3></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Shift Sessions</p><h3 class="mt-1 text-2xl font-bold text-slate-900">{{ shift_count }}</h3></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Payments</p><h3 class="mt-1 text-2xl font-bold text-slate-900">{{ payments_total|floatformat:2 }}</h3></div>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <a href="{% url 'reports:sales' %}" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#0f7ea6] hover:shadow-md">
+            <p class="text-sm font-semibold text-slate-900">Sales Reports</p>
+            <p class="mt-1 text-sm text-slate-500">Posted sales, liters, and receipts.</p>
+        </a>
+        <a href="{% url 'reports:inventory' %}" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#0f7ea6] hover:shadow-md">
+            <p class="text-sm font-semibold text-slate-900">Inventory Reports</p>
+            <p class="mt-1 text-sm text-slate-500">Tank stock and movement history.</p>
+        </a>
+        <a href="{% url 'reports:shifts' %}" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#0f7ea6] hover:shadow-md">
+            <p class="text-sm font-semibold text-slate-900">Shift Reports</p>
+            <p class="mt-1 text-sm text-slate-500">Open, closed, and reconciled shifts.</p>
+        </a>
+        <a href="{% url 'reports:financial' %}" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#0f7ea6] hover:shadow-md">
+            <p class="text-sm font-semibold text-slate-900">Financial Reports</p>
+            <p class="mt-1 text-sm text-slate-500">Payments and procurement costs.</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

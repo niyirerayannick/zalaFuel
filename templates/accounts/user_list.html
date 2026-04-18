@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}Users | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .driver-panel {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+    .driver-modal-field,
+    .driver-modal-file {
+        width: 100%;
+        min-height: 2.8rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225);
+        background: rgb(248 250 252);
+        color: rgb(15 23 42);
+        transition: all 0.2s ease;
+    }
+    .driver-modal-field { padding: 0.78rem 0.95rem 0.78rem 2.75rem; }
+    .driver-modal-file { padding: 0.7rem 0.95rem 0.7rem 2.75rem; }
+    .driver-modal-field:focus,
+    .driver-modal-file:focus {
+        outline: none; background: white; border-color: rgb(21 128 61);
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+    .driver-modal-error {
+        border-color: rgb(239 68 68) !important;
+        background: rgb(254 242 242) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+    }
+    .driver-label {
+        display: block;
+        margin-bottom: 0.45rem;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgb(51 65 85);
+    }
+    .driver-help { margin-top: 0.35rem; font-size: 0.72rem; color: rgb(100 116 139); }
+    .driver-error { min-height: 1rem; margin-top: 0.45rem; font-size: 0.75rem; color: rgb(220 38 38); }
+    .driver-input-shell, .driver-file-shell { position: relative; }
+    .driver-field-icon {
+        position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%);
+        color: rgb(100 116 139); font-size: 1.05rem; pointer-events: none; transition: color 0.2s ease;
+    }
+    .driver-input-shell:focus-within .driver-field-icon,
+    .driver-file-shell:focus-within .driver-field-icon { color: rgb(21 128 61); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <form class="hidden">{% csrf_token %}</form>
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Management</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Users</h1>
+                <p class="mt-1 text-sm text-slate-600">Manage staff access, station assignments, and account status.</p>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" id="user-add-btn" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                    <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                    Add User
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Users</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ total_users }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Active Users</p>
+            <h3 class="mt-1 text-2xl font-bold text-green-700">{{ active_users }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Inactive Users</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ inactive_users }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Assigned to Stations</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ station_users }}</h3>
+        </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
+            <form method="get" class="flex w-full flex-wrap gap-2">
+                <select name="station" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All stations</option>
+                    {% for station in stations %}
+                        <option value="{{ station.id }}" {% if filters.station == station.id|stringformat:'s' %}selected{% endif %}>{{ station.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="role" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All roles</option>
+                    {% for value, label in role_choices %}
+                        <option value="{{ value }}" {% if filters.role == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <select name="status" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All status</option>
+                    <option value="active" {% if filters.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if filters.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+                <input type="text" name="search" value="{{ filters.search }}" placeholder="Search name, email, staff ID, or station" class="flex-1 min-w-[220px] rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]" />
+                <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">Filter</button>
+                <a href="{% url 'accounts:user-export-excel' %}?{{ request.GET.urlencode }}" class="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    <span class="material-symbols-outlined text-[16px] leading-none">grid_on</span>
+                    Export Excel
+                </a>
+                <a href="{% url 'accounts:user-export-pdf' %}?{{ request.GET.urlencode }}" class="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    <span class="material-symbols-outlined text-[16px] leading-none">picture_as_pdf</span>
+                    Export PDF
+                </a>
+            </form>
+        </div>
+        <div id="user-list-content">
+            {% include "accounts/users/_list_content.html" %}
+        </div>
+    </div>
+</div>
+
+<div id="user-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="user-panel" class="driver-panel fixed inset-y-0 right-0 z-50 hidden w-full max-w-2xl translate-x-full transform shadow-2xl transition-transform duration-300">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                    <span class="material-symbols-outlined text-[20px] leading-none">person_add</span>
+                </div>
+                <div>
+                    <h2 class="text-base font-semibold text-slate-900" id="user-panel-title">Add User</h2>
+                    <p class="text-xs text-slate-500">Fast entry mode for staff accounts.</p>
+                </div>
+            </div>
+            <button type="button" id="user-close-btn" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+        <div id="user-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+        <div class="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-3 backdrop-blur">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="user-cancel-btn" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</button>
+                <button type="button" id="user-save-btn" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">Save User</button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('user-add-btn');
+    const overlay = document.getElementById('user-overlay');
+    const panel = document.getElementById('user-panel');
+    const panelBody = document.getElementById('user-panel-body');
+    const closeBtn = document.getElementById('user-close-btn');
+    const cancelBtn = document.getElementById('user-cancel-btn');
+    const saveBtn = document.getElementById('user-save-btn');
+    const listContainer = document.getElementById('user-list-content');
+    const titleEl = document.getElementById('user-panel-title');
+    let currentForm = null;
+
+    if (!addBtn || !overlay || !panel || !panelBody || !saveBtn || !listContainer) {
+        return;
+    }
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(function () {
+            panel.classList.remove('translate-x-full');
+        });
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(function () {
+            overlay.classList.add('hidden');
+            panel.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            currentForm = null;
+            saveBtn.textContent = 'Save User';
+        }, 220);
+    }
+
+    function styleModalFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden' || el.type === 'checkbox') return;
+            if (el.type === 'file') {
+                el.classList.add('driver-modal-file');
+            } else {
+                el.classList.add('driver-modal-field');
+            }
+        });
+    }
+
+    function clearErrors() {
+        const formError = panelBody.querySelector('#user-form-error');
+        if (formError) { formError.classList.add('hidden'); formError.textContent = ''; }
+        panelBody.querySelectorAll('.driver-error').forEach(function (el) { el.textContent = ''; });
+        panelBody.querySelectorAll('.driver-modal-error').forEach(function (el) { el.classList.remove('driver-modal-error'); });
+    }
+
+    function normalizeErrors(errors) {
+        if (!errors) return {};
+        return errors;
+    }
+
+    function showErrors(payload) {
+        const formError = panelBody.querySelector('#user-form-error');
+        if (payload.non_field_errors && payload.non_field_errors.length && formError) {
+            formError.classList.remove('hidden');
+            formError.textContent = payload.non_field_errors.join(' ');
+        }
+        const errors = normalizeErrors(payload.errors);
+        Object.keys(errors).forEach(function (field) {
+            const input = panelBody.querySelector('#id_' + field);
+            const error = panelBody.querySelector('[data-error-for="' + field + '"]');
+            const messages = Array.isArray(errors[field]) ? errors[field] : [errors[field]];
+            if (input) input.classList.add('driver-modal-error');
+            if (error) error.textContent = messages.join(' ');
+        });
+    }
+
+    async function refreshList() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('partial', 'list');
+        const response = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        listContainer.innerHTML = await response.text();
+    }
+
+    async function loadForm(url, title) {
+        openPanel();
+        titleEl.textContent = title;
+        saveBtn.textContent = title.toLowerCase().includes('delete') ? 'Delete' : 'Save User';
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        const separator = url.includes('?') ? '&' : '?';
+        const response = await fetch(url + separator + 'partial=form', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        panelBody.innerHTML = await response.text();
+        currentForm = panelBody.querySelector('#user-modal-form');
+        styleModalFields();
+        const deleteCancel = panelBody.querySelector('#user-delete-cancel-btn');
+        if (deleteCancel) deleteCancel.addEventListener('click', closePanel);
+    }
+
+    async function postAction(url) {
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}');
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (!response.ok) throw new Error('Action failed');
+        await refreshList();
+    }
+
+    addBtn.addEventListener('click', function () {
+        clearErrors();
+        loadForm("{% url 'accounts:user-create' %}", 'Add User');
+    });
+
+    listContainer.addEventListener('click', function (event) {
+        const editBtn = event.target.closest('.user-edit-btn');
+        const detailsToggle = event.target.closest('.user-details-toggle');
+        const resetBtn = event.target.closest('.user-reset-btn');
+        const toggleBtn = event.target.closest('.user-toggle-btn');
+        if (editBtn) {
+            event.preventDefault();
+            clearErrors();
+            loadForm(editBtn.dataset.editUrl, 'Edit User');
+        }
+        if (detailsToggle) {
+            const targetSel = detailsToggle.dataset.target;
+            const row = document.querySelector(targetSel);
+            if (row) row.classList.toggle('hidden');
+        }
+        if (resetBtn) {
+            event.preventDefault();
+            if (confirm('Send a temporary password to this user?')) {
+                postAction(resetBtn.dataset.resetUrl).catch(function () {
+                    alert('Unable to reset this user password right now.');
+                });
+            }
+        }
+        if (toggleBtn) {
+            event.preventDefault();
+            postAction(toggleBtn.dataset.toggleUrl).catch(function () {
+                alert('Unable to update this user status right now.');
+            });
+        }
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !panel.classList.contains('hidden')) {
+            closePanel();
+        }
+    });
+
+    saveBtn.addEventListener('click', async function () {
+        if (!currentForm) return;
+        clearErrors();
+        saveBtn.disabled = true;
+        const previousLabel = saveBtn.textContent;
+        saveBtn.textContent = previousLabel === 'Delete' ? 'Deleting...' : 'Saving...';
+        try {
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+            closePanel();
+            await refreshList();
+        } catch (error) {
+            const formError = panelBody.querySelector('#user-form-error');
+            if (formError) {
+                formError.classList.remove('hidden');
+                formError.textContent = 'Unable to save the user right now. Please try again.';
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = previousLabel;
+        }
+    });
+});
+</script>
+{% endblock %}

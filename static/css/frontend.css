@@ -1,0 +1,26 @@
+:root {
+    --color-primary: #16A34A;
+    --color-secondary: #475569;
+    --color-success: #16A34A;
+    --color-warning: #D97706;
+    --color-danger: #DC2626;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.flash-message {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.flash-message.flash-hide {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+.modal-hidden {
+    display: none;
+}

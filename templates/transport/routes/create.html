@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Add Route | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .route-label {
+        display: block;
+        margin-bottom: 0.45rem;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgb(51 65 85);
+    }
+
+    .route-help {
+        margin-top: 0.45rem;
+        font-size: 0.75rem;
+        color: rgb(100 116 139);
+    }
+
+    .route-error {
+        min-height: 1rem;
+        margin-top: 0.45rem;
+        font-size: 0.75rem;
+        color: rgb(220 38 38);
+    }
+
+    .route-input-shell {
+        position: relative;
+    }
+
+    .route-field-icon {
+        position: absolute;
+        left: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgb(100 116 139);
+        font-size: 1.05rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+
+    .route-input-shell:focus-within .route-field-icon {
+        color: rgb(21 128 61);
+    }
+
+    .route-field {
+        width: 100%;
+        min-height: 2.8rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225);
+        background: rgb(248 250 252);
+        color: rgb(15 23 42);
+        transition: all 0.2s ease;
+    }
+
+    .route-field:not(input[type="checkbox"]) {
+        padding: 0.78rem 0.95rem 0.78rem 2.75rem;
+    }
+
+    .route-field::placeholder {
+        color: rgb(148 163 184);
+    }
+
+    .route-field:focus {
+        outline: none;
+        border-color: rgb(21 128 61);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+
+    .route-field-error {
+        border-color: rgb(239 68 68) !important;
+        background: rgb(254 242 242) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+    }
+
+    input[type="checkbox"] {
+        height: 1rem;
+        width: 1rem;
+        border-radius: 0.3rem;
+        border-color: rgb(148 163 184);
+        color: rgb(21 128 61);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include "transport/routes/_form_page.html" with form_title="Add Route" form_subtitle="Create a route record with the same operational logic already used in dispatch." back_url=cancel_url submit_label="Save Route" %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('route-record-form');
+    const submitBtn = document.getElementById('route-submit-btn');
+    const alertBox = document.getElementById('route-form-alert');
+
+    function styleFields(scope) {
+        scope.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden') return;
+            el.classList.add('route-field');
+        });
+    }
+
+    function shortCode(value) {
+        return (value || '')
+            .split(/\s+/)
+            .filter(Boolean)
+            .map(function (part) { return part[0]; })
+            .join('')
+            .slice(0, 4)
+            .toUpperCase();
+    }
+
+    function syncPreview(scope) {
+        const origin = scope.querySelector('#id_origin');
+        const destination = scope.querySelector('#id_destination');
+        const distance = scope.querySelector('#id_distance_km');
+        const status = scope.querySelector('#id_is_active');
+
+        function update() {
+            const originValue = origin ? origin.value.trim() : '';
+            const destinationValue = destination ? destination.value.trim() : '';
+            const distanceValue = parseFloat(distance && distance.value ? distance.value : '0') || 0;
+            const hours = distanceValue > 0 ? distanceValue / 60 : 0;
+            const wholeHours = Math.floor(hours);
+            const minutes = Math.round((hours - wholeHours) * 60);
+
+            const routeName = scope.querySelector('#route-name-preview');
+            const routeCode = scope.querySelector('#route-code-preview');
+            const routeOrigin = scope.querySelector('#route-origin-preview');
+            const routeDestination = scope.querySelector('#route-destination-preview');
+            const travelTime = scope.querySelector('#route-travel-time');
+            const distancePreview = scope.querySelector('#route-distance-preview');
+            const timePreview = scope.querySelector('#route-time-preview');
+            const statusPreview = scope.querySelector('#route-status-preview');
+
+            if (routeName) routeName.textContent = originValue && destinationValue ? originValue + ' to ' + destinationValue : 'Auto-generated from origin and destination';
+            if (routeCode) routeCode.textContent = originValue && destinationValue ? shortCode(originValue) + '-' + shortCode(destinationValue) : 'Generated from the selected locations';
+            if (routeOrigin) routeOrigin.textContent = originValue || 'Not set';
+            if (routeDestination) routeDestination.textContent = destinationValue || 'Not set';
+
+            const timeText = distanceValue > 0 ? (wholeHours ? wholeHours + 'h ' : '') + minutes + 'm' : 'Auto-estimated from distance';
+            if (travelTime) travelTime.textContent = timeText;
+            if (distancePreview) distancePreview.textContent = distanceValue > 0 ? distanceValue.toFixed(2) + ' km' : '0 km';
+            if (timePreview) timePreview.textContent = timeText;
+            if (statusPreview) statusPreview.textContent = status && status.checked ? 'Active' : 'Inactive';
+        }
+
+        [origin, destination, distance, status].forEach(function (field) {
+            if (!field) return;
+            field.addEventListener('input', update);
+            field.addEventListener('change', update);
+        });
+        update();
+    }
+
+    function clearErrors(scope) {
+        scope.querySelectorAll('.route-error').forEach(function (el) { el.textContent = ''; });
+        scope.querySelectorAll('.route-field-error').forEach(function (el) { el.classList.remove('route-field-error'); });
+    }
+
+    styleFields(document);
+    syncPreview(document);
+
+    if (!form) return;
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        clearErrors(document);
+        if (alertBox) alertBox.classList.add('hidden');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
+
+        try {
+            const response = await fetch(form.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                if (payload.non_field_errors && alertBox) {
+                    alertBox.className = 'rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700';
+                    alertBox.textContent = payload.non_field_errors.join(' ');
+                    alertBox.classList.remove('hidden');
+                }
+                if (payload.errors) {
+                    Object.keys(payload.errors).forEach(function (field) {
+                        const input = document.getElementById('id_' + field);
+                        const error = document.querySelector('[data-error-for="' + field + '"]');
+                        if (input) input.classList.add('route-field-error');
+                        if (error) error.textContent = payload.errors[field].join(' ');
+                    });
+                }
+                return;
+            }
+
+            window.location.href = payload.detail_url || "{% url 'transport:routes:list' %}";
+        } catch (error) {
+            if (alertBox) {
+                alertBox.className = 'rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700';
+                alertBox.textContent = 'Unable to save the route right now. Please try again.';
+                alertBox.classList.remove('hidden');
+            }
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] leading-none">check</span>Save Route';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,5 @@
+<form id="trip-modal-form" method="post" action="{{ request.path }}" class="space-y-5" novalidate>
+    {% csrf_token %}
+    <div id="trip-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"></div>
+    {% include "transport/trips/_form_fields.html" %}
+</form>

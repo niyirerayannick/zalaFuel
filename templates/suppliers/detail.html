@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Supplier {{ supplier.name }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div class="rounded-2xl border border-slate-200 bg-gradient-to-r from-[#0c5069] via-[#0f7ea6] to-[#1a6a87] p-6 text-white shadow-lg">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-white/80">Supply</p>
+                <h1 class="mt-1 text-2xl font-bold">{{ supplier.name }}</h1>
+                <p class="text-sm text-white/80">{{ supplier.contact_person|default:"No contact person" }}{% if supplier.phone %} Ã¢â‚¬Â¢ {{ supplier.phone }}{% endif %}</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'suppliers:purchase-orders' %}" class="inline-flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25">
+                    <span class="material-symbols-outlined text-[18px] leading-none">receipt_long</span>
+                    Purchase Orders
+                </a>
+                <a href="{% url 'suppliers:deliveries' %}" class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-[#0c5069] transition hover:bg-slate-100">
+                    <span class="material-symbols-outlined text-[18px] leading-none">local_shipping</span>
+                    Deliveries
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Email</p>
+            <p class="mt-1 text-lg font-bold text-slate-900">{{ supplier.email|default:"--" }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Purchase Orders</p>
+            <p class="mt-1 text-lg font-bold text-slate-900">{{ supplier.purchase_orders.count }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Inventory Moves</p>
+            <p class="mt-1 text-lg font-bold text-slate-900">{{ supplier.inventory_records.count }}</p>
+        </div>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="border-b border-slate-200 px-5 py-3">
+                <h3 class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-900">Recent Purchase Orders</h3>
+            </div>
+            <div class="p-5 space-y-3">
+                {% for po in purchase_orders %}
+                <div class="rounded-xl border border-slate-200 px-4 py-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-semibold text-slate-900">{{ po.reference }}</p>
+                            <p class="text-xs text-slate-500">{{ po.station.name }} Ã¢â‚¬Â¢ {{ po.get_fuel_type_display }}</p>
+                        </div>
+                        <span class="rounded-full px-3 py-1 text-[11px] font-semibold {% if po.status == 'delivered' %}bg-emerald-50 text-emerald-700{% elif po.status == 'ordered' %}bg-amber-50 text-amber-700{% else %}bg-slate-100 text-slate-700{% endif %}">
+                            {{ po.get_status_display }}
+                        </span>
+                    </div>
+                    <p class="mt-2 text-sm text-slate-700">{{ po.volume_liters }} L{% if po.unit_cost %} at {{ po.unit_cost }}{% endif %}</p>
+                </div>
+                {% empty %}
+                <p class="text-sm text-slate-500">No purchase orders for this supplier yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="border-b border-slate-200 px-5 py-3">
+                <h3 class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-900">Recent Deliveries</h3>
+            </div>
+            <div class="p-5 space-y-3">
+                {% for delivery in deliveries %}
+                <div class="rounded-xl border border-slate-200 px-4 py-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-semibold text-slate-900">{{ delivery.delivery_reference|default:delivery.purchase_order.reference }}</p>
+                            <p class="text-xs text-slate-500">{{ delivery.tank.name|default:"No tank" }} Ã¢â‚¬Â¢ {{ delivery.delivery_date|date:"Y-m-d" }}</p>
+                        </div>
+                        <span class="rounded-full px-3 py-1 text-[11px] font-semibold {% if delivery.status == 'received' %}bg-emerald-50 text-emerald-700{% elif delivery.status == 'cancelled' %}bg-rose-50 text-rose-700{% else %}bg-amber-50 text-amber-700{% endif %}">
+                            {{ delivery.get_status_display }}
+                        </span>
+                    </div>
+                    <p class="mt-2 text-sm text-slate-700">{{ delivery.delivered_volume }} L</p>
+                </div>
+                {% empty %}
+                <p class="text-sm text-slate-500">No deliveries recorded for this supplier yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-200 px-5 py-3">
+            <h3 class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-900">Inventory Movement History</h3>
+        </div>
+        <div class="p-5">
+            {% if inventory_records %}
+            <div class="space-y-2">
+                {% for record in inventory_records %}
+                <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
+                    <div>
+                        <div class="text-sm text-slate-800">{{ record.get_movement_type_display }}: {{ record.quantity }}</div>
+                        <div class="text-xs text-slate-500">{{ record.tank.name }} Ã¢â‚¬Â¢ {{ record.reference|default:"No reference" }}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs font-medium text-slate-600">Balance {{ record.balance_after }} L</div>
+                        <div class="text-xs text-slate-500">{{ record.created_at|date:"Y-m-d H:i" }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-sm text-slate-500">No supplier-linked inventory movement recorded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

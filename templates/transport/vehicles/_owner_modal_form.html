@@ -1,0 +1,37 @@
+<form id="owner-modal-form" method="post" action="{{ form_action }}" class="space-y-5" novalidate>
+    {% csrf_token %}
+    <div id="owner-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"></div>
+    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">groups</span>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-slate-900">Owner Information</h3>
+                <p class="text-xs text-slate-500">Capture the external vehicle owner details used across the fleet workflow.</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+            <div class="md:col-span-2">
+                <label for="{{ create_form.name.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wide text-slate-600">Owner Name</label>
+                {{ create_form.name }}
+                <p class="mt-1 text-xs text-red-600" data-error-for="name">{% if create_form.name.errors %}{{ create_form.name.errors.0 }}{% endif %}</p>
+            </div>
+            <div>
+                <label for="{{ create_form.phone.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wide text-slate-600">Phone</label>
+                {{ create_form.phone }}
+                <p class="mt-1 text-xs text-red-600" data-error-for="phone">{% if create_form.phone.errors %}{{ create_form.phone.errors.0 }}{% endif %}</p>
+            </div>
+            <div>
+                <label for="{{ create_form.bank_name.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wide text-slate-600">Bank Name</label>
+                {{ create_form.bank_name }}
+                <p class="mt-1 text-xs text-red-600" data-error-for="bank_name">{% if create_form.bank_name.errors %}{{ create_form.bank_name.errors.0 }}{% endif %}</p>
+            </div>
+            <div class="md:col-span-2">
+                <label for="{{ create_form.bank_account.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wide text-slate-600">Bank Account</label>
+                {{ create_form.bank_account }}
+                <p class="mt-1 text-xs text-red-600" data-error-for="bank_account">{% if create_form.bank_account.errors %}{{ create_form.bank_account.errors.0 }}{% endif %}</p>
+            </div>
+        </div>
+    </section>
+</form>

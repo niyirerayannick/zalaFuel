@@ -1,0 +1,75 @@
+<section data-section="profile" class="space-y-4 pb-4">
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-green-100">
+        <h2 class="text-lg font-semibold text-gray-900">Profile</h2>
+        <p class="mt-1 text-sm text-gray-500">Existing profile tools, reorganized into a softer mobile layout.</p>
+    </div>
+
+    <article class="bg-white rounded-2xl p-4 shadow-sm border border-green-100">
+        <div class="flex items-center gap-4">
+            {% if request.user.profile_photo %}
+            <img src="{{ request.user.profile_photo.url }}" alt="{{ request.user.full_name }}" class="h-20 w-20 rounded-2xl object-cover shadow-sm">
+            {% else %}
+            <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-green-50 text-2xl font-semibold text-[#166534]">
+                {{ request.user.full_name|slice:":1"|upper }}
+            </div>
+            {% endif %}
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">{{ request.user.full_name }}</h3>
+                <p class="mt-1 text-sm text-gray-500">{{ request.user.email }}</p>
+                <p class="mt-1 text-sm text-gray-500">{{ request.user.phone|default:"No phone added" }}</p>
+            </div>
+        </div>
+    </article>
+
+    <article class="bg-white rounded-2xl p-4 shadow-sm border border-green-100">
+        <div class="mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Edit Profile</h3>
+        </div>
+        <form method="post" enctype="multipart/form-data" action="{% url 'transport:driver_profile_update' %}" hx-post="{% url 'transport:driver_profile_update' %}" hx-target="#driver-content" hx-swap="innerHTML transition:true" hx-sync="this:drop" data-driver-disable class="space-y-4">
+            {% csrf_token %}
+            <label class="block text-sm text-gray-500">
+                Name
+                {{ profile_form.full_name }}
+                {% if profile_form.full_name.errors %}<p class="mt-1 text-xs text-red-600">{{ profile_form.full_name.errors.0 }}</p>{% endif %}
+            </label>
+            <label class="block text-sm text-gray-500">
+                Phone
+                {{ profile_form.phone }}
+                {% if profile_form.phone.errors %}<p class="mt-1 text-xs text-red-600">{{ profile_form.phone.errors.0 }}</p>{% endif %}
+            </label>
+            <label class="block text-sm text-gray-500">
+                Email
+                {{ profile_form.email }}
+                {% if profile_form.email.errors %}<p class="mt-1 text-xs text-red-600">{{ profile_form.email.errors.0 }}</p>{% endif %}
+            </label>
+            <label class="block text-sm text-gray-500">
+                Profile Photo
+                {{ profile_form.profile_photo }}
+                {% if profile_form.profile_photo.errors %}<p class="mt-1 text-xs text-red-600">{{ profile_form.profile_photo.errors.0 }}</p>{% endif %}
+            </label>
+            <button type="submit" class="w-full bg-green-600 text-white rounded-xl py-3 font-semibold shadow-sm hover:bg-green-700">Save Profile</button>
+        </form>
+    </article>
+
+    <article class="bg-white rounded-2xl p-4 shadow-sm border border-green-100">
+        <h3 class="text-lg font-semibold text-gray-900">Driver Record</h3>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+            <div class="bg-gray-50 rounded-xl p-4 space-y-1">
+                <p class="text-sm text-gray-500">License</p>
+                <p class="text-base font-medium text-gray-900">{{ driver.license_number }}</p>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4 space-y-1">
+                <p class="text-sm text-gray-500">Expiry</p>
+                <p class="text-base font-medium text-gray-900">{{ driver.license_expiry|date:"M d, Y" }}</p>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4 space-y-1">
+                <p class="text-sm text-gray-500">Status</p>
+                <p class="text-base font-medium text-gray-900">{{ driver.get_status_display }}</p>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4 space-y-1">
+                <p class="text-sm text-gray-500">Fuel Requests</p>
+                <p class="text-base font-medium text-gray-900">{{ fuel_request_count }}</p>
+            </div>
+        </div>
+    </article>
+</section>

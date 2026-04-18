@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block extra_head %}
+    <!-- Google Fonts: Roboto -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body, .roboto {
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}Add New Fuel Entry | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-2 sm:px-8 lg:px-16 py-10 roboto">
+
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{% url 'transport:fuel:list' %}" class="inline-flex items-center text-sm font-medium text-green-700 hover:text-green-900">
+            <span class="material-icons mr-2">arrow_back</span>
+            Back to Fuel Records
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Main Form Column -->
+        <div class="lg:col-span-2">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-green-700 flex items-center">
+                    <span class="material-icons mr-2 text-green-600">local_gas_station</span>
+                    Add Fuel Entry
+                </h1>
+                <p class="mt-2 text-sm text-gray-600">Record a new fuel purchase for a trip</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-green-100">
+
+                <!-- Display form errors if any -->
+                {% if form.non_field_errors %}
+                <div class="mx-6 mt-6 bg-red-50 border border-red-200 rounded-md p-4">
+                    <div class="flex">
+                        <svg class="h-5 w-5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Please correct the following errors:</h3>
+                            <ul class="mt-1 text-sm text-red-700 list-disc list-inside">
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" class="px-8 py-8" id="fuelForm">
+                    {% csrf_token %}
+
+                    <!-- Section: Trip Assignment -->
+                    <div class="border-b border-green-200 pb-6 mb-6">
+                        <h3 class="text-lg font-medium text-green-700 mb-4 flex items-center">
+                            <span class="material-icons mr-2 text-green-600">directions_bus</span>
+                            Trip Assignment
+                        </h3>
+                        <div>
+                            <label for="{{ form.trip.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                Trip <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.trip }}
+                            {% if form.trip.errors %}
+                            <p class="mt-1 text-sm text-red-600 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                {{ form.trip.errors.0 }}
+                            </p>
+                            {% endif %}
+                            <p class="mt-1 text-xs text-gray-400">Select the trip this fuel purchase is for</p>
+                        </div>
+                    </div>
+
+                    <hr class="border-green-100">
+
+                    <!-- Section: Fuel Details -->
+                    <div class="border-b border-green-200 pb-6 mb-6">
+                        <h3 class="text-lg font-medium text-green-700 mb-4 flex items-center">
+                            <span class="material-icons mr-2 text-green-600">local_gas_station</span>
+                            Fuel Details
+                        </h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Liters -->
+                            <div>
+                                <label for="{{ form.liters.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Liters <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    {{ form.liters }}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-400 text-sm font-medium">L</span>
+                                    </div>
+                                </div>
+                                {% if form.liters.errors %}
+                                <p class="mt-1 text-sm text-red-600 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                    {{ form.liters.errors.0 }}
+                                </p>
+                                {% endif %}
+                                <p class="mt-1 text-xs text-gray-400">Amount of fuel purchased</p>
+                            </div>
+
+                            <!-- Price per Liter -->
+                            <div>
+                                <label for="{{ form.price_per_liter.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Price per Liter <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    {{ form.price_per_liter }}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-400 text-sm font-medium">/L</span>
+                                    </div>
+                                </div>
+                                {% if form.price_per_liter.errors %}
+                                <p class="mt-1 text-sm text-red-600 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                    {{ form.price_per_liter.errors.0 }}
+                                </p>
+                                {% endif %}
+                                <p class="mt-1 text-xs text-gray-400">Unit price per liter</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-green-100">
+
+                    <!-- Section: Station & Date -->
+                    <div class="border-b border-green-200 pb-6 mb-6">
+                        <h3 class="text-lg font-medium text-green-700 mb-4 flex items-center">
+                            <span class="material-icons mr-2 text-green-600">store</span>
+                            Station & Date
+                        </h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Fuel Station -->
+                            <div>
+                                <label for="{{ form.station.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Fuel Station <span class="text-red-500">*</span>
+                                </label>
+                                {{ form.station }}
+                                {% if form.station.errors %}
+                                <p class="mt-1 text-sm text-red-600 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                    {{ form.station.errors.0 }}
+                                </p>
+                                {% endif %}
+                                <p class="mt-1 text-xs text-gray-400">Select a partner fuel station</p>
+                            </div>
+
+                            <!-- Date -->
+                            <div>
+                                <label for="{{ form.date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Date <span class="text-red-500">*</span>
+                                </label>
+                                {{ form.date }}
+                                {% if form.date.errors %}
+                                <p class="mt-1 text-sm text-red-600 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                    {{ form.date.errors.0 }}
+                                </p>
+                                {% endif %}
+                                <p class="mt-1 text-xs text-gray-400">Date of the fuel purchase</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-green-100">
+
+                    <!-- Section: Supporting Document -->
+                    <div class="pb-6 mb-6">
+                        <h3 class="text-lg font-medium text-green-700 mb-4 flex items-center">
+                            <span class="material-icons mr-2 text-green-600">receipt</span>
+                            Supporting Document
+                        </h3>
+
+                        <div>
+                            <label for="{{ form.invoice.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                Invoice / Receipt
+                            </label>
+                            {{ form.invoice }}
+                            {% if form.invoice.errors %}
+                            <p class="mt-1 text-sm text-red-600 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                {{ form.invoice.errors.0 }}
+                            </p>
+                            {% endif %}
+                            <p class="mt-1 text-xs text-gray-400">Upload an invoice or receipt (PDF, JPG, PNG, DOC Ã¢â‚¬â€ max 10 MB)</p>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex flex-col sm:flex-row items-center justify-end gap-4 pt-6 border-t border-green-200">
+                        <a href="{% url 'transport:fuel:list' %}" class="inline-flex items-center px-4 py-2 border border-green-300 rounded-md shadow-sm text-sm font-medium text-green-700 bg-white hover:bg-green-50 transition">
+                            <span class="material-icons mr-2">cancel</span>
+                            Cancel
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
+                            <span class="material-icons mr-2">add</span>
+                            Create Fuel Entry
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="lg:col-span-1 space-y-6">
+
+            <!-- Live Cost Preview -->
+            <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-green-100">
+                <div class="bg-green-600 px-5 py-4">
+                    <h3 class="text-sm font-semibold text-white flex items-center">
+                        <span class="material-icons mr-2">calculate</span>
+                        Live Cost Preview
+                    </h3>
+                </div>
+                <div class="p-5">
+                    <div class="text-center py-4">
+                        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Estimated Total Cost</p>
+                        <p id="liveCost" class="text-3xl font-bold text-gray-900 tabular-nums">Ã¢â‚¬â€</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-4 space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Liters</span>
+                            <span id="previewLiters" class="font-medium text-gray-700 tabular-nums">Ã¢â‚¬â€</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Price/Liter</span>
+                            <span id="previewPrice" class="font-medium text-gray-700 tabular-nums">Ã¢â‚¬â€</span>
+                        </div>
+                        <div class="border-t border-dashed border-gray-200 pt-3 flex justify-between text-sm">
+                            <span class="text-gray-500 font-medium">Total</span>
+                            <span id="previewTotal" class="font-bold text-orange-600 tabular-nums">Ã¢â‚¬â€</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips -->
+            <!-- Quick Stats -->
+            <div class="bg-white shadow-xl rounded-2xl border border-green-100 p-5">
+                <h4 class="text-sm font-semibold text-green-700 mb-3 flex items-center">
+                    <span class="material-icons mr-2 text-green-600">menu</span>
+                    Quick Navigation
+                </h4>
+                <div class="space-y-2">
+                    <a href="{% url 'transport:fuel:list' %}" class="flex items-center text-sm text-green-700 hover:text-green-900 transition py-1">
+                        <span class="material-icons mr-2 text-green-600">list</span>
+                        All Fuel Records
+                    </a>
+                    <a href="{% url 'transport:fuel:analytics' %}" class="flex items-center text-sm text-green-700 hover:text-green-900 transition py-1">
+                        <span class="material-icons mr-2 text-green-600">analytics</span>
+                        Analytics Dashboard
+                    </a>
+                    <a href="{% url 'transport:fuel:efficiency' %}" class="flex items-center text-sm text-green-700 hover:text-green-900 transition py-1">
+                        <span class="material-icons mr-2 text-green-600">speed</span>
+                        Vehicle Efficiency
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #id_liters, #id_price_per_liter, #id_station, #id_date, #id_invoice {
+        width: 100%;
+        min-width: 220px;
+        max-width: 600px;
+        padding: 0.75rem 1rem;
+        font-size: 1.1rem;
+        border-radius: 0.75rem;
+        border: 1px solid #22c55e;
+        transition: box-shadow 0.2s;
+    }
+    #id_liters:focus, #id_price_per_liter:focus, #id_station:focus, #id_date:focus, #id_invoice:focus {
+        box-shadow: 0 0 0 2px #22c55e33;
+        border-color: #16a34a;
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const litersInput = document.getElementById('id_liters');
+    const priceInput = document.getElementById('id_price_per_liter');
+    const liveCost = document.getElementById('liveCost');
+    const previewLiters = document.getElementById('previewLiters');
+    const previewPrice = document.getElementById('previewPrice');
+    const previewTotal = document.getElementById('previewTotal');
+
+    function formatNumber(n) {
+        return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function updatePreview() {
+        const liters = parseFloat(litersInput?.value) || 0;
+        const price = parseFloat(priceInput?.value) || 0;
+        const total = liters * price;
+
+        previewLiters.textContent = liters > 0 ? liters.toFixed(2) + ' L' : 'Ã¢â‚¬â€';
+        previewPrice.textContent = price > 0 ? formatNumber(price) : 'Ã¢â‚¬â€';
+
+        if (total > 0) {
+            liveCost.textContent = formatNumber(total);
+            previewTotal.textContent = formatNumber(total);
+            liveCost.classList.remove('text-gray-900');
+            liveCost.classList.add('text-green-600');
+        } else {
+            liveCost.textContent = 'Ã¢â‚¬â€';
+            previewTotal.textContent = 'Ã¢â‚¬â€';
+            liveCost.classList.remove('text-green-600');
+            liveCost.classList.add('text-gray-900');
+        }
+    }
+
+    if (litersInput) litersInput.addEventListener('input', updatePreview);
+    if (priceInput) priceInput.addEventListener('input', updatePreview);
+    updatePreview();
+});
+</script>
+{% endblock %}

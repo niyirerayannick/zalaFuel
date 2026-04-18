@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ brand_name|default:"ZALA/ECO ENERGY" }} system documentation">
+    <title>{{ page_title }} | {% if system_settings %}{{ system_settings.company_name }}{% else %}{{ brand_name|default:"ZALA/ECO ENERGY" }}{% endif %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
+    <style>
+        :root {
+            --theme-50: {% if theme.primary == 'blue' %}#EFF6FF{% elif theme.primary == 'purple' %}#F5F3FF{% elif theme.primary == 'red' %}#FEF2F2{% elif theme.primary == 'orange' %}#FFF7ED{% else %}#F0FDF4{% endif %};
+            --theme-100: {% if theme.primary == 'blue' %}#DBEAFE{% elif theme.primary == 'purple' %}#EDE9FE{% elif theme.primary == 'red' %}#FEE2E2{% elif theme.primary == 'orange' %}#FFEDD5{% else %}#DCFCE7{% endif %};
+            --theme-200: {% if theme.primary == 'blue' %}#BFDBFE{% elif theme.primary == 'purple' %}#DDD6FE{% elif theme.primary == 'red' %}#FECACA{% elif theme.primary == 'orange' %}#FED7AA{% else %}#BBF7D0{% endif %};
+            --theme-600: {% if theme.primary == 'blue' %}#2563EB{% elif theme.primary == 'purple' %}#7C3AED{% elif theme.primary == 'red' %}#DC2626{% elif theme.primary == 'orange' %}#EA580C{% else %}#16A34A{% endif %};
+            --theme-700: {% if theme.primary == 'blue' %}#1D4ED8{% elif theme.primary == 'purple' %}#6D28D9{% elif theme.primary == 'red' %}#B91C1C{% elif theme.primary == 'orange' %}#C2410C{% else %}#15803D{% endif %};
+            --theme-900: {% if theme.primary == 'blue' %}#172554{% elif theme.primary == 'purple' %}#3B0764{% elif theme.primary == 'red' %}#7F1D1D{% elif theme.primary == 'orange' %}#7C2D12{% else %}#14532D{% endif %};
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: "Inter", sans-serif;
+            background: #ffffff;
+            color: #0f172a;
+        }
+        .doc-scroll::-webkit-scrollbar {
+            width: 10px;
+        }
+        .doc-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+        .doc-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .doc-prose p {
+            color: #475569;
+            line-height: 1.75;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen lg:grid lg:grid-cols-[300px_minmax(0,1fr)]">
+        <aside class="border-b border-slate-200 bg-slate-50 lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r">
+            <div class="flex h-full flex-col">
+                <div class="border-b border-slate-200 px-5 py-5">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--theme-900)] shadow-sm">
+                            <img src="{% static 'img/Afrilott.png' %}" alt="{{ brand_name|default:\"ZALA/ECO ENERGY\" }}" class="h-6 w-auto object-contain" style="filter:brightness(0) invert(1);">
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--theme-700)]">System Docs</p>
+                            <h1 class="text-base font-bold text-slate-900">{% if system_settings %}{{ system_settings.company_name }}{% else %}{{ brand_name|default:"ZALA/ECO ENERGY" }}{% endif %}</h1>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-sm leading-6 text-slate-500">
+                        Operational guide for every major module in the transport management system.
+                    </p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <a href="/transport/analytics/dashboard/" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
+                            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                            Dashboard
+                        </a>
+                    </div>
+                </div>
+
+                <div class="doc-scroll flex-1 overflow-y-auto px-4 py-5">
+                    <p class="px-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Module Directory</p>
+                    <nav class="mt-3 space-y-1">
+                        {% for module in documentation_modules %}
+                        <a href="#module-{{ forloop.counter }}" class="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-slate-900">
+                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[var(--theme-700)] shadow-sm">
+                                <span class="material-symbols-outlined text-[1.1rem]">{{ module.icon }}</span>
+                            </span>
+                            <span class="min-w-0">
+                                <span class="block truncate font-semibold text-slate-900">{{ module.title }}</span>
+                                <span class="block truncate text-xs text-slate-500">{{ module.eyebrow }}</span>
+                            </span>
+                        </a>
+                        {% endfor %}
+                    </nav>
+
+                    <div class="mt-8 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--theme-700)]">Quick Links</p>
+                        <div class="mt-3 space-y-2">
+                            {% for item in documentation_quick_links %}
+                            <a href="{{ item.url }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-[var(--theme-50)] hover:text-slate-900">
+                                <span class="material-symbols-outlined text-[1.1rem] text-[var(--theme-700)]">{{ item.icon }}</span>
+                                <span>{{ item.label }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="min-w-0">
+            <header class="border-b border-slate-200 bg-white/90 backdrop-blur">
+                <div class="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-8 lg:px-10">
+                    <div class="flex flex-wrap items-start justify-between gap-4">
+                        <div class="max-w-3xl">
+                            <p class="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--theme-700)]">Documentation Overview</p>
+                            <h2 class="mt-3 text-4xl font-bold tracking-tight text-slate-900">{{ page_title }}</h2>
+                            <p class="mt-4 text-base leading-8 text-slate-500">
+                                {{ page_subtitle }}
+                            </p>
+                        </div>
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 px-5 py-4">
+                            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Coverage</p>
+                            <p class="mt-2 text-2xl font-bold text-slate-900">{{ documentation_modules|length }} modules</p>
+                            <p class="mt-1 text-sm text-slate-500">Single-page guide with section navigation</p>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-3 md:grid-cols-5">
+                        {% for step in documentation_flow %}
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                            <div class="flex items-start gap-3">
+                                <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--theme-100)] text-xs font-bold text-[var(--theme-700)]">{{ forloop.counter }}</span>
+                                <p class="text-sm leading-6 text-slate-600">{{ step }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </header>
+
+            <div class="mx-auto max-w-6xl px-6 py-10 lg:px-10">
+                <div class="space-y-10">
+                    {% for module in documentation_modules %}
+                    <section id="module-{{ forloop.counter }}" class="scroll-mt-10 rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+                        <div class="border-b border-slate-200 px-6 py-6 lg:px-8">
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--theme-50)] text-[var(--theme-700)]">
+                                    <span class="material-symbols-outlined text-[1.55rem]">{{ module.icon }}</span>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--theme-700)]">{{ module.eyebrow }}</p>
+                                    <h3 class="mt-2 text-2xl font-bold text-slate-900">{{ module.title }}</h3>
+                                    <div class="doc-prose mt-3 max-w-none">
+                                        <p>{{ module.summary }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-8 px-6 py-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
+                            <div>
+                                <h4 class="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">What this module handles</h4>
+                                <div class="mt-4 space-y-3">
+                                    {% for item in module.highlights %}
+                                    <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                                        <div class="flex gap-3">
+                                            <span class="material-symbols-outlined mt-0.5 text-[1.1rem] text-[var(--theme-700)]">check_circle</span>
+                                            <p class="text-sm leading-7 text-slate-600">{{ item }}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">Workflow</h4>
+                                <div class="mt-4 space-y-3">
+                                    {% for item in module.workflow %}
+                                    <div class="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+                                        <div class="flex gap-3">
+                                            <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--theme-100)] text-sm font-bold text-[var(--theme-700)]">{{ forloop.counter }}</span>
+                                            <p class="text-sm leading-7 text-slate-600">{{ item }}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

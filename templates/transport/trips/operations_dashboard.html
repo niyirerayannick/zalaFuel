@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Operations Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <p class="text-sm text-slate-500">Operations</p>
+        <h1 class="text-3xl font-bold text-slate-900">Operations Dashboard</h1>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-3">
+        <section class="rounded-3xl bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-900">Pending Approvals</h2>
+            <div class="mt-4 space-y-3">
+                {% for trip in pending_approvals %}
+                <a href="{% url 'transport:trips:detail' trip.pk %}" class="block rounded-2xl border border-slate-100 p-4 text-sm">{{ trip.order_number }}</a>
+                {% empty %}<p class="text-sm text-slate-500">No pending approvals.</p>{% endfor %}
+            </div>
+        </section>
+        <section class="rounded-3xl bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-900">Active Trips</h2>
+            <div class="mt-4 space-y-3">
+                {% for trip in active_trips %}
+                <a href="{% url 'transport:trips:detail' trip.pk %}" class="block rounded-2xl border border-slate-100 p-4 text-sm">{{ trip.order_number }}</a>
+                {% empty %}<p class="text-sm text-slate-500">No active trips.</p>{% endfor %}
+            </div>
+        </section>
+        <section class="rounded-3xl bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-900">Allowance Requests</h2>
+            <div class="mt-4 space-y-3">
+                {% for allowance in allowance_requests %}
+                <div class="rounded-2xl border border-slate-100 p-4 text-sm">{{ allowance.driver.name }} - {{ allowance.amount }}</div>
+                {% empty %}<p class="text-sm text-slate-500">No pending allowance requests.</p>{% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

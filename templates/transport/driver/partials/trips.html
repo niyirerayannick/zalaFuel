@@ -1,0 +1,148 @@
+<section data-section="trips" class="space-y-4 pb-4">
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-green-100">
+        <h2 class="text-lg font-semibold text-gray-900">Trips</h2>
+        <p class="mt-1 text-sm text-gray-500">All current driver trips in a mobile card layout.</p>
+    </div>
+
+    <div class="space-y-4">
+        {% for trip in driver_trips %}
+        <article x-data="{ startOpen: false, endOpen: false, fuelOpen: false }" class="bg-white rounded-2xl p-4 shadow-sm border border-green-100">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-sm text-gray-500">{{ trip.order_number }}</p>
+                    <h3 class="mt-1 text-lg font-semibold text-gray-900">{{ trip.route.origin }} to {{ trip.route.destination }}</h3>
+                    <p class="mt-1 text-sm text-gray-500">{{ trip.customer.company_name }} • {{ trip.vehicle.plate_number }}</p>
+                </div>
+                <span class="rounded-full px-3 py-1 text-xs font-semibold {% if trip.status == 'IN_TRANSIT' %}bg-green-50 text-green-700{% elif trip.status == 'DELIVERED' %}bg-gray-100 text-gray-600{% else %}bg-amber-50 text-amber-700{% endif %}">
+                    {{ trip.get_status_display }}
+                </span>
+            </div>
+
+            <div class="mt-4 bg-gray-50 rounded-xl p-4 space-y-3">
+                <div class="flex items-center justify-between gap-3">
+                    <p class="text-sm text-gray-500">Pickup</p>
+                    <p class="text-base font-medium text-gray-900">{{ trip.route.origin }}</p>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                    <p class="text-sm text-gray-500">Destination</p>
+                    <p class="text-base font-medium text-gray-900">{{ trip.route.destination }}</p>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                    <p class="text-sm text-gray-500">Time</p>
+                    <p class="text-base font-medium text-gray-900">{{ trip.created_at|date:"M d, H:i" }}</p>
+                </div>
+            </div>
+
+            {% if trip.status == 'ASSIGNED' %}
+            <div class="mt-4 grid grid-cols-2 gap-3">
+                <form method="post" action="{% url 'transport:trips:accept' trip.pk %}" hx-post="{% url 'transport:trips:accept' trip.pk %}" hx-target="#driver-content" hx-swap="innerHTML transition:true" data-driver-disable>
+                    {% csrf_token %}
+                    <input type="hidden" name="return_tab" value="trips">
+                    <button type="submit" class="w-full bg-green-600 text-white rounded-xl py-3 font-semibold shadow-sm hover:bg-green-700">Accept</button>
+                </form>
+                <form method="post" action="{% url 'transport:trips:reject' trip.pk %}" hx-post="{% url 'transport:trips:reject' trip.pk %}" hx-target="#driver-content" hx-swap="innerHTML transition:true" hx-confirm="Reject this trip and return it for reassignment?" data-driver-disable>
+                    {% csrf_token %}
+                    <input type="hidden" name="return_tab" value="trips">
+                    <button type="submit" class="w-full rounded-xl py-3 font-semibold shadow-sm bg-gray-100 text-gray-700">Reject</button>
+                </form>
+            </div>
+            {% if trip.driver_response == 'ACCEPTED' %}
+            <button type="button" @click="startOpen = true" class="mt-3 w-full bg-[#166534] text-white rounded-xl py-3 font-semibold shadow-sm">Start Trip</button>
+            {% endif %}
+            {% elif trip.status == 'IN_TRANSIT' %}
+            <div class="mt-4 grid grid-cols-2 gap-3">
+                <button type="button" @click="fuelOpen = true" class="w-full bg-green-600 text-white rounded-xl py-3 font-semibold shadow-sm hover:bg-green-700">Request Fuel</button>
+                <button type="button" @click="endOpen = true" class="w-full rounded-xl py-3 font-semibold shadow-sm bg-slate-900 text-white">End Trip</button>
+            </div>
+            {% else %}
+            <div class="mt-4 rounded-xl bg-gray-50 p-4 text-sm text-gray-500">
+                {% if trip.status == 'DELIVERED' or trip.status == 'CLOSED' %}
+                Trip completed successfully.
+                {% else %}
+                No driver actions available for this trip right now.
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <a href="{% url 'transport:trips:detail' trip.pk %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#166534]">
+                <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                View trip details
+            </a>
+
+            <div x-cloak x-show="startOpen" class="fixed inset-0 z-[60] flex items-end bg-slate-950/40 p-4" @click.self="startOpen = false">
+                <div class="w-full rounded-2xl bg-white p-4 shadow-xl">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm text-gray-500">Start Trip</p>
+                            <h4 class="mt-1 text-lg font-semibold text-gray-900">{{ trip.order_number }}</h4>
+                        </div>
+                        <button type="button" @click="startOpen = false" class="rounded-full bg-gray-100 p-2 text-gray-500">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                        </button>
+                    </div>
+                    <form method="post" action="{% url 'transport:trips:start' trip.pk %}" hx-post="{% url 'transport:trips:start' trip.pk %}" hx-target="#driver-content" hx-swap="innerHTML transition:true" data-driver-disable class="mt-4 space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="return_tab" value="trips">
+                        <label class="block text-sm text-gray-500">
+                            Odometer Start
+                            <input name="km_start" type="number" min="1" step="0.01" required class="mt-2 block w-full rounded-xl border border-green-100 bg-gray-50 px-4 py-3 text-sm text-gray-900 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-100" placeholder="Enter current odometer">
+                        </label>
+                        <button type="submit" class="w-full bg-[#166534] text-white rounded-xl py-3 font-semibold shadow-sm">Confirm Start</button>
+                    </form>
+                </div>
+            </div>
+
+            <div x-cloak x-show="endOpen" class="fixed inset-0 z-[60] flex items-end bg-slate-950/40 p-4" @click.self="endOpen = false">
+                <div class="w-full rounded-2xl bg-white p-4 shadow-xl">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm text-gray-500">End Trip</p>
+                            <h4 class="mt-1 text-lg font-semibold text-gray-900">{{ trip.order_number }}</h4>
+                        </div>
+                        <button type="button" @click="endOpen = false" class="rounded-full bg-gray-100 p-2 text-gray-500">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                        </button>
+                    </div>
+                    <form method="post" action="{% url 'transport:trips:complete' trip.pk %}" hx-post="{% url 'transport:trips:complete' trip.pk %}" hx-target="#driver-content" hx-swap="innerHTML transition:true" data-driver-disable class="mt-4 space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="return_tab" value="trips">
+                        <label class="block text-sm text-gray-500">
+                            Odometer End
+                            <input name="km_end" type="number" min="1" step="0.01" required class="mt-2 block w-full rounded-xl border border-green-100 bg-gray-50 px-4 py-3 text-sm text-gray-900 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-100" placeholder="Enter final odometer">
+                        </label>
+                        <button type="submit" class="w-full rounded-xl py-3 font-semibold shadow-sm bg-slate-900 text-white">Confirm End Trip</button>
+                    </form>
+                </div>
+            </div>
+
+            <div x-cloak x-show="fuelOpen" class="fixed inset-0 z-[60] flex items-end bg-slate-950/40 p-4" @click.self="fuelOpen = false">
+                <div class="w-full rounded-2xl bg-white p-4 shadow-xl">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm text-gray-500">Fuel Request</p>
+                            <h4 class="mt-1 text-lg font-semibold text-gray-900">{{ trip.order_number }}</h4>
+                        </div>
+                        <button type="button" @click="fuelOpen = false" class="rounded-full bg-gray-100 p-2 text-gray-500">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                        </button>
+                    </div>
+                    <form method="post" enctype="multipart/form-data" action="{% url 'transport:driver_fuel_request_modal' %}" hx-post="{% url 'transport:driver_fuel_request_modal' %}" hx-target="#driver-content" hx-swap="innerHTML transition:true" data-driver-disable class="mt-4 space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="trip" value="{{ trip.pk }}">
+                        <input type="hidden" name="return_tab" value="trips">
+                        <label class="block text-sm text-gray-500">Preferred Station{{ fuel_modal_form.station }}</label>
+                        <label class="block text-sm text-gray-500">Amount{{ fuel_modal_form.amount }}</label>
+                        <label class="block text-sm text-gray-500">Notes{{ fuel_modal_form.notes }}</label>
+                        <label class="block text-sm text-gray-500">Upload Receipt{{ fuel_modal_form.receipt }}</label>
+                        <button type="submit" class="w-full bg-green-600 text-white rounded-xl py-3 font-semibold shadow-sm hover:bg-green-700">Submit Request</button>
+                    </form>
+                </div>
+            </div>
+        </article>
+        {% empty %}
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-green-100 text-sm text-gray-500">
+            No trips available for your account yet.
+        </div>
+        {% endfor %}
+    </div>
+</section>

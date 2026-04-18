@@ -1,0 +1,285 @@
+{% load static rbac_tags %}
+<div class="theme-shell h-full flex flex-col font-[Inter] shadow-xl border-r" id="sidebar-shell">
+    <style>
+        .sidebar-scroll-hidden {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .sidebar-scroll-hidden::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+    <!-- Header -->
+    <div class="theme-shell-border theme-shell-strong h-16 px-6 flex items-center justify-between border-b backdrop-blur-sm sticky top-0 z-10">
+        <a href="{% url 'accounts:dashboard' %}" class="flex items-center gap-3 group transition-all duration-300">
+            {% comment %} <div class="h-10 w-auto flex items-center justify-center">
+                <img src="{% static 'img/Afrilott.png' %}" alt="Logo" class="h-8 w-auto object-contain transition-transform group-hover:scale-105" style="filter:brightness(0) invert(1);">
+            </div> {% endcomment %}
+            <span class="text-xl font-bold text-white tracking-tight">
+                {% if system_settings %}{{ system_settings.company_name }}{% else %}{{ brand_name|default:"ZALA/ECO ENERGY" }}{% endif %}
+            </span>
+        </a>
+    </div>
+
+    <!-- Navigation -->
+            <nav class="sidebar-scroll-hidden flex-1 overflow-y-auto px-4 py-6 space-y-4">
+        {% with path=request.path %}
+            <div class="space-y-1">
+                <a href="{% url 'core:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/home' in path or path == '/' %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                    </svg>
+                    <span class="font-medium">Overview</span>
+                </a>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Daily Work</p>
+                <a href="{% url 'sales:pos' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/sales/pos/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 5h18M3 12h18M3 19h18"></path>
+                    </svg>
+                    <span class="font-medium">POS / Sales</span>
+                </a>
+                <a href="{% url 'sales:shifts' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/sales/shifts/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="font-medium">Shift Sessions</span>
+                </a>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Inventory & Supply</p>
+                <a href="{% url 'inventory:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if path == '/inventory/' %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 19h16M4 15h10M4 11h16M4 7h7"></path>
+                    </svg>
+                    <span class="font-medium">Stock Levels</span>
+                </a>
+                <a href="{% url 'inventory:tanks' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/inventory/tanks/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 7a4 4 0 014-4h8a4 4 0 014 4v10a4 4 0 01-4 4H8a4 4 0 01-4-4V7z"></path>
+                    </svg>
+                    <span class="font-medium">Tanks</span>
+                </a>
+                <a href="{% url 'stations:pumps' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/stations/pumps/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 7h16M4 12h16M4 17h16"></path>
+                    </svg>
+                    <span class="font-medium">Pumps / Nozzles</span>
+                </a>
+                <a href="{% url 'suppliers:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if path == '/suppliers/' %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 7h18M5 7v10a2 2 0 002 2h10a2 2 0 002-2V7"></path>
+                    </svg>
+                    <span class="font-medium">Suppliers</span>
+                </a>
+                <a href="{% url 'suppliers:deliveries' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/suppliers/deliveries/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 7h18M5 7v10a2 2 0 002 2h10a2 2 0 002-2V7"></path>
+                    </svg>
+                    <span class="font-medium">Deliveries</span>
+                </a>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Business</p>
+                <a href="{% url 'finance:customers' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/finance/customers/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a4 4 0 00-5-3.87M9 20v-2a4 4 0 00-3-3.87M12 11a4 4 0 100-8 4 4 0 000 8zm0 0c2.21 0 4 1.79 4 4v1a1 1 0 01-1 1H9a1 1 0 01-1-1v-1c0-2.21 1.79-4 4-4z"></path>
+                    </svg>
+                    <span class="font-medium">Customers</span>
+                </a>
+                <a href="{% url 'finance:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/finance/' in path and '/finance/customers/' not in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                    </svg>
+                    <span class="font-medium">Finance</span>
+                </a>
+                <a href="{% url 'reports:dashboard' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/reports/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 19h16M4 15h10M4 11h16M4 7h7"></path>
+                    </svg>
+                    <span class="font-medium">Reports</span>
+                </a>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Administration</p>
+                <a href="{% url 'stations:list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/stations/' in path and '/stations/pumps/' not in path and '/stations/nozzles/' not in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 7l9-4 9 4v10a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4H9v4a2 2 0 01-2 2H3a2 2 0 01-2-2V7z"></path>
+                    </svg>
+                    <span class="font-medium">Stations</span>
+                </a>
+                <a href="{% url 'accounts:user-list' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/users/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a4 4 0 00-5-3.87M9 20v-2a4 4 0 00-3-3.87M12 11a4 4 0 100-8 4 4 0 000 8zm0 0c2.21 0 4 1.79 4 4v1a1 1 0 01-1 1H9a1 1 0 01-1-1v-1c0-2.21 1.79-4 4-4z"></path>
+                    </svg>
+                    <span class="font-medium">Users</span>
+                </a>
+                <a href="{% url 'accounts:system-settings' %}" class="group flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 {% if '/settings/' in path %}theme-shell-link-active{% else %}theme-shell-link{% endif %}">
+                    <svg class="w-5 h-5 mr-3 transition-colors theme-accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    </svg>
+                    <span class="font-medium">System Settings</span>
+                </a>
+            </div>
+        {% endwith %}
+    </nav>
+
+
+
+    <!-- User Section -->
+    <div class="theme-shell-border theme-shell-strong p-4 border-t">
+        <div
+            class="flex items-center gap-3 px-2 py-1"
+            id="sidebar-account-profile"
+            data-account-name="{{ request.user.full_name|default:request.user.get_username }}"
+            data-account-email="{{ request.user.email|default:'' }}"
+            data-account-role="{{ request.current_system_role|default:request.user.role|title }}"
+            data-account-avatar="{% if request.user.profile_photo %}{{ request.user.profile_photo.url }}{% endif %}"
+        >
+            <div class="relative">
+                {% if request.user.profile_photo %}
+                    <img src="{{ request.user.profile_photo.url }}" alt="" class="w-9 h-9 rounded-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                    <div class="theme-accent-btn hidden w-9 h-9 rounded-full items-center justify-center font-bold text-sm">
+                        {{ request.user.full_name|slice:":1"|upper }}
+                    </div>
+                {% else %}
+                    <div class="theme-accent-btn w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm">
+                        {{ request.user.full_name|slice:":1"|upper }}
+                    </div>
+                {% endif %}
+                <div class="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2" style="background: var(--theme-500); border-color: var(--theme-900);"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-white truncate">{{ request.user.full_name }}</p>
+                <p class="theme-accent-text text-[11px] font-medium uppercase tracking-wider">{{ request.current_system_role|default:request.user.role|title }}</p>
+            </div>
+        </div>
+        <div class="mt-4 space-y-2">
+            <form method="post" action="{% url 'accounts:logout' %}" id="switch-user-form">
+                {% csrf_token %}
+                <button
+                    type="button"
+                    id="switch-user-trigger"
+                    class="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left text-sm font-medium text-white transition hover:bg-white/10"
+                >
+                    <span class="inline-flex items-center gap-2">
+                        <svg class="h-4 w-4 text-[var(--theme-300)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 16l4-4m0 0l-4-4m4 4H9m4 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        <span>Switch User</span>
+                    </span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="switch-user-modal" class="fixed inset-0 z-[120] hidden">
+    <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" data-switch-user-close></div>
+    <div class="relative flex min-h-full items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-2xl border border-white/10 bg-[var(--theme-900)]/95 shadow-2xl">
+            <div class="flex items-start justify-between gap-4 border-b border-white/10 px-6 py-5">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--theme-300)]">Confirm Sign Out</p>
+                    <h3 class="mt-2 text-xl font-semibold text-white">Switch account?</h3>
+                </div>
+                <button type="button" class="rounded-lg p-2 text-slate-300 transition hover:bg-white/10 hover:text-white" aria-label="Close sign out confirmation" data-switch-user-close>
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="px-6 py-5">
+                <div class="rounded-2xl border border-[var(--theme-500)]/30 bg-[var(--theme-500)]/10 px-4 py-4">
+                    <p class="text-sm leading-6 text-slate-100">You are about to sign out of this account. Do you want to continue and switch to another saved account or sign in again?</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-3 border-t border-white/10 px-6 py-4">
+                <button type="button" class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10" data-switch-user-close>Cancel</button>
+                <button type="button" id="switch-user-confirm" class="rounded-xl bg-[var(--theme-500)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--theme-400)]">Sign Out</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const RECENT_ACCOUNTS_KEY = "atms_recent_accounts";
+        const modal = document.getElementById("switch-user-modal");
+        const trigger = document.getElementById("switch-user-trigger");
+        const confirmButton = document.getElementById("switch-user-confirm");
+        const form = document.getElementById("switch-user-form");
+        const profile = document.getElementById("sidebar-account-profile");
+
+        if (!modal || !trigger || !confirmButton || !form || !profile) {
+            return;
+        }
+
+        const closeTargets = modal.querySelectorAll("[data-switch-user-close]");
+
+        function loadAccounts() {
+            try {
+                const stored = window.localStorage.getItem(RECENT_ACCOUNTS_KEY);
+                const parsed = stored ? JSON.parse(stored) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveCurrentAccount() {
+            const email = (profile.dataset.accountEmail || "").trim();
+            if (!email) {
+                return;
+            }
+
+            const currentAccount = {
+                name: (profile.dataset.accountName || "").trim(),
+                email: email,
+                role: (profile.dataset.accountRole || "").trim(),
+                avatar: (profile.dataset.accountAvatar || "").trim(),
+                savedAt: Date.now()
+            };
+
+            const deduped = loadAccounts().filter(function (account) {
+                return (account.email || "").toLowerCase() !== email.toLowerCase();
+            });
+
+            deduped.unshift(currentAccount);
+            window.localStorage.setItem(RECENT_ACCOUNTS_KEY, JSON.stringify(deduped.slice(0, 6)));
+            window.localStorage.setItem("atms_switch_user_requested", "1");
+        }
+
+        function openModal() {
+            modal.classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+        }
+
+        function closeModal() {
+            modal.classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        }
+
+        trigger.addEventListener("click", openModal);
+
+        closeTargets.forEach(function (element) {
+            element.addEventListener("click", closeModal);
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && !modal.classList.contains("hidden")) {
+                closeModal();
+            }
+        });
+
+        confirmButton.addEventListener("click", function () {
+            saveCurrentAccount();
+            form.submit();
+        });
+    })();
+</script>

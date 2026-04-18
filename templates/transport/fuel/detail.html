@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Fuel Entry #{{ fuel_entry.id }} - {{ fuel_entry.trip.order_number }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{% url 'transport:fuel:list' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">
+            <svg class="-ml-1 mr-1 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Back to Fuel Entries
+        </a>
+    </div>
+
+    <!-- Page Header -->
+    <div class="mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 h-16 w-16">
+                    <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg">
+                        <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5">
+                    <h1 class="text-3xl font-bold text-gray-900">Fuel Entry #{{ fuel_entry.id }}</h1>
+                    <div class="mt-2 flex flex-wrap items-center gap-3">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+                            <svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            {{ fuel_entry.date|date:"M j, Y" }}
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                            Trip: {{ fuel_entry.trip.order_number }}
+                        </span>
+                        <span class="text-sm text-gray-500">{{ fuel_entry.liters }} L &bull; {{ fuel_entry.total_cost|currency }}</span>
+                    </div>
+                </div>
+            </div>
+            {% if request.can_manage_fuel %}
+            <div class="flex space-x-3">
+                <a href="{% url 'transport:fuel:edit' fuel_entry.pk %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors">
+                    <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    Edit Entry
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path></svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-xs font-medium text-gray-500 uppercase">Total Cost</p>
+                    <p class="text-xl font-bold text-orange-600">{{ fuel_entry.total_cost|currency }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-xs font-medium text-gray-500 uppercase">Quantity</p>
+                    <p class="text-xl font-bold text-blue-600">{{ fuel_entry.liters }} L</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-xs font-medium text-gray-500 uppercase">Price/Liter</p>
+                    <p class="text-xl font-bold text-green-600">{{ fuel_entry.price_per_liter|currency }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-xs font-medium text-gray-500 uppercase">Station</p>
+                    <p class="text-lg font-bold text-gray-900 truncate" title="{% if fuel_entry.station %}{{ fuel_entry.station.name }}{% else %}{{ fuel_entry.fuel_station }}{% endif %}">{% if fuel_entry.station %}{{ fuel_entry.station.name }}{% elif fuel_entry.fuel_station %}{{ fuel_entry.fuel_station }}{% else %}N/A{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Transaction Details -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <svg class="h-5 w-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Fuel Transaction Details
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Trip</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                <a href="{% url 'transport:trips:detail' fuel_entry.trip.pk %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    {{ fuel_entry.trip.order_number }}
+                                </a>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Fuel Date</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ fuel_entry.date|date:"l, F j, Y" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Quantity</dt>
+                            <dd class="mt-1 text-sm font-semibold text-gray-900">{{ fuel_entry.liters }} liters</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Price per Liter</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ fuel_entry.price_per_liter|currency }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Total Cost</dt>
+                            <dd class="mt-1 text-sm font-semibold text-orange-600">{{ fuel_entry.total_cost|currency }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Fuel Station</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if fuel_entry.station %}
+                                    {{ fuel_entry.station.name }}
+                                    {% if fuel_entry.station.location %}
+                                        <span class="text-gray-500">({{ fuel_entry.station.location }})</span>
+                                    {% endif %}
+                                {% else %}
+                                    {{ fuel_entry.fuel_station|default:"Not specified" }}
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Supporting Document</dt>
+                            <dd class="mt-1 text-sm">
+                                {% if fuel_entry.invoice %}
+                                    <a href="{{ fuel_entry.invoice.url }}" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        Download Invoice
+                                    </a>
+                                {% else %}
+                                    <span class="text-gray-400">No document attached</span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Record Created</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ fuel_entry.created_at|date:"F j, Y g:i A" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ fuel_entry.updated_at|date:"F j, Y g:i A" }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Trip Information -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <svg class="h-5 w-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                        Trip Information
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Order Number</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                <a href="{% url 'transport:trips:detail' fuel_entry.trip.pk %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    {{ fuel_entry.trip.order_number }}
+                                </a>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Status</dt>
+                            <dd class="mt-1">
+                                {% if fuel_entry.trip.status == 'DELIVERED' or fuel_entry.trip.status == 'CLOSED' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ fuel_entry.trip.get_status_display }}</span>
+                                {% elif fuel_entry.trip.status == 'IN_TRANSIT' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{{ fuel_entry.trip.get_status_display }}</span>
+                                {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ fuel_entry.trip.get_status_display }}</span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                        {% if fuel_entry.trip.vehicle %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Vehicle</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                <a href="{% url 'transport:vehicles:detail' fuel_entry.trip.vehicle.pk %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    {{ fuel_entry.trip.vehicle.plate_number }}
+                                </a>
+                                <span class="text-gray-500">({{ fuel_entry.trip.vehicle.get_vehicle_type_display }})</span>
+                            </dd>
+                        </div>
+                        {% endif %}
+                        {% if fuel_entry.trip.driver %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Driver</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                <a href="{% url 'transport:drivers:detail' fuel_entry.trip.driver.pk %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    {{ fuel_entry.trip.driver.get_full_name|default:fuel_entry.trip.driver.email }}
+                                </a>
+                            </dd>
+                        </div>
+                        {% endif %}
+                        {% if fuel_entry.trip.route %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Route</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ fuel_entry.trip.route.origin }} Ã¢â€ â€™ {{ fuel_entry.trip.route.destination }}</dd>
+                        </div>
+                        {% endif %}
+                        {% if fuel_entry.trip.customer %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Customer</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ fuel_entry.trip.customer.company_name|default:fuel_entry.trip.customer }}</dd>
+                        </div>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            
+            <!-- Cost Summary -->
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-200 bg-orange-50">
+                    <h3 class="text-sm font-semibold text-orange-800 flex items-center">
+                        <svg class="h-5 w-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path></svg>
+                        Cost Breakdown
+                    </h3>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Quantity</span>
+                            <span class="text-lg font-bold text-gray-900">{{ fuel_entry.liters }} L</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Price per Liter</span>
+                            <span class="font-medium text-gray-900">{{ fuel_entry.price_per_liter|currency }}</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 pt-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-gray-700">Total Cost</span>
+                            <span class="text-xl font-bold text-orange-600">{{ fuel_entry.total_cost|currency }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicle Info -->
+            {% if fuel_entry.trip.vehicle %}
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-200">
+                    <h3 class="text-sm font-semibold text-gray-700 flex items-center">
+                        <svg class="h-5 w-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                        Vehicle
+                    </h3>
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                            <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM2 10v5a1 1 0 001 1h1a1 1 0 001-1v-1h8v1a1 1 0 001 1h1a1 1 0 001-1v-5H2z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-semibold text-gray-900">{{ fuel_entry.trip.vehicle.plate_number }}</p>
+                            <p class="text-xs text-gray-500">{{ fuel_entry.trip.vehicle.get_vehicle_type_display }}</p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'transport:vehicles:detail' fuel_entry.trip.vehicle.pk %}" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                            View Vehicle
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Driver Info -->
+            {% if fuel_entry.trip.driver %}
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-200">
+                    <h3 class="text-sm font-semibold text-gray-700 flex items-center">
+                        <svg class="h-5 w-5 mr-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                        Driver
+                    </h3>
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
+                            <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-semibold text-gray-900">{{ fuel_entry.trip.driver.get_full_name|default:fuel_entry.trip.driver.email }}</p>
+                            <p class="text-xs text-gray-500">Driver</p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'transport:drivers:detail' fuel_entry.trip.driver.pk %}" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                            View Driver Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Actions -->
+            {% if request.can_manage_fuel %}
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-200">
+                    <h3 class="text-sm font-semibold text-gray-700">Quick Actions</h3>
+                </div>
+                <div class="p-4 space-y-2">
+                    <a href="{% url 'transport:fuel:edit' fuel_entry.pk %}" class="w-full flex items-center justify-center px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        Edit Entry
+                    </a>
+                    <a href="{% url 'transport:fuel:create' %}" class="w-full flex items-center justify-center px-4 py-2.5 bg-orange-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-orange-700 transition-colors">
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        Add New Entry
+                    </a>
+                    <a href="{% url 'transport:trips:detail' fuel_entry.trip.pk %}" class="w-full flex items-center justify-center px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                        View Trip Details
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

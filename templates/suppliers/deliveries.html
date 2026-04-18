@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Deliveries | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div class="rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-emerald-50 p-6 shadow-sm">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">Receiving</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Fuel Delivery Receipts</h1>
+                <p class="mt-1 text-sm text-slate-600">Draft and pending receipts do not change stock. Only posted receipts increase tank inventory.</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'suppliers:purchase-orders' %}" class="inline-flex items-center gap-2 rounded-xl border border-[#0f7ea6] px-4 py-2 text-sm font-semibold text-[#0f7ea6] transition hover:bg-[#0f7ea6]/10">
+                    <span class="material-symbols-outlined text-[18px] leading-none">receipt_long</span>
+                    Purchase Orders
+                </a>
+                <a href="{% url 'suppliers:deliveries-create' %}" class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                    <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                    Record Delivery
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Pending</p>
+            <p class="mt-1 text-2xl font-bold text-amber-600">{{ pending_count }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Received</p>
+            <p class="mt-1 text-2xl font-bold text-emerald-600">{{ received_count }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Cancelled</p>
+            <p class="mt-1 text-2xl font-bold text-rose-600">{{ cancelled_count }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Received Volume</p>
+            <p class="mt-1 text-2xl font-bold text-slate-900">{{ received_volume|floatformat:2 }} L</p>
+        </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-200 px-4 py-3">
+            <form method="get" class="flex flex-wrap gap-2">
+                <input type="text" name="search" value="{{ filters.search }}" placeholder="Search supplier, PO, or delivery ref" class="min-w-[260px] flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                <select name="status" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All status</option>
+                    {% for value,label in delivery_statuses %}
+                    <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Filter</button>
+            </form>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Delivery Ref</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Supplier / PO</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Tank</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Liters</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    {% for delivery in deliveries %}
+                    <tr class="hover:bg-slate-50/70">
+                        <td class="px-4 py-3">
+                            <div class="text-sm font-semibold text-slate-900">{{ delivery.delivery_reference|default:"No ref" }}</div>
+                            <div class="text-xs text-slate-500">
+                                {% if delivery.received_by %}
+                                    {{ delivery.received_by.full_name|default:delivery.received_by.email }}
+                                {% else %}
+                                    Not posted yet
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="text-sm font-semibold text-slate-900">{{ delivery.purchase_order.supplier.name }}</div>
+                            <div class="text-xs text-slate-500">{{ delivery.purchase_order.reference }} Ã¢â‚¬Â¢ {{ delivery.purchase_order.station.name }}</div>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-slate-700">{{ delivery.tank.name|default:"Unassigned" }}</td>
+                        <td class="px-4 py-3 text-sm text-slate-700">{{ delivery.delivered_volume }} L</td>
+                        <td class="px-4 py-3 text-sm text-slate-700">{{ delivery.delivery_date|date:"Y-m-d" }}</td>
+                        <td class="px-4 py-3">
+                            <span class="rounded-full px-3 py-1 text-[11px] font-semibold {% if delivery.status == 'received' %}bg-emerald-50 text-emerald-700{% elif delivery.status == 'cancelled' %}bg-rose-50 text-rose-700{% elif delivery.status == 'pending' %}bg-amber-50 text-amber-700{% else %}bg-slate-100 text-slate-700{% endif %}">
+                                {{ delivery.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-wrap gap-2">
+                                {% if delivery.status != 'received' and delivery.status != 'cancelled' %}
+                                <form method="post" action="{% url 'suppliers:deliveries-post' delivery.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="rounded-lg border border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">Post Receipt</button>
+                                </form>
+                                {% endif %}
+                                {% if delivery.tank_id %}
+                                <a href="{% url 'inventory:tanks-detail' delivery.tank_id %}" class="rounded-lg border border-[#0f7ea6] px-3 py-1.5 text-xs font-semibold text-[#0f7ea6] hover:bg-[#0f7ea6]/10">View Tank</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-4 py-8 text-center text-sm text-slate-500">No delivery receipts found yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Shift Reports | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div class="rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Reports</p>
+        <h1 class="mt-1 text-2xl font-bold text-slate-900">Shift Reports</h1>
+        <p class="mt-1 text-sm text-slate-600">Review shift openings, closures, sales totals, and cash reconciliation.</p>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Shift</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Station</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Attendant</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Status</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Sales</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Variance</th></tr></thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                {% for shift in shifts %}
+                <tr class="hover:bg-slate-50/80 transition"><td class="px-4 py-3 text-sm font-semibold text-slate-900">#{{ shift.pk }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ shift.station.name }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ shift.attendant.full_name|default:shift.attendant.email|default:"--" }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ shift.get_status_display }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ shift.total_sales|floatformat:2 }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ shift.variance_amount|floatformat:2 }}</td></tr>
+                {% empty %}
+                <tr><td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500">No shifts found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{{ form.job }}
+{{ form.customer }}
+{{ form.commodity_type }}
+{{ form.cargo_category }}
+{{ form.status }}
+{{ form.km_end }}
+{{ form.fuel_cost }}
+{{ form.other_expenses }}
+{{ form.revenue }}
+
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">local_shipping</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Trip Setup</h3>
+            <p class="text-xs text-slate-500">Select unassigned shipments, then assign the trip assets.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="md:col-span-2">
+            <div class="flex items-center justify-between gap-3">
+                <label for="{{ form.shipments.id_for_label }}" class="trip-label !mb-0">Assign Shipments <span class="text-red-500">*</span></label>
+                <button type="button" id="trip-toggle-shipments-btn" class="inline-flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-800 transition hover:border-green-300 hover:bg-green-100">
+                    <span class="material-symbols-outlined text-[15px] leading-none">add</span>
+                    Add Shipment
+                </button>
+            </div>
+            <div id="trip-selected-shipments" class="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                <p>No shipments selected yet.</p>
+            </div>
+            <div id="trip-shipments-picker" class="mt-3 {% if not form.shipments.errors %}hidden{% endif %}">
+                {{ form.shipments }}
+                <div id="trip-shipment-cards" class="mt-3 grid grid-cols-1 gap-3"></div>
+                {% if form.shipments.help_text %}<p class="trip-help">{{ form.shipments.help_text }}</p>{% endif %}
+            </div>
+            <p class="trip-error" data-error-for="shipments">{% if form.shipments.errors %}{{ form.shipments.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.vehicle.id_for_label }}" class="trip-label">Vehicle <span class="text-red-500">*</span></label>
+            <div class="trip-input-shell">
+                <span class="material-symbols-outlined trip-field-icon">directions_car</span>
+                {{ form.vehicle }}
+            </div>
+            <p class="trip-error" data-error-for="vehicle">{% if form.vehicle.errors %}{{ form.vehicle.errors.0 }}{% endif %}</p>
+            {% if form.vehicle.help_text %}<p class="trip-help">{{ form.vehicle.help_text }}</p>{% endif %}
+        </div>
+        <div id="trip-rental-fee-block" class="hidden">
+            <label for="{{ form.rental_fee.id_for_label }}" class="trip-label">Rental Fee <span class="text-red-500">*</span></label>
+            <div class="trip-input-shell">
+                <span class="material-symbols-outlined trip-field-icon">payments</span>
+                {{ form.rental_fee }}
+            </div>
+            <p class="trip-error" data-error-for="rental_fee">{% if form.rental_fee.errors %}{{ form.rental_fee.errors.0 }}{% endif %}</p>
+            {% if form.rental_fee.help_text %}<p class="trip-help">{{ form.rental_fee.help_text }}</p>{% endif %}
+        </div>
+        <div>
+            <label for="{{ form.driver.id_for_label }}" class="trip-label">Driver <span class="text-red-500">*</span></label>
+            <div class="trip-input-shell">
+                <span class="material-symbols-outlined trip-field-icon">badge</span>
+                {{ form.driver }}
+            </div>
+            <p class="trip-error" data-error-for="driver">{% if form.driver.errors %}{{ form.driver.errors.0 }}{% endif %}</p>
+            {% if form.driver.help_text %}<p class="trip-help">{{ form.driver.help_text }}</p>{% endif %}
+        </div>
+        <div class="md:col-span-2">
+            <label for="{{ form.route.id_for_label }}" class="trip-label">Route <span class="text-red-500">*</span></label>
+            <div class="trip-input-shell">
+                <span class="material-symbols-outlined trip-field-icon">map</span>
+                {{ form.route }}
+            </div>
+            <p class="trip-error" data-error-for="route">{% if form.route.errors %}{{ form.route.errors.0 }}{% endif %}</p>
+            {% if form.route.help_text %}<p class="trip-help">{{ form.route.help_text }}</p>{% endif %}
+        </div>
+        <div>
+            <label for="{{ form.quantity.id_for_label }}" class="trip-label">Total Load</label>
+            <div class="trip-input-shell">
+                <span class="material-symbols-outlined trip-field-icon">straighten</span>
+                {{ form.quantity }}
+            </div>
+            <p class="trip-error" data-error-for="quantity">{% if form.quantity.errors %}{{ form.quantity.errors.0 }}{% endif %}</p>
+            <p id="trip-quantity-help" class="trip-help">Auto-calculated from the selected shipments.</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Shipment Summary</p>
+            <p id="trip-shipment-count" class="mt-2 text-sm font-semibold text-slate-900">0 shipments</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Cargo Profile</p>
+            <p id="trip-quantity-preview" class="mt-2 text-sm font-semibold text-slate-900">Not selected</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Vehicle Ownership</p>
+            <p id="trip-vehicle-ownership" class="mt-2 text-sm font-semibold text-slate-900">Company vehicle</p>
+        </div>
+    </div>
+</section>
+
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">route</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Route Details</h3>
+            <p class="text-xs text-slate-500">Confirm the dispatch route for the selected shipments.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Departure Location</p>
+            <p id="trip-route-origin" class="mt-2 text-sm font-semibold text-slate-900">Select a route</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Destination</p>
+            <p id="trip-route-destination" class="mt-2 text-sm font-semibold text-slate-900">Select a route</p>
+        </div>
+    </div>
+</section>

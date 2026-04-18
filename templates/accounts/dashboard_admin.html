@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <h2 class="text-2xl font-bold text-slate-900">Admin Dashboard</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {% include "components/stats_card.html" with title="Vehicles" value="284" subtitle="Operational fleet" %}
+        {% include "components/stats_card.html" with title="Drivers" value="192" subtitle="Active drivers" %}
+        {% include "components/stats_card.html" with title="Fuel Logs" value="1,902" subtitle="This month" %}
+        {% include "components/stats_card.html" with title="Clients" value="87" subtitle="Registered clients" %}
+    </div>
+</div>
+{% endblock %}

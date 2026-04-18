@@ -1,0 +1,131 @@
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">route</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Route Information</h3>
+            <p class="text-xs text-slate-500">Core route identity based on the current backend fields.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Route Name</p>
+            <p id="route-name-preview" class="mt-2 text-sm font-semibold text-slate-900">Auto-generated from origin and destination</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Route Code</p>
+            <p id="route-code-preview" class="mt-2 text-sm font-semibold text-slate-900">Generated from the selected locations</p>
+        </div>
+    </div>
+</section>
+
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">place</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Location Details</h3>
+            <p class="text-xs text-slate-500">Define the active path between two locations.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div>
+            <label for="{{ form.origin.id_for_label }}" class="route-label">Origin Location <span class="text-red-500">*</span></label>
+            <div class="route-input-shell">
+                <span class="material-symbols-outlined route-field-icon">trip_origin</span>
+                {{ form.origin }}
+            </div>
+            <p class="route-error" data-error-for="origin">{% if form.origin.errors %}{{ form.origin.errors.0 }}{% endif %}</p>
+        </div>
+        <div>
+            <label for="{{ form.destination.id_for_label }}" class="route-label">Destination Location <span class="text-red-500">*</span></label>
+            <div class="route-input-shell">
+                <span class="material-symbols-outlined route-field-icon">location_on</span>
+                {{ form.destination }}
+            </div>
+            <p class="route-error" data-error-for="destination">{% if form.destination.errors %}{{ form.destination.errors.0 }}{% endif %}</p>
+        </div>
+    </div>
+</section>
+
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-lime-100 text-lime-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">speed</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Distance Information</h3>
+            <p class="text-xs text-slate-500">Track route length and a frontend-only travel estimate.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div>
+            <label for="{{ form.distance_km.id_for_label }}" class="route-label">Distance (KM) <span class="text-red-500">*</span></label>
+            <div class="route-input-shell">
+                <span class="material-symbols-outlined route-field-icon">straighten</span>
+                {{ form.distance_km }}
+            </div>
+            <p class="route-error" data-error-for="distance_km">{% if form.distance_km.errors %}{{ form.distance_km.errors.0 }}{% endif %}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Estimated Travel Time</p>
+            <p id="route-travel-time" class="mt-2 text-sm font-semibold text-slate-900">Auto-estimated from distance</p>
+        </div>
+    </div>
+</section>
+
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-100 text-teal-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">check_circle</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Additional Details</h3>
+            <p class="text-xs text-slate-500">Route availability plus non-persistent planning cues.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <label class="route-label mb-3">Status</label>
+            <label class="inline-flex items-center">
+                {{ form.is_active }}
+                <span class="ml-2 text-sm font-medium text-slate-800">Active Route</span>
+            </label>
+            <p class="route-error" data-error-for="is_active">{% if form.is_active.errors %}{{ form.is_active.errors.0 }}{% endif %}</p>
+            <p class="route-help">Only active routes will be available during trip creation.</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Notes</p>
+            <p class="mt-2 text-sm text-slate-600">Dedicated route notes are not part of the current backend model, so this section remains informational to preserve existing logic.</p>
+        </div>
+    </div>
+</section>
+
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
+            <span class="material-symbols-outlined text-[20px] leading-none">map</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-slate-900">Map Preview</h3>
+            <p class="text-xs text-slate-500">A lightweight location preview derived from the entered route.</p>
+        </div>
+    </div>
+    <div class="p-5">
+        <div class="rounded-2xl border border-dashed border-slate-300 bg-[radial-gradient(circle_at_top,_rgba(22,101,52,0.08),_transparent_45%),linear-gradient(135deg,_#f8fafc,_#ecfdf5)] p-6">
+            <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+                <div class="rounded-xl bg-white/90 p-4 shadow-sm">
+                    <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Origin</p>
+                    <p id="route-origin-preview" class="mt-2 text-sm font-semibold text-slate-900">Not set</p>
+                </div>
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-green-700 text-white shadow-sm">
+                    <span class="material-symbols-outlined text-[18px] leading-none">east</span>
+                </div>
+                <div class="rounded-xl bg-white/90 p-4 shadow-sm">
+                    <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Destination</p>
+                    <p id="route-destination-preview" class="mt-2 text-sm font-semibold text-slate-900">Not set</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

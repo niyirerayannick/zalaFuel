@@ -1,0 +1,41 @@
+<section data-section="messages" class="space-y-4 pb-4">
+    <div class="overflow-hidden rounded-[28px] border border-green-100 bg-white shadow-sm">
+        <div class="border-b border-green-100 bg-[#166534] px-4 py-4 text-white">
+            <div class="flex items-center gap-3">
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur">
+                    <span class="material-symbols-outlined text-[22px]">support_agent</span>
+                </div>
+                <div class="min-w-0">
+                    <h2 class="truncate text-base font-semibold">{{ support_contact.full_name|default:"Support Team" }}</h2>
+                    <p class="truncate text-xs text-white/75">online support</p>
+                </div>
+                <div class="ml-auto flex items-center gap-2 text-white/85">
+                    <span class="material-symbols-outlined text-[19px]">call</span>
+                    <span class="material-symbols-outlined text-[19px]">more_vert</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-[#efeae2] bg-[radial-gradient(circle_at_top_left,rgba(22,101,52,0.08),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(21,128,61,0.08),transparent_22%)] p-3">
+            <div id="driver-message-thread" class="max-h-[54vh] overflow-y-auto rounded-[24px] px-1 py-2">
+                {% include "transport/driver/partials/_message_thread.html" %}
+            </div>
+        </div>
+
+        <div class="border-t border-green-100 bg-[#f7f7f7] p-3">
+            <form id="driver-message-composer" method="post" action="{% url 'transport:driver_message_send' %}" hx-post="{% url 'transport:driver_message_send' %}" hx-target="#driver-content" hx-swap="innerHTML transition:true" hx-sync="this:drop" data-driver-disable class="flex items-end gap-2">
+                {% csrf_token %}
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                </div>
+                <label class="min-w-0 flex-1 text-sm text-gray-500">
+                    {{ message_form.body }}
+                    {% if message_form.body.errors %}<p class="mt-2 text-xs text-red-600">{{ message_form.body.errors.0 }}</p>{% endif %}
+                </label>
+                <button type="submit" class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-600 text-white shadow-sm transition hover:bg-green-700">
+                    <span class="material-symbols-outlined text-[20px] leading-none">send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>

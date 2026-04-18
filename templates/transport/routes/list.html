@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}Routes Management | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .route-panel {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .route-modal-field {
+        width: 100%;
+        min-height: 2.8rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225);
+        background: rgb(248 250 252);
+        color: rgb(15 23 42);
+        transition: all 0.2s ease;
+    }
+
+    .route-modal-field:not(input[type="checkbox"]) {
+        padding: 0.78rem 0.95rem 0.78rem 2.75rem;
+    }
+
+    .route-modal-field:focus {
+        outline: none;
+        background: white;
+        border-color: rgb(21 128 61);
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+
+    .route-modal-error {
+        border-color: rgb(239 68 68) !important;
+        background: rgb(254 242 242) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+    }
+
+    .route-label {
+        display: block;
+        margin-bottom: 0.45rem;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgb(51 65 85);
+    }
+
+    .route-help {
+        margin-top: 0.45rem;
+        font-size: 0.75rem;
+        color: rgb(100 116 139);
+    }
+
+    .route-error {
+        min-height: 1rem;
+        margin-top: 0.45rem;
+        font-size: 0.75rem;
+        color: rgb(220 38 38);
+    }
+
+    .route-input-shell {
+        position: relative;
+    }
+
+    .route-field-icon {
+        position: absolute;
+        left: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgb(100 116 139);
+        font-size: 1.05rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+
+    .route-input-shell:focus-within .route-field-icon {
+        color: rgb(21 128 61);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fleet Operations</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Routes Management</h1>
+                <p class="mt-1 text-sm text-slate-600">Manage your route library with the same fast dashboard experience as the rest of the transport system.</p>
+            </div>
+            {% if can_manage_fleet %}
+            <button type="button" id="route-add-new-btn" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                <span class="material-symbols-outlined text-[18px] leading-none">add</span>
+                Add Route
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="route-list-content">
+        {% include "transport/routes/_list_content.html" %}
+    </div>
+</div>
+
+{% if can_manage_fleet %}
+<div id="route-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="route-panel" class="route-panel fixed inset-y-0 right-0 z-50 hidden w-full max-w-2xl translate-x-full transform shadow-2xl transition-transform duration-300">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                    <span class="material-symbols-outlined text-[20px] leading-none">alt_route</span>
+                </div>
+                <div>
+                    <h2 class="text-base font-semibold text-slate-900">Add Route</h2>
+                    <p class="text-xs text-slate-500">Fast entry mode for dispatch routes.</p>
+                </div>
+            </div>
+            <button type="button" id="route-close-btn" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+        <div id="route-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+        <div class="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-3 backdrop-blur">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="route-cancel-btn" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</button>
+                <button type="button" id="route-save-btn" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">Save Route</button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if can_manage_fleet %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('route-add-new-btn');
+    const overlay = document.getElementById('route-overlay');
+    const panel = document.getElementById('route-panel');
+    const panelBody = document.getElementById('route-panel-body');
+    const closeBtn = document.getElementById('route-close-btn');
+    const cancelBtn = document.getElementById('route-cancel-btn');
+    const saveBtn = document.getElementById('route-save-btn');
+    const listContainer = document.getElementById('route-list-content');
+    let currentForm = null;
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(function () {
+            panel.classList.remove('translate-x-full');
+        });
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(function () {
+            overlay.classList.add('hidden');
+            panel.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            currentForm = null;
+        }, 220);
+    }
+
+    function styleModalFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden') return;
+            el.classList.add('route-modal-field');
+        });
+    }
+
+    function shortCode(value) {
+        return (value || '')
+            .split(/\s+/)
+            .filter(Boolean)
+            .map(function (part) { return part[0]; })
+            .join('')
+            .slice(0, 4)
+            .toUpperCase();
+    }
+
+    function syncPreview(scope) {
+        const origin = scope.querySelector('#id_origin');
+        const destination = scope.querySelector('#id_destination');
+        const distance = scope.querySelector('#id_distance_km');
+        const status = scope.querySelector('#id_is_active');
+
+        function update() {
+            const originValue = origin ? origin.value.trim() : '';
+            const destinationValue = destination ? destination.value.trim() : '';
+            const distanceValue = parseFloat(distance && distance.value ? distance.value : '0') || 0;
+            const hours = distanceValue > 0 ? distanceValue / 60 : 0;
+            const wholeHours = Math.floor(hours);
+            const minutes = Math.round((hours - wholeHours) * 60);
+            const timeText = distanceValue > 0 ? (wholeHours ? wholeHours + 'h ' : '') + minutes + 'm' : 'Auto-estimated from distance';
+
+            const routeName = scope.querySelector('#route-name-preview');
+            const routeCode = scope.querySelector('#route-code-preview');
+            const routeOrigin = scope.querySelector('#route-origin-preview');
+            const routeDestination = scope.querySelector('#route-destination-preview');
+            const travelTime = scope.querySelector('#route-travel-time');
+            const distancePreview = scope.querySelector('#route-distance-preview');
+            const timePreview = scope.querySelector('#route-time-preview');
+            const statusPreview = scope.querySelector('#route-status-preview');
+
+            if (routeName) routeName.textContent = originValue && destinationValue ? originValue + ' to ' + destinationValue : 'Auto-generated from origin and destination';
+            if (routeCode) routeCode.textContent = originValue && destinationValue ? shortCode(originValue) + '-' + shortCode(destinationValue) : 'Generated from the selected locations';
+            if (routeOrigin) routeOrigin.textContent = originValue || 'Not set';
+            if (routeDestination) routeDestination.textContent = destinationValue || 'Not set';
+            if (travelTime) travelTime.textContent = timeText;
+            if (distancePreview) distancePreview.textContent = distanceValue > 0 ? distanceValue.toFixed(2) + ' km' : '0 km';
+            if (timePreview) timePreview.textContent = timeText;
+            if (statusPreview) statusPreview.textContent = status && status.checked ? 'Active' : 'Inactive';
+        }
+
+        [origin, destination, distance, status].forEach(function (field) {
+            if (!field) return;
+            field.addEventListener('input', update);
+            field.addEventListener('change', update);
+        });
+        update();
+    }
+
+    function clearErrors() {
+        const formError = panelBody.querySelector('#route-form-error');
+        if (formError) {
+            formError.classList.add('hidden');
+            formError.textContent = '';
+        }
+        panelBody.querySelectorAll('.route-error').forEach(function (el) { el.textContent = ''; });
+        panelBody.querySelectorAll('.route-modal-error').forEach(function (el) { el.classList.remove('route-modal-error'); });
+    }
+
+    function showErrors(payload) {
+        const formError = panelBody.querySelector('#route-form-error');
+        if (payload.non_field_errors && payload.non_field_errors.length && formError) {
+            formError.classList.remove('hidden');
+            formError.textContent = payload.non_field_errors.join(' ');
+        }
+        if (payload.errors) {
+            Object.keys(payload.errors).forEach(function (field) {
+                const input = panelBody.querySelector('#id_' + field);
+                const error = panelBody.querySelector('[data-error-for="' + field + '"]');
+                if (input) input.classList.add('route-modal-error');
+                if (error) error.textContent = payload.errors[field].join(' ');
+            });
+        }
+    }
+
+    async function refreshList() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('partial', 'list');
+        const response = await fetch(url.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        listContainer.innerHTML = await response.text();
+    }
+
+    async function loadForm(url, title) {
+        openPanel();
+        panel.querySelector('h2').textContent = title;
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        const separator = url.includes('?') ? '&' : '?';
+        const response = await fetch(url + separator + 'partial=form', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        panelBody.innerHTML = await response.text();
+        currentForm = panelBody.querySelector('#route-modal-form');
+        styleModalFields();
+        syncPreview(panelBody);
+    }
+
+    addBtn.addEventListener('click', function () {
+        clearErrors();
+        loadForm("{% url 'transport:routes:create' %}", 'Add Route');
+    });
+
+    listContainer.addEventListener('click', function (event) {
+        const editBtn = event.target.closest('.route-edit-btn');
+        if (!editBtn) return;
+        event.preventDefault();
+        clearErrors();
+        loadForm(editBtn.dataset.editUrl, 'Edit Route');
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !panel.classList.contains('hidden')) {
+            closePanel();
+        }
+    });
+
+    saveBtn.addEventListener('click', async function () {
+        if (!currentForm) return;
+        clearErrors();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        try {
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+            closePanel();
+            await refreshList();
+        } catch (error) {
+            const formError = panelBody.querySelector('#route-form-error');
+            if (formError) {
+                formError.classList.remove('hidden');
+                formError.textContent = 'Unable to save the route right now. Please try again.';
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Route';
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

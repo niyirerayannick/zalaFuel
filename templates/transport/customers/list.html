@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Customers Management | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .customer-panel {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .customer-modal-field {
+        width: 100%;
+        min-height: 2.8rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225);
+        background: rgb(248 250 252);
+        color: rgb(15 23 42);
+        transition: all 0.2s ease;
+    }
+
+    .customer-modal-field:not(textarea) {
+        padding: 0.78rem 0.95rem 0.78rem 2.75rem;
+    }
+
+    textarea.customer-modal-field {
+        padding: 0.9rem 0.95rem 0.9rem 2.75rem;
+    }
+
+    .customer-modal-field:focus {
+        outline: none;
+        background: white;
+        border-color: rgb(21 128 61);
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+
+    .customer-modal-error {
+        border-color: rgb(239 68 68) !important;
+        background: rgb(254 242 242) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+    }
+
+    select.customer-modal-field {
+        appearance: none;
+        padding-right: 2rem;
+        background-image: linear-gradient(45deg, transparent 50%, rgb(71 85 105) 50%), linear-gradient(135deg, rgb(71 85 105) 50%, transparent 50%);
+        background-position: calc(100% - 18px) 18px, calc(100% - 13px) 18px;
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+    }
+
+    .customer-label {
+        display: block;
+        margin-bottom: 0.45rem;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgb(51 65 85);
+    }
+
+    .customer-help {
+        margin-top: 0.45rem;
+        font-size: 0.75rem;
+        color: rgb(100 116 139);
+    }
+
+    .customer-error {
+        min-height: 1rem;
+        margin-top: 0.45rem;
+        font-size: 0.75rem;
+        color: rgb(220 38 38);
+    }
+
+    .customer-input-shell {
+        position: relative;
+    }
+
+    .customer-field-icon {
+        position: absolute;
+        left: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgb(100 116 139);
+        font-size: 1.05rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+
+    .customer-input-shell:focus-within .customer-field-icon {
+        color: rgb(21 128 61);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fleet Operations</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">Customers Management</h1>
+                <p class="mt-1 text-sm text-slate-600">Manage customer profiles and client relationships in one dashboard view.</p>
+            </div>
+            {% if request.user.role != 'driver' %}
+            <button type="button" id="customer-add-new-btn" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                <span class="material-symbols-outlined text-[18px] leading-none">person_add</span>
+                Add Customer
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="customer-list-content">
+        {% include "transport/customers/_list_content.html" %}
+    </div>
+</div>
+
+{% if request.user.role != 'driver' %}
+<div id="customer-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="customer-panel" class="customer-panel fixed inset-y-0 right-0 z-50 hidden w-full max-w-2xl translate-x-full transform shadow-2xl transition-transform duration-300">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                    <span class="material-symbols-outlined text-[20px] leading-none">supervisor_account</span>
+                </div>
+                <div>
+                    <h2 class="text-base font-semibold text-slate-900">Add Customer</h2>
+                    <p class="text-xs text-slate-500">Fast entry mode for client profiles.</p>
+                </div>
+            </div>
+            <button type="button" id="customer-close-btn" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+        <div id="customer-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+        <div class="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-3 backdrop-blur">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="customer-cancel-btn" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</button>
+                <button type="button" id="customer-save-btn" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">Save Customer</button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if request.user.role != 'driver' %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('customer-add-new-btn');
+    const overlay = document.getElementById('customer-overlay');
+    const panel = document.getElementById('customer-panel');
+    const panelBody = document.getElementById('customer-panel-body');
+    const closeBtn = document.getElementById('customer-close-btn');
+    const cancelBtn = document.getElementById('customer-cancel-btn');
+    const saveBtn = document.getElementById('customer-save-btn');
+    const listContainer = document.getElementById('customer-list-content');
+    let currentForm = null;
+
+    if (!addBtn || !overlay || !panel || !panelBody || !saveBtn || !listContainer) {
+        return;
+    }
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(function () {
+            panel.classList.remove('translate-x-full');
+        });
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(function () {
+            overlay.classList.add('hidden');
+            panel.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            currentForm = null;
+        }, 220);
+    }
+
+    function styleModalFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden' || el.type === 'checkbox') return;
+            el.classList.add('customer-modal-field');
+        });
+    }
+
+    function parseAddressParts(address) {
+        if (!address) return ['Not detected', 'Not detected'];
+        const parts = address.split(',').map(function (item) { return item.trim(); }).filter(Boolean);
+        if (parts.length === 1) return [parts[0], 'Not detected'];
+        return [parts[parts.length - 2] || 'Not detected', parts[parts.length - 1] || 'Not detected'];
+    }
+
+    function syncPreview(scope) {
+        const address = scope.querySelector('#id_address');
+        const status = scope.querySelector('#id_status');
+        const createAccountCheckbox = scope.querySelector('#id_create_account');
+        const accountInfo = scope.querySelector('#customer-account-info');
+
+        function update() {
+            const value = address ? address.value : '';
+            const parsed = parseAddressParts(value);
+            const cityPreview = scope.querySelector('#customer-city-preview');
+            const countryPreview = scope.querySelector('#customer-country-preview');
+            const citySide = scope.querySelector('#customer-city-side');
+            const countrySide = scope.querySelector('#customer-country-side');
+            const statusPreview = scope.querySelector('#customer-status-preview');
+
+            if (cityPreview) cityPreview.textContent = parsed[0];
+            if (countryPreview) countryPreview.textContent = parsed[1];
+            if (citySide) citySide.textContent = parsed[0];
+            if (countrySide) countrySide.textContent = parsed[1];
+            if (statusPreview && status) statusPreview.textContent = status.options[status.selectedIndex] ? status.options[status.selectedIndex].text : '--';
+            if (createAccountCheckbox && accountInfo) accountInfo.style.display = createAccountCheckbox.checked ? 'block' : 'none';
+        }
+
+        if (address) {
+            address.addEventListener('input', update);
+            address.addEventListener('change', update);
+        }
+        if (status) {
+            status.addEventListener('input', update);
+            status.addEventListener('change', update);
+        }
+        if (createAccountCheckbox) {
+            createAccountCheckbox.addEventListener('change', update);
+        }
+        update();
+    }
+
+    function clearErrors() {
+        const formError = panelBody.querySelector('#customer-form-error');
+        if (formError) {
+            formError.classList.add('hidden');
+            formError.textContent = '';
+        }
+        panelBody.querySelectorAll('.customer-error').forEach(function (el) { el.textContent = ''; });
+        panelBody.querySelectorAll('.customer-modal-error').forEach(function (el) { el.classList.remove('customer-modal-error'); });
+    }
+
+    function showErrors(payload) {
+        const formError = panelBody.querySelector('#customer-form-error');
+        if (payload.non_field_errors && payload.non_field_errors.length && formError) {
+            formError.classList.remove('hidden');
+            formError.textContent = payload.non_field_errors.join(' ');
+        }
+        if (payload.errors) {
+            Object.keys(payload.errors).forEach(function (field) {
+                const input = panelBody.querySelector('#id_' + field);
+                const error = panelBody.querySelector('[data-error-for="' + field + '"]');
+                if (input) input.classList.add('customer-modal-error');
+                if (error) error.textContent = payload.errors[field].join(' ');
+            });
+        }
+    }
+
+    async function refreshList() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('partial', 'list');
+        const response = await fetch(url.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        listContainer.innerHTML = await response.text();
+    }
+
+    async function loadForm(url, title) {
+        openPanel();
+        panel.querySelector('h2').textContent = title;
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        const separator = url.includes('?') ? '&' : '?';
+        const response = await fetch(url + separator + 'partial=form', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        panelBody.innerHTML = await response.text();
+        currentForm = panelBody.querySelector('#customer-modal-form');
+        styleModalFields();
+        syncPreview(panelBody);
+    }
+
+    addBtn.addEventListener('click', function () {
+        clearErrors();
+        loadForm("{% url 'transport:customers:create' %}", 'Add Customer');
+    });
+
+    listContainer.addEventListener('click', function (event) {
+        const editBtn = event.target.closest('.customer-edit-btn');
+        if (!editBtn) return;
+        event.preventDefault();
+        clearErrors();
+        loadForm(editBtn.dataset.editUrl, 'Edit Customer');
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !panel.classList.contains('hidden')) {
+            closePanel();
+        }
+    });
+
+    saveBtn.addEventListener('click', async function () {
+        if (!currentForm) return;
+        clearErrors();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        try {
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+            closePanel();
+            await refreshList();
+        } catch (error) {
+            const formError = panelBody.querySelector('#customer-form-error');
+            if (formError) {
+                formError.classList.remove('hidden');
+                formError.textContent = 'Unable to save the customer right now. Please try again.';
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Customer';
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

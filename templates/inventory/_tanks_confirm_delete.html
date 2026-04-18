@@ -1,0 +1,10 @@
+<form id="tank-modal-form" method="post" action="{{ action|default:request.path }}">
+    {% csrf_token %}
+    <div class="space-y-4">
+        <p class="text-sm text-slate-700">Delete tank <strong>{{ tank }}</strong>? This will remove it from selections.</p>
+        <div class="flex justify-end gap-3">
+            <button type="button" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50" onclick="history.back()">Cancel</button>
+            <button type="submit" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-700">Delete</button>
+        </div>
+    </div>
+</form>

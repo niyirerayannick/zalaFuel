@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+{% block title %}Shifts | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .driver-panel {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+    .driver-modal-field,
+    .driver-modal-file {
+        width: 100%;
+        min-height: 2.8rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgb(203 213 225);
+        background: rgb(248 250 252);
+        color: rgb(15 23 42);
+        transition: all 0.2s ease;
+    }
+    .driver-modal-field { padding: 0.78rem 0.95rem 0.78rem 2.75rem; }
+    .driver-modal-file { padding: 0.7rem 0.95rem 0.7rem 2.75rem; }
+    .driver-modal-field:focus,
+    .driver-modal-file:focus {
+        outline: none; background: white; border-color: rgb(21 128 61);
+        box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16), 0 8px 20px rgba(21, 128, 61, 0.08);
+    }
+    .driver-modal-error {
+        border-color: rgb(239 68 68) !important;
+        background: rgb(254 242 242) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12) !important;
+    }
+    select.driver-modal-field {
+        appearance: none;
+        padding-right: 2rem;
+        background-image: linear-gradient(45deg, transparent 50%, rgb(71 85 105) 50%), linear-gradient(135deg, rgb(71 85 105) 50%, transparent 50%);
+        background-position: calc(100% - 18px) 18px, calc(100% - 13px) 18px;
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+    }
+    .driver-label {
+        display: block;
+        margin-bottom: 0.45rem;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgb(51 65 85);
+    }
+    .driver-help { margin-top: 0.45rem; font-size: 0.75rem; color: rgb(100 116 139); }
+    .driver-error { min-height: 1rem; margin-top: 0.45rem; font-size: 0.75rem; color: rgb(220 38 38); }
+    .driver-input-shell, .driver-file-shell { position: relative; }
+    .driver-field-icon {
+        position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%);
+        color: rgb(100 116 139); font-size: 1.05rem; pointer-events: none; transition: color 0.2s ease;
+    }
+    .driver-input-shell:focus-within .driver-field-icon,
+    .driver-file-shell:focus-within .driver-field-icon { color: rgb(21 128 61); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fuel Operations</p>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900">{{ page_title|default:'Shifts' }}</h1>
+                <p class="mt-1 text-sm text-slate-600">Manage attendant shifts and sales accountability.</p>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" id="shift-open-btn" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
+                    <span class="material-symbols-outlined text-[18px] leading-none">play_arrow</span>
+                    Open Shift
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Active Shifts</p>
+            <h3 class="mt-1 text-2xl font-bold text-green-700">{{ kpi_active }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Sales Today</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ kpi_sales_today|floatformat:2 }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Liters Today</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ kpi_liters_today|floatformat:2 }}</h3>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Attendants Working</p>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ kpi_attendants }}</h3>
+        </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
+            <form method="get" class="flex w-full flex-wrap gap-2">
+                <select name="station" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All stations</option>
+                    {% for st in stations %}
+                    <option value="{{ st.id }}" {% if filters.station == st.id|stringformat:'s' %}selected{% endif %}>{{ st.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="status" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All status</option>
+                    <option value="open" {% if filters.status == 'open' %}selected{% endif %}>Open</option>
+                    <option value="closed" {% if filters.status == 'closed' %}selected{% endif %}>Closed</option>
+                </select>
+                <select name="shift_type" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
+                    <option value="">All shift types</option>
+                    {% for value, label in shift_type_choices %}
+                    <option value="{{ value }}" {% if filters.shift_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">Filter</button>
+            </form>
+        </div>
+        <div id="shift-list-content">
+            {% include "sales/_shifts_list_content.html" %}
+        </div>
+    </div>
+</div>
+
+<div id="shift-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50"></div>
+<aside id="shift-panel" class="driver-panel fixed inset-y-0 right-0 z-50 hidden w-full max-w-2xl translate-x-full transform shadow-2xl transition-transform duration-300">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                    <span class="material-symbols-outlined text-[20px] leading-none">schedule</span>
+                </div>
+                <div>
+                    <h2 class="text-base font-semibold text-slate-900" id="shift-panel-title">Open Shift</h2>
+                    <p class="text-xs text-slate-500">Fast entry mode for attendant shifts.</p>
+                </div>
+            </div>
+            <button type="button" id="shift-close-btn" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">close</span>
+            </button>
+        </div>
+        <div id="shift-panel-body" class="flex-1 overflow-y-auto px-5 py-5">
+            <div class="text-sm text-slate-500">Loading form...</div>
+        </div>
+        <div class="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-3 backdrop-blur">
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="shift-cancel-btn" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Cancel</button>
+                <button type="button" id="shift-save-btn" class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">Save Shift</button>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const overlay = document.getElementById('shift-overlay');
+    const panel = document.getElementById('shift-panel');
+    const panelBody = document.getElementById('shift-panel-body');
+    const closeBtn = document.getElementById('shift-close-btn');
+    const cancelBtn = document.getElementById('shift-cancel-btn');
+    const saveBtn = document.getElementById('shift-save-btn');
+    const openBtn = document.getElementById('shift-open-btn');
+    const listContainer = document.getElementById('shift-list-content');
+    const titleEl = document.getElementById('shift-panel-title');
+    let currentForm = null;
+
+    if (!openBtn || !overlay || !panel || !panelBody || !saveBtn || !listContainer) {
+        return;
+    }
+
+    function openPanel() {
+        overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(function () {
+            panel.classList.remove('translate-x-full');
+        });
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePanel() {
+        panel.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(function () {
+            overlay.classList.add('hidden');
+            panel.classList.add('hidden');
+            panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+            currentForm = null;
+        }, 220);
+    }
+
+    function styleModalFields() {
+        panelBody.querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.type === 'hidden' || el.type === 'checkbox') return;
+            if (el.type === 'file') {
+                el.classList.add('driver-modal-file');
+            } else {
+                el.classList.add('driver-modal-field');
+            }
+        });
+    }
+
+    function renderOpeningReadingRow(nozzle) {
+        const row = document.createElement('div');
+        row.className = 'rounded-xl border border-slate-200 bg-white p-3 shadow-sm';
+
+        const shell = document.createElement('div');
+        shell.className = 'grid gap-3 sm:grid-cols-[minmax(0,1fr)_10rem] sm:items-center';
+
+        const text = document.createElement('div');
+        const title = document.createElement('p');
+        title.className = 'text-sm font-semibold text-slate-900';
+        title.textContent = nozzle.label;
+        const helper = document.createElement('p');
+        helper.className = 'mt-1 text-xs text-slate-500';
+        helper.textContent = 'Default source: ' + nozzle.source;
+        text.appendChild(title);
+        text.appendChild(helper);
+
+        const inputShell = document.createElement('div');
+        inputShell.className = 'driver-input-shell';
+        const icon = document.createElement('span');
+        icon.className = 'material-symbols-outlined driver-field-icon';
+        icon.textContent = 'speed';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.step = '0.01';
+        input.min = '0';
+        input.name = 'opening_reading_' + nozzle.id;
+        input.id = 'id_opening_reading_' + nozzle.id;
+        input.value = nozzle.opening_reading;
+        input.className = 'driver-modal-field';
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'opening_nozzle_ids';
+        hidden.value = nozzle.id;
+        inputShell.appendChild(icon);
+        inputShell.appendChild(input);
+        inputShell.appendChild(hidden);
+
+        const error = document.createElement('p');
+        error.className = 'driver-error';
+        error.dataset.errorFor = 'opening_reading_' + nozzle.id;
+
+        shell.appendChild(text);
+        shell.appendChild(inputShell);
+        row.appendChild(shell);
+        row.appendChild(error);
+        return row;
+    }
+
+    async function loadOpeningReadings(stationId) {
+        const container = panelBody.querySelector('#shift-opening-readings');
+        if (!container) return;
+        if (!stationId) {
+            container.innerHTML = '<p class="rounded-xl border border-dashed border-cyan-200 bg-white/70 px-4 py-3 text-sm text-slate-500">Choose a station to load opening readings.</p>';
+            return;
+        }
+        const url = new URL(container.dataset.readingsUrl, window.location.origin);
+        url.searchParams.set('station', stationId);
+        container.innerHTML = '<p class="rounded-xl border border-cyan-100 bg-white/70 px-4 py-3 text-sm text-slate-500">Loading opening readings...</p>';
+        try {
+            const response = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const payload = await response.json();
+            container.innerHTML = '';
+            if (!payload.results || !payload.results.length) {
+                container.innerHTML = '<p class="rounded-xl border border-dashed border-cyan-200 bg-white/70 px-4 py-3 text-sm text-slate-500">No active nozzles found for this station.</p>';
+                return;
+            }
+            payload.results.forEach(function (nozzle) {
+                container.appendChild(renderOpeningReadingRow(nozzle));
+            });
+        } catch (error) {
+            container.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">Unable to load opening readings.</p>';
+        }
+    }
+
+    async function loadStationAttendants(stationId) {
+        const wrapper = panelBody.querySelector('#shift-attendant-field');
+        const attendantField = panelBody.querySelector('#id_attendant') || panelBody.querySelector('[name="attendant"]');
+        const emptyMessage = panelBody.querySelector('#shift-attendant-empty');
+        if (!wrapper || !attendantField) return;
+
+        const selectedValue = attendantField.value;
+        attendantField.innerHTML = '<option value="">Loading attendants...</option>';
+        if (emptyMessage) emptyMessage.classList.add('hidden');
+
+        if (!stationId) {
+            attendantField.innerHTML = '<option value="">Select station first</option>';
+            return;
+        }
+
+        const url = new URL(wrapper.dataset.attendantsUrl, window.location.origin);
+        url.searchParams.set('station', stationId);
+        try {
+            const response = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const payload = await response.json();
+            attendantField.innerHTML = '<option value="">Select attendant</option>';
+            if (!payload.results || !payload.results.length) {
+                if (emptyMessage) {
+                    emptyMessage.textContent = payload.empty_message || 'No active attendants are assigned to this station.';
+                    emptyMessage.classList.remove('hidden');
+                }
+                return;
+            }
+            payload.results.forEach(function (attendant) {
+                const option = document.createElement('option');
+                option.value = attendant.id;
+                option.textContent = attendant.label;
+                if (attendant.id === selectedValue) {
+                    option.selected = true;
+                }
+                attendantField.appendChild(option);
+            });
+        } catch (error) {
+            attendantField.innerHTML = '<option value="">Unable to load attendants</option>';
+            if (emptyMessage) {
+                emptyMessage.textContent = 'Unable to load attendants for this station.';
+                emptyMessage.classList.remove('hidden');
+            }
+        }
+    }
+
+    function initOpeningReadings() {
+        const stationField = panelBody.querySelector('#id_station') || panelBody.querySelector('[name="station"]');
+        const container = panelBody.querySelector('#shift-opening-readings');
+        if (!stationField) return;
+        stationField.addEventListener('change', function () {
+            loadStationAttendants(stationField.value);
+            loadOpeningReadings(stationField.value);
+        });
+        if (stationField.value) {
+            loadStationAttendants(stationField.value);
+            loadOpeningReadings(stationField.value);
+        } else if (container) {
+            loadOpeningReadings('');
+        }
+    }
+
+    function initClosingVariance() {
+        const expectedField = panelBody.querySelector('#id_expected_amount');
+        const closingField = panelBody.querySelector('#id_closing_cash');
+        const preview = panelBody.querySelector('#shift-variance-preview');
+        if (!expectedField || !closingField || !preview) return;
+
+        function formatAmount(value) {
+            return Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function syncVariance() {
+            const expected = Number.parseFloat(expectedField.value || '0');
+            const closing = Number.parseFloat(closingField.value || '');
+            if (Number.isNaN(closing)) {
+                preview.textContent = 'Enter the declared closing amount to calculate variance.';
+                preview.className = 'driver-help';
+                return;
+            }
+            const variance = closing - expected;
+            if (variance === 0) {
+                preview.textContent = 'Balanced: declared closing amount matches actual shift sales.';
+                preview.className = 'driver-help text-emerald-700';
+            } else if (variance > 0) {
+                preview.textContent = 'Overage: declared amount is ' + formatAmount(variance) + ' above expected sales.';
+                preview.className = 'driver-help text-amber-700';
+            } else {
+                preview.textContent = 'Shortage: declared amount is ' + formatAmount(Math.abs(variance)) + ' below expected sales.';
+                preview.className = 'driver-help text-red-700';
+            }
+        }
+
+        closingField.addEventListener('input', syncVariance);
+        syncVariance();
+    }
+
+    function clearErrors() {
+        const formError = panelBody.querySelector('#shift-form-error');
+        if (formError) {
+            formError.classList.add('hidden');
+            formError.textContent = '';
+        }
+        panelBody.querySelectorAll('.driver-error').forEach(function (el) { el.textContent = ''; });
+        panelBody.querySelectorAll('.driver-modal-error').forEach(function (el) { el.classList.remove('driver-modal-error'); });
+    }
+
+    function showErrors(payload) {
+        const formError = panelBody.querySelector('#shift-form-error');
+        if (payload.error && formError) {
+            formError.classList.remove('hidden');
+            formError.textContent = payload.error;
+        }
+        if (payload.non_field_errors && payload.non_field_errors.length && formError) {
+            formError.classList.remove('hidden');
+            formError.textContent = payload.non_field_errors.join(' ');
+        }
+        if (payload.errors) {
+            Object.keys(payload.errors).forEach(function (field) {
+                const input = panelBody.querySelector('#id_' + field) || panelBody.querySelector('[name="' + field + '"]');
+                const error = panelBody.querySelector('[data-error-for="' + field + '"]');
+                if (input) input.classList.add('driver-modal-error');
+                if (error) error.textContent = payload.errors[field].join(' ');
+            });
+        }
+    }
+
+    async function refreshList() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('partial', 'list');
+        const response = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        listContainer.innerHTML = await response.text();
+    }
+
+    async function loadForm(url, title) {
+        openPanel();
+        titleEl.textContent = title;
+        saveBtn.textContent = title === 'Close Shift' ? 'Close Shift' : 'Save Shift';
+        panelBody.innerHTML = '<div class="text-sm text-slate-500">Loading form...</div>';
+        const separator = url.includes('?') ? '&' : '?';
+        const response = await fetch(url + separator + 'partial=form', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        panelBody.innerHTML = await response.text();
+        currentForm = panelBody.querySelector('#shift-modal-form');
+        styleModalFields();
+        initOpeningReadings();
+        initClosingVariance();
+    }
+
+    openBtn.addEventListener('click', function () {
+        clearErrors();
+        loadForm("{% url 'sales:shifts-open' %}", 'Open Shift');
+    });
+
+    listContainer.addEventListener('click', function (event) {
+        const closeShiftBtn = event.target.closest('.shift-close-btn');
+        if (closeShiftBtn) {
+            event.preventDefault();
+            clearErrors();
+            loadForm(closeShiftBtn.dataset.closeUrl, 'Close Shift');
+        }
+    });
+
+    overlay.addEventListener('click', closePanel);
+    closeBtn.addEventListener('click', closePanel);
+    cancelBtn.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !panel.classList.contains('hidden')) {
+            closePanel();
+        }
+    });
+
+    saveBtn.addEventListener('click', async function () {
+        if (!currentForm) return;
+        const savingLabel = saveBtn.textContent;
+        clearErrors();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        try {
+            const response = await fetch(currentForm.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(currentForm),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                showErrors(payload);
+                return;
+            }
+            closePanel();
+            await refreshList();
+        } catch (error) {
+            const formError = panelBody.querySelector('#shift-form-error');
+            if (formError) {
+                formError.classList.remove('hidden');
+                formError.textContent = 'Unable to save the shift right now. Please try again.';
+            }
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = savingLabel;
+        }
+    });
+});
+</script>
+{% endblock %}

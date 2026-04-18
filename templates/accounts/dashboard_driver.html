@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Driver Dashboard | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <h2 class="text-2xl font-bold text-slate-900">Driver Dashboard</h2>
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 class="font-semibold text-slate-900">Today's Assignment</h3>
+        <p class="mt-2 text-sm text-slate-600">Route: Kigali Ã¢â€ â€™ Musanze Ã¢â‚¬Â¢ Vehicle: RAB 123 D Ã¢â‚¬Â¢ ETA: 16:45</p>
+        <div class="mt-4 flex flex-wrap gap-3">
+            <button class="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">Enable GPS Sharing</button>
+            <button class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700">Request Fuel</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

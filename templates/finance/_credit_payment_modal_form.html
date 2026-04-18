@@ -1,0 +1,66 @@
+<form id="customer-modal-form" method="post" action="{{ action|default:request.path }}" class="space-y-4 bg-white">
+    {% csrf_token %}
+    <div id="customer-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        {% if form.non_field_errors %}{{ form.non_field_errors|join:" " }}{% endif %}
+    </div>
+
+    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-5 py-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                <span class="material-symbols-outlined text-[20px] leading-none">payments</span>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-slate-900">Credit Settlement</h3>
+                <p class="text-xs text-slate-500">Record customer payment against outstanding fuel credit.</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+            <div>
+                <label class="driver-label">Customer</label>
+                <div class="driver-input-shell">
+                    <span class="material-symbols-outlined driver-field-icon">badge</span>
+                    <input type="text" class="driver-modal-field" readonly value="{{ customer.name }}">
+                </div>
+            </div>
+            <div>
+                <label class="driver-label">Outstanding Balance</label>
+                <div class="driver-input-shell">
+                    <span class="material-symbols-outlined driver-field-icon">account_balance_wallet</span>
+                    <input type="text" class="driver-modal-field" readonly value="{{ customer.current_balance|floatformat:2 }}">
+                </div>
+            </div>
+            <div>
+                <label class="driver-label" for="{{ form.amount.id_for_label }}">Payment Amount <span class="text-red-500">*</span></label>
+                <div class="driver-input-shell">
+                    <span class="material-symbols-outlined driver-field-icon">payments</span>
+                    {{ form.amount }}
+                </div>
+                <p class="driver-error" data-error-for="amount">{% if form.amount.errors %}{{ form.amount.errors.0 }}{% endif %}</p>
+            </div>
+            <div>
+                <label class="driver-label" for="{{ form.method.id_for_label }}">Payment Method <span class="text-red-500">*</span></label>
+                <div class="driver-input-shell">
+                    <span class="material-symbols-outlined driver-field-icon">credit_card</span>
+                    {{ form.method }}
+                </div>
+                <p class="driver-error" data-error-for="method">{% if form.method.errors %}{{ form.method.errors.0 }}{% endif %}</p>
+            </div>
+            <div class="md:col-span-2">
+                <label class="driver-label" for="{{ form.reference.id_for_label }}">Reference</label>
+                <div class="driver-input-shell">
+                    <span class="material-symbols-outlined driver-field-icon">receipt_long</span>
+                    {{ form.reference }}
+                </div>
+                <p class="driver-error" data-error-for="reference">{% if form.reference.errors %}{{ form.reference.errors.0 }}{% endif %}</p>
+            </div>
+            <div class="md:col-span-2">
+                <label class="driver-label" for="{{ form.notes.id_for_label }}">Notes</label>
+                <div class="driver-input-shell">
+                    <span class="material-symbols-outlined driver-field-icon">description</span>
+                    {{ form.notes }}
+                </div>
+                <p class="driver-error" data-error-for="notes">{% if form.notes.errors %}{{ form.notes.errors.0 }}{% endif %}</p>
+            </div>
+        </div>
+    </section>
+</form>

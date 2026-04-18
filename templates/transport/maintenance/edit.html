@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Edit Maintenance Record | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .field-label { display:block; margin-bottom:.375rem; font-size:.75rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:rgb(51 65 85); }
+    .input-shell { position:relative; }
+    .field-icon { position:absolute; left:.75rem; top:50%; transform:translateY(-50%); font-size:1rem; line-height:1; color:rgb(71 85 105); pointer-events:none; transition:color .2s ease; }
+    .input-shell:focus-within .field-icon { color:rgb(21 128 61); }
+    .maint-field { width:100%; min-height:2.75rem; border:1px solid rgb(203 213 225); background:rgb(248 250 252); border-radius:.75rem; padding:.7rem .875rem .7rem 2.4rem; font-size:.9rem; line-height:1.25rem; color:rgb(15 23 42); transition:all .22s ease; box-shadow:inset 0 1px 0 rgba(255,255,255,.5); }
+    select.maint-field { appearance:none; background-image:linear-gradient(45deg, transparent 50%, rgb(71 85 105) 50%), linear-gradient(135deg, rgb(71 85 105) 50%, transparent 50%); background-position:calc(100% - 18px) calc(1.1em), calc(100% - 13px) calc(1.1em); background-size:5px 5px, 5px 5px; background-repeat:no-repeat; padding-right:2.2rem; }
+    .maint-field:focus { outline:none; background:#fff; border-color:rgb(21 128 61); box-shadow:0 0 0 4px rgba(21,128,61,.15), 0 8px 20px rgba(21,128,61,.08); }
+    .maint-field-error { border-color:rgb(239 68 68)!important; background-color:rgb(254 242 242)!important; box-shadow:0 0 0 3px rgba(239,68,68,.12)!important; }
+    .field-help { margin-top:.35rem; font-size:.72rem; color:rgb(100 116 139); }
+</style>
+{% endblock %}
+
+{% block content %}
+{% url 'transport:maintenance:detail' object.pk as maintenance_detail_url %}
+{% include "transport/maintenance/_form_page.html" with is_edit=True form_title="Edit Maintenance Record" form_subtitle="Update service details for this maintenance record." back_url=maintenance_detail_url cancel_url=maintenance_detail_url submit_label="Update Maintenance Record" %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function costPreview() {
+    return {
+        costDisplay: '--',
+        downtimeDisplay: '0 days',
+        odometerDisplay: '-- km',
+        init() {
+            const costEl = document.getElementById('id_cost');
+            const downtimeEl = document.getElementById('id_downtime_days');
+            const odometerEl = document.getElementById('id_service_km');
+            const serviceDateEl = document.getElementById('id_service_date');
+
+            const updateCost = () => {
+                const v = parseFloat(costEl?.value);
+                this.costDisplay = isNaN(v) ? '--' : '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+            const updateDowntime = () => {
+                const v = parseInt(downtimeEl?.value, 10) || 0;
+                this.downtimeDisplay = v + ' day' + (v !== 1 ? 's' : '');
+                document.getElementById('downtimeWindow').textContent = v + ' day(s)';
+                updateSchedule();
+            };
+            const updateOdometer = () => {
+                const v = parseInt(odometerEl?.value, 10);
+                this.odometerDisplay = isNaN(v) ? '-- km' : v.toLocaleString() + ' km';
+            };
+            const updateSchedule = () => {
+                const displayMain = document.getElementById('estimatedReturnDate');
+                const displaySide = document.getElementById('estimatedReturnDateSide');
+                const downtime = parseInt(downtimeEl?.value, 10) || 0;
+                const serviceDateStr = serviceDateEl?.value;
+                if (!serviceDateStr) { displayMain.textContent = '--'; displaySide.textContent = '--'; return; }
+                const base = new Date(serviceDateStr + 'T00:00:00');
+                if (Number.isNaN(base.getTime())) { displayMain.textContent = '--'; displaySide.textContent = '--'; return; }
+                base.setDate(base.getDate() + downtime);
+                const formatted = base.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+                displayMain.textContent = formatted; displaySide.textContent = formatted;
+            };
+
+            if (costEl) { costEl.addEventListener('input', updateCost); updateCost(); }
+            if (downtimeEl) { downtimeEl.addEventListener('input', updateDowntime); updateDowntime(); }
+            if (odometerEl) { odometerEl.addEventListener('input', updateOdometer); updateOdometer(); }
+            if (serviceDateEl) { serviceDateEl.addEventListener('input', updateSchedule); }
+            updateSchedule();
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('maintenance-record-form');
+    const alertBox = document.getElementById('maintenance-form-alert');
+    const submitBtn = document.getElementById('maintenance-submit-btn');
+    const fieldIds = ['id_vehicle', 'id_service_type', 'id_service_date', 'id_service_km', 'id_cost', 'id_workshop', 'id_downtime_days'];
+
+    fieldIds.forEach((id) => { const el = document.getElementById(id); if (el) el.classList.add('maint-field'); });
+
+    if (!form) return;
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        alertBox.classList.add('hidden');
+        document.querySelectorAll('.field-error').forEach((el) => el.textContent = '');
+        fieldIds.forEach((id) => { const el = document.getElementById(id); if (el) el.classList.remove('maint-field-error'); });
+
+        try {
+            const response = await fetch(form.action || window.location.href, { method:'POST', body:new FormData(form), headers:{ 'X-Requested-With':'XMLHttpRequest' } });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                if (payload.non_field_errors && payload.non_field_errors.length) {
+                    alertBox.className = 'rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700';
+                    alertBox.textContent = payload.non_field_errors.join(' ');
+                    alertBox.classList.remove('hidden');
+                }
+                if (payload.errors) {
+                    Object.keys(payload.errors).forEach((key) => {
+                        const err = document.querySelector('[data-error-for="' + key + '"]');
+                        if (err) err.textContent = payload.errors[key].join(' ');
+                        const input = document.getElementById('id_' + key);
+                        if (input) input.classList.add('maint-field-error');
+                    });
+                }
+                return;
+            }
+
+            alertBox.className = 'rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700';
+            alertBox.textContent = payload.message || 'Updated successfully.';
+            alertBox.classList.remove('hidden');
+        } catch (_err) {
+            alertBox.className = 'rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700';
+            alertBox.textContent = 'Unable to update right now. Please try again.';
+            alertBox.classList.remove('hidden');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+});
+</script>
+{% endblock %}

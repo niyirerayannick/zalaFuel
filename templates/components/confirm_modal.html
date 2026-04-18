@@ -1,0 +1,15 @@
+<div id="{{ modal_id }}" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+    <div class="w-full max-w-md rounded-xl bg-white shadow-xl">
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-slate-900">{{ modal_title|default:"Confirm Action" }}</h3>
+            <p class="mt-2 text-sm text-slate-600">{{ modal_message|default:"Are you sure you want to continue?" }}</p>
+        </div>
+        <div class="px-6 pb-6 flex items-center justify-end gap-3">
+            <button type="button" data-confirm-close="{{ modal_id }}" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100">Cancel</button>
+            <form method="post" action="{{ form_action }}">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">Confirm</button>
+            </form>
+        </div>
+    </div>
+</div>
