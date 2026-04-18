@@ -5,56 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ subject }}</title>
 </head>
-<body style="margin:0;padding:0;background:#f3f6f8;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f3f6f8;padding:24px 12px;">
+<body style="margin:0;padding:0;background:#f0f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1e293b;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f0f5f9;padding:40px 16px;">
         <tr>
             <td align="center">
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:680px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #d8e4db;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(14,96,128,0.08);">
                     <tr>
-                        <td style="background:#0f5b2a;padding:28px 32px;">
-                            <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#b7dfc4;font-weight:700;">{{ from_name }}</div>
-                            <div style="margin-top:8px;font-size:28px;line-height:1.2;color:#ffffff;font-weight:700;">{{ headline }}</div>
-                            <div style="margin-top:8px;font-size:14px;line-height:1.6;color:#ddf6e4;">{{ company_name }}</div>
+                        <td style="background:linear-gradient(135deg, #0e6080 0%, #147a9e 100%);padding:36px 40px;text-align:center;">
+                            <div style="display:inline-block;width:56px;height:56px;background:rgba(255,255,255,0.15);border-radius:16px;margin-bottom:16px;">
+                                <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M28 14C20.268 14 14 20.268 14 28C14 35.732 20.268 42 28 42C35.732 42 42 35.732 42 28C42 20.268 35.732 14 28 14ZM28 18C33.514 18 38 22.486 38 28C38 33.514 33.514 38 28 38C22.486 38 18 33.514 18 28C18 22.486 22.486 18 28 18Z" fill="white" fill-opacity="0.3"/>
+                                    <circle cx="28" cy="28" r="8" fill="white" fill-opacity="0.5"/>
+                                </svg>
+                            </div>
+                            <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:8px;">{{ from_name }}</div>
+                            <div style="font-size:26px;line-height:1.25;color:#ffffff;font-weight:700;">{{ headline }}</div>
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding:32px;">
-                            <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#1f2937;">{{ greeting }},</p>
-                            <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#475569;">{{ intro }}</p>
+                        <td style="padding:40px;">
+                            <p style="margin:0 0 8px;font-size:17px;font-weight:600;color:#1e293b;">{{ greeting }},</p>
+                            <p style="margin:0 0 28px;font-size:15px;line-height:1.7;color:#475569;">{{ intro }}</p>
 
                             {% if details %}
-                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 20px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 28px;background:#f8fafc;border-radius:12px;overflow:hidden;">
                                 {% for item in details %}
                                 <tr>
-                                    <td style="width:34%;padding:12px 16px;background:#f8fafc;font-size:13px;font-weight:700;color:#0f172a;border-bottom:1px solid #e2e8f0;">{{ item.label }}</td>
-                                    <td style="padding:12px 16px;font-size:14px;color:#334155;border-bottom:1px solid #e2e8f0;">{{ item.value }}</td>
+                                    <td style="padding:16px 20px;font-size:13px;color:#64748b;border-bottom:1px solid #e2e8f0;">{{ item.label }}</td>
+                                    <td style="padding:16px 20px;font-size:15px;font-weight:600;color:#0e6080;text-align:right;border-bottom:1px solid #e2e8f0;">{{ item.value }}</td>
                                 </tr>
                                 {% endfor %}
                             </table>
                             {% endif %}
 
                             {% if cta_label and cta_url %}
-                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;text-align:center;">
                                 <tr>
-                                    <td style="border-radius:10px;background:#15803d;">
-                                        <a href="{{ cta_url }}" style="display:inline-block;padding:13px 22px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;">{{ cta_label }}</a>
+                                    <td style="border-radius:12px;background:linear-gradient(135deg, #0e6080 0%, #147a9e 100%);">
+                                        <a href="{{ cta_url }}" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:12px;">{{ cta_label }}</a>
                                     </td>
                                 </tr>
                             </table>
                             {% endif %}
 
                             {% if note %}
-                            <div style="margin:0 0 20px;padding:14px 16px;background:#f8fafc;border-left:4px solid #16a34a;font-size:13px;line-height:1.7;color:#475569;">
-                                {{ note }}
+                            <div style="margin:0 0 28px;padding:20px;background:#fffbeb;border-radius:12px;border-left:4px solid #f59e0b;">
+                                <p style="margin:0;font-size:14px;line-height:1.7;color:#92400e;">{{ note }}</p>
                             </div>
                             {% endif %}
 
-                            <p style="margin:0;font-size:14px;line-height:1.7;color:#475569;">Regards,<br><strong style="color:#0f172a;">{{ closing }}</strong></p>
+                            <p style="margin:0;font-size:14px;line-height:1.7;color:#64748b;">Regards,<br><strong style="color:#1e293b;">{{ closing }}</strong></p>
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;font-size:12px;line-height:1.7;color:#64748b;">
-                            This is an automated message from {{ company_name }}. Please do not share confidential codes, passwords, or attached billing documents with unauthorized persons.
+                        <td style="padding:24px 40px;background:#f8fafc;text-align:center;border-top:1px solid #e2e8f0;">
+                            <p style="margin:0;font-size:12px;line-height:1.6;color:#94a3b8;">{{ company_name }} &middot; Automated Notification</p>
+                            <p style="margin:8px 0 0;font-size:11px;line-height:1.6;color:#cbd5e1;">Please do not share confidential codes or passwords with anyone.</p>
+                        </td>
+                    </tr>
+                </table>
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;margin-top:24px;">
+                    <tr>
+                        <td style="text-align:center;padding:16px;">
+                            <p style="margin:0;font-size:12px;color:#94a3b8;">Powered by ZALA Terminal</p>
                         </td>
                     </tr>
                 </table>

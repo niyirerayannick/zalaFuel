@@ -50,8 +50,8 @@ def send_atms_email(
         "cta_label": cta_label,
         "cta_url": cta_url,
         "closing": closing,
-        "from_name": getattr(settings, "EMAIL_FROM_NAME", "ZALA Terminal Notification Center"),
-        "company_name": "ZALA Terminal",
+        "from_name": getattr(settings, "EMAIL_FROM_NAME", "ZALA Terminal"),
+        "company_name": getattr(settings, "BRAND_NAME", "ZALA Terminal"),
     }
 
     text_body = render_to_string("emails/base.txt", context)
