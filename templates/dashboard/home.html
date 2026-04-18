@@ -35,6 +35,45 @@
 
     <section class="grid gap-6 xl:grid-cols-2">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-900">Stock Trend Chart</h2>
+                <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Line</span>
+            </div>
+            <div class="mt-4 h-[280px]">
+                <canvas id="dashboardStockTrendChart"></canvas>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-900">Receipts and Dispatches Chart</h2>
+                <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Bar</span>
+            </div>
+            <div class="mt-4 h-[280px]">
+                <canvas id="dashboardReceiptsDispatchesChart"></canvas>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-900">Market Share Graph</h2>
+                <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Doughnut</span>
+            </div>
+            <div class="mt-4 h-[280px]">
+                <canvas id="dashboardMarketShareChart"></canvas>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-900">Revenue and Volume Graph</h2>
+                <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Mixed</span>
+            </div>
+            <div class="mt-4 h-[280px]">
+                <canvas id="dashboardRevenueVolumeChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 class="text-lg font-bold text-slate-900">Stock Trends</h2>
             <div class="mt-4 space-y-3">
                 {% for row in stock_trends %}
@@ -46,6 +85,33 @@
             </div>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-900">Receipts vs Dispatches</h2>
+                <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Volume</span>
+            </div>
+            <div class="mt-4 space-y-4">
+                {% for row in receipts_vs_dispatches %}
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-sm text-slate-600">
+                        <span>{{ row.label }}</span>
+                        <span>{{ row.receipts|floatformat:2 }} / {{ row.dispatches|floatformat:2 }} L</span>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="h-2 rounded-full bg-slate-100">
+                            <div class="h-2 rounded-full bg-emerald-500" style="width:{% widthratio row.receipts kpis.total_receipts|default:1 100 %}%"></div>
+                        </div>
+                        <div class="h-2 rounded-full bg-slate-100">
+                            <div class="h-2 rounded-full bg-[#0f7ea6]" style="width:{% widthratio row.dispatches kpis.total_dispatches|default:1 100 %}%"></div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}<p class="text-sm text-slate-500">No receipts or dispatches yet.</p>{% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-3">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 class="text-lg font-bold text-slate-900">Revenue vs Volume</h2>
             <div class="mt-4 overflow-x-auto">
                 <table class="min-w-full text-sm">
@@ -56,6 +122,68 @@
                         {% empty %}<tr><td colspan="3" class="py-4 text-slate-500">No revenue data yet.</td></tr>{% endfor %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">Market Share</h2>
+            <div class="mt-4 space-y-3">
+                {% for row in market_share %}
+                <div>
+                    <div class="flex items-center justify-between text-sm text-slate-600"><span>{{ row.label }}</span><span>{{ row.share|floatformat:2 }}%</span></div>
+                    <div class="mt-1 h-2 rounded-full bg-slate-100"><div class="h-2 rounded-full bg-violet-500" style="width:{{ row.share|floatformat:0 }}%"></div></div>
+                </div>
+                {% empty %}<p class="text-sm text-slate-500">No market share snapshot available.</p>{% endfor %}
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">Alert Severity</h2>
+            <div class="mt-4 space-y-3">
+                {% for row in alert_breakdown %}
+                <div class="flex items-center justify-between rounded-xl px-3 py-3 {% if row.severity == 'critical' %}bg-rose-50{% elif row.severity == 'warning' %}bg-amber-50{% else %}bg-sky-50{% endif %}">
+                    <span class="text-sm font-semibold text-slate-900">{{ row.label }}</span>
+                    <span class="text-sm text-slate-600">{{ row.count }}</span>
+                </div>
+                {% empty %}<p class="text-sm text-slate-500">No alert severity data yet.</p>{% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">Product Flow</h2>
+            <div class="mt-4 space-y-4">
+                {% for row in product_flow %}
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-sm text-slate-600">
+                        <span>{{ row.label }}</span>
+                        <span>{{ row.receipts|floatformat:2 }} / {{ row.dispatches|floatformat:2 }} L</span>
+                    </div>
+                    <div class="grid gap-1">
+                        <div class="h-2 rounded-full bg-slate-100">
+                            <div class="h-2 rounded-full bg-emerald-500" style="width:{% widthratio row.receipts kpis.total_receipts|default:1 100 %}%"></div>
+                        </div>
+                        <div class="h-2 rounded-full bg-slate-100">
+                            <div class="h-2 rounded-full bg-orange-500" style="width:{% widthratio row.dispatches kpis.total_dispatches|default:1 100 %}%"></div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}<p class="text-sm text-slate-500">No product flow data available.</p>{% endfor %}
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900">Tank Utilization</h2>
+            <div class="mt-4 space-y-3">
+                {% for tank in terminal_summary|slice:":6" %}
+                <div>
+                    <div class="flex items-center justify-between text-sm text-slate-600">
+                        <span>{{ tank.name }} · {{ tank.terminal.name }}</span>
+                        <span>{{ tank.utilization_percent|floatformat:1 }}%</span>
+                    </div>
+                    <div class="mt-1 h-2 rounded-full bg-slate-100">
+                        <div class="h-2 rounded-full bg-cyan-500" style="width:{{ tank.utilization_percent|floatformat:0 }}%"></div>
+                    </div>
+                </div>
+                {% empty %}<p class="text-sm text-slate-500">No tank utilization data available.</p>{% endfor %}
             </div>
         </div>
     </section>
@@ -119,4 +247,180 @@
         </div>
     </section>
 </div>
+{% endblock %}
+{% block extra_js %}
+{{ stock_trends|json_script:"dashboard-stock-trends-data" }}
+{{ receipts_vs_dispatches|json_script:"dashboard-receipts-dispatches-data" }}
+{{ market_share|json_script:"dashboard-market-share-data" }}
+{{ revenue_vs_volume|json_script:"dashboard-revenue-volume-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (function () {
+        if (typeof Chart === "undefined") {
+            return;
+        }
+
+        const theme = (window.atmsTheme && window.atmsTheme.chart) || {};
+        const stockTrends = JSON.parse(document.getElementById("dashboard-stock-trends-data").textContent || "[]");
+        const receiptsDispatches = JSON.parse(document.getElementById("dashboard-receipts-dispatches-data").textContent || "[]");
+        const marketShare = JSON.parse(document.getElementById("dashboard-market-share-data").textContent || "[]");
+        const revenueVolume = JSON.parse(document.getElementById("dashboard-revenue-volume-data").textContent || "[]");
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: theme.legend || "#334155",
+                        font: { family: "Inter" }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: theme.tick || "#64748B" },
+                    grid: { color: theme.grid || "#E2E8F0" }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: theme.tick || "#64748B" },
+                    grid: { color: theme.grid || "#E2E8F0" }
+                }
+            }
+        };
+
+        const stockTrendCanvas = document.getElementById("dashboardStockTrendChart");
+        if (stockTrendCanvas) {
+            new Chart(stockTrendCanvas, {
+                type: "line",
+                data: {
+                    labels: stockTrends.map(row => row.label),
+                    datasets: [{
+                        label: "Closing Stock",
+                        data: stockTrends.map(row => row.value),
+                        borderColor: theme.primary || "#0f7ea6",
+                        backgroundColor: theme.primaryFill || "rgba(15, 126, 166, 0.14)",
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointBackgroundColor: theme.primary || "#0f7ea6"
+                    }]
+                },
+                options: commonOptions
+            });
+        }
+
+        const receiptsDispatchesCanvas = document.getElementById("dashboardReceiptsDispatchesChart");
+        if (receiptsDispatchesCanvas) {
+            new Chart(receiptsDispatchesCanvas, {
+                type: "bar",
+                data: {
+                    labels: receiptsDispatches.map(row => row.label),
+                    datasets: [
+                        {
+                            label: "Receipts",
+                            data: receiptsDispatches.map(row => row.receipts),
+                            backgroundColor: theme.success || "#16A34A",
+                            borderRadius: 6
+                        },
+                        {
+                            label: "Dispatches",
+                            data: receiptsDispatches.map(row => row.dispatches),
+                            backgroundColor: theme.primary || "#0f7ea6",
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: commonOptions
+            });
+        }
+
+        const marketShareCanvas = document.getElementById("dashboardMarketShareChart");
+        if (marketShareCanvas) {
+            new Chart(marketShareCanvas, {
+                type: "doughnut",
+                data: {
+                    labels: marketShare.map(row => row.label),
+                    datasets: [{
+                        data: marketShare.map(row => row.share),
+                        backgroundColor: theme.palette || ["#0f7ea6", "#14B8A6", "#F59E0B", "#8B5CF6", "#EF4444"],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+                            labels: {
+                                color: theme.legend || "#334155",
+                                font: { family: "Inter" }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        const revenueVolumeCanvas = document.getElementById("dashboardRevenueVolumeChart");
+        if (revenueVolumeCanvas) {
+            new Chart(revenueVolumeCanvas, {
+                data: {
+                    labels: revenueVolume.map(row => row.label),
+                    datasets: [
+                        {
+                            type: "bar",
+                            label: "Revenue",
+                            data: revenueVolume.map(row => row.revenue),
+                            backgroundColor: theme.highlight || "#F59E0B",
+                            borderRadius: 6,
+                            yAxisID: "y"
+                        },
+                        {
+                            type: "line",
+                            label: "Volume",
+                            data: revenueVolume.map(row => row.volume),
+                            borderColor: theme.primary || "#0f7ea6",
+                            backgroundColor: theme.primaryFill || "rgba(15, 126, 166, 0.14)",
+                            tension: 0.35,
+                            fill: false,
+                            yAxisID: "y1"
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: theme.legend || "#334155",
+                                font: { family: "Inter" }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: theme.tick || "#64748B" },
+                            grid: { color: theme.grid || "#E2E8F0" }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: theme.tick || "#64748B" },
+                            grid: { color: theme.grid || "#E2E8F0" }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: "right",
+                            ticks: { color: theme.tick || "#64748B" },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+    })();
+</script>
 {% endblock %}

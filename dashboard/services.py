@@ -80,6 +80,24 @@ def dashboard_snapshot():
             }
             for row in latest_revenue[:6]
         ][::-1]
+        product_flow = [
+            {
+                "label": row["product__name"],
+                "receipts": float(row["receipts_total"] or 0),
+                "dispatches": float(row["dispatches_total"] or 0),
+            }
+            for row in ProductReceipt.objects.values("product__name")
+            .annotate(receipts_total=Sum("quantity_received"), dispatches_total=Sum("product__dispatches__quantity_dispatched"))
+            .order_by("-receipts_total", "product__name")[:5]
+        ]
+        alert_breakdown = [
+            {
+                "label": label,
+                "count": alerts.filter(severity=severity).count(),
+                "severity": severity,
+            }
+            for severity, label in Alert.Severity.choices
+        ]
 
         terminal_summary = Tank.objects.select_related("terminal", "product").order_by("terminal__name", "name")[:8]
         omc_ranking = (
@@ -111,6 +129,8 @@ def dashboard_snapshot():
             "receipts_vs_dispatches": receipts_vs_dispatches,
             "market_share": market_share,
             "revenue_vs_volume": revenue_vs_volume,
+            "product_flow": product_flow,
+            "alert_breakdown": alert_breakdown,
             "latest_activity": latest_activity,
             "terminal_summary": terminal_summary,
             "omc_ranking": omc_ranking,
@@ -132,6 +152,8 @@ def dashboard_snapshot():
             "receipts_vs_dispatches": [],
             "market_share": [],
             "revenue_vs_volume": [],
+            "product_flow": [],
+            "alert_breakdown": [],
             "latest_activity": [],
             "terminal_summary": [],
             "omc_ranking": [],

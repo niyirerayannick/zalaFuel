@@ -5,6 +5,7 @@
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 class="text-3xl font-bold text-slate-900">{{ terminal.name }}</h1>
         <p class="mt-2 text-sm text-slate-600">{{ terminal.location }} · {{ terminal.get_status_display }} · Capacity {{ terminal.capacity_liters|floatformat:2 }} L</p>
+        <p class="mt-2 text-sm text-slate-600">Manager: {{ terminal.manager.full_name|default:terminal.manager_name|default:"Not assigned" }}</p>
     </section>
     <section class="grid gap-6 xl:grid-cols-2">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

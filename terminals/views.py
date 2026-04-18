@@ -17,7 +17,7 @@ class TerminalListView(OperationsManageMixin, ListView):
     context_object_name = "terminals"
 
     def get_queryset(self):
-        return Terminal.objects.annotate(
+        return Terminal.objects.select_related("manager").annotate(
             tank_count=Count("tanks", distinct=True),
             stock_total=Sum("tanks__current_stock_liters"),
         ).order_by("name")
@@ -44,6 +44,9 @@ class TerminalDetailView(OperationsManageMixin, DetailView):
     model = Terminal
     template_name = "terminals/detail.html"
     context_object_name = "terminal"
+
+    def get_queryset(self):
+        return Terminal.objects.select_related("manager")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -92,4 +95,3 @@ class TerminalActivityLogView(OperationsManageMixin, ListView):
         context = super().get_context_data(**kwargs)
         context.update({"page_title": "Terminal Activity Log", "active_menu": "terminal_operations"})
         return context
-
