@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Finance | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Finance | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
@@ -55,8 +55,8 @@
                 {% for sale in recent_revenue %}
                 <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
                     <div>
-                        <div class="text-sm text-slate-800">{{ sale.shift.station.name }} Ã¢â‚¬Â¢ {{ sale.nozzle.pump.label }}</div>
-                        <div class="text-xs text-slate-500">{{ sale.get_payment_method_display }} Ã¢â‚¬Â¢ {{ sale.created_at|date:"Y-m-d H:i" }}</div>
+                        <div class="text-sm text-slate-800">{{ sale.shift.station.name }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ sale.nozzle.pump.label }}</div>
+                        <div class="text-xs text-slate-500">{{ sale.get_payment_method_display }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ sale.created_at|date:"Y-m-d H:i" }}</div>
                     </div>
                     <div class="text-right">
                         <div class="text-sm font-semibold text-slate-900">{{ sale.total_amount|floatformat:2 }}</div>
@@ -81,8 +81,8 @@
                 {% for receipt in recent_expenses %}
                 <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
                     <div>
-                        <div class="text-sm text-slate-800">{{ receipt.purchase_order.supplier.name }} Ã¢â‚¬Â¢ {{ receipt.tank.name|default:"No tank" }}</div>
-                        <div class="text-xs text-slate-500">{{ receipt.get_status_display }} Ã¢â‚¬Â¢ {{ receipt.delivery_date|date:"Y-m-d" }}</div>
+                        <div class="text-sm text-slate-800">{{ receipt.purchase_order.supplier.name }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ receipt.tank.name|default:"No tank" }}</div>
+                        <div class="text-xs text-slate-500">{{ receipt.get_status_display }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ receipt.delivery_date|date:"Y-m-d" }}</div>
                     </div>
                     <div class="text-right">
                         <div class="text-sm font-semibold text-slate-900">

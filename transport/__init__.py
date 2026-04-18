@@ -1,1 +1,1 @@
-"""ZALA/ECO ENERGY (ZALA/ECO ENERGY) domain package."""
+"""ZALA Terminal (ZALA Terminal) domain package."""

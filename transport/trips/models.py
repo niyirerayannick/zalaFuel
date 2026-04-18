@@ -207,8 +207,8 @@ class Trip(TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.order_number:
             date_prefix = timezone.now().strftime("%Y%m%d")
-            seed = Trip.objects.filter(order_number__startswith=f"ZALA/ECO ENERGY-{date_prefix}").count() + 1
-            self.order_number = f"ZALA/ECO ENERGY-{date_prefix}-{seed:04d}"
+            seed = Trip.objects.filter(order_number__startswith=f"ZALA Terminal-{date_prefix}").count() + 1
+            self.order_number = f"ZALA Terminal-{date_prefix}-{seed:04d}"
         if self.status in {self.TripStatus.DRAFT, self.TripStatus.PENDING_APPROVAL, self.TripStatus.APPROVED}:
             self.driver_response = self.DriverResponse.PENDING
         if self.vehicle_id and self.vehicle.ownership_type == self.vehicle.OwnershipType.COMPANY:
@@ -330,7 +330,7 @@ class Shipment(TimeStampedModel):
     )
     container_number = models.CharField(max_length=120, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
-    sender_name = models.CharField(max_length=120, default="ZALA/ECO ENERGY")
+    sender_name = models.CharField(max_length=120, default="ZALA Terminal")
 
     class Meta:
         ordering = ["created_at"]
@@ -344,7 +344,7 @@ class Shipment(TimeStampedModel):
 
     @property
     def external_sender_name(self):
-        return "ZALA/ECO ENERGY"
+        return "ZALA Terminal"
 
     def calculate_quantity_from_weight(self):
         if not self.order_id:
@@ -450,6 +450,6 @@ class Shipment(TimeStampedModel):
             self.quantity = self.calculate_quantity_from_weight()
         else:
             self.weight_kg = self.calculate_weight_kg()
-        self.sender_name = "ZALA/ECO ENERGY"
+        self.sender_name = "ZALA Terminal"
         self.full_clean()
         return super().save(*args, **kwargs)

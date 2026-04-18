@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load currency_tags %}
 
-{% block title %}{{ vehicle.plate_number }} | Fleet Details | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}{{ vehicle.plate_number }} | Fleet Details | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -175,7 +175,7 @@
                             <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle Owner</dt>
                             <dd class="mt-1 text-sm text-gray-900">
                                 {% if vehicle.owner %}
-                                    {{ vehicle.owner.name }}{% if vehicle.owner.phone %} Ã‚Â· {{ vehicle.owner.phone }}{% endif %}
+                                    {{ vehicle.owner.name }}{% if vehicle.owner.phone %} Ãƒâ€šÃ‚Â· {{ vehicle.owner.phone }}{% endif %}
                                 {% else %}
                                     Company Fleet
                                 {% endif %}
@@ -450,7 +450,7 @@
                     {% if performance_metrics.total_distance > 0 and total_fuel_issued > 0 %}
                     <div class="border-t border-gray-100 pt-3 flex justify-between text-sm">
                         <span class="text-gray-500">Avg Consumption</span>
-                        <span class="font-medium text-gray-900">Ã¢â‚¬â€</span>
+                        <span class="font-medium text-gray-900">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</span>
                     </div>
                     {% endif %}
                 </div>

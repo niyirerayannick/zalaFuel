@@ -56,7 +56,7 @@ def _contains_any(name, keywords):
 
 
 class Command(BaseCommand):
-    help = "Generate an ZALA/ECO ENERGY SOA (Statement of Account) Excel report."
+    help = "Generate an ZALA Terminal SOA (Statement of Account) Excel report."
 
     def add_arguments(self, parser):
         parser.add_argument("--year", type=int, default=timezone.now().year)

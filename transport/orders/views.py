@@ -30,7 +30,7 @@ from transport.trips.models import Shipment, Trip
 
 
 def _logo_path():
-    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA/ECO ENERGY.png"
+    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA Terminal.png"
     return candidate if candidate.exists() else None
 
 
@@ -193,7 +193,7 @@ class OrderExcelExportView(OrderExportMixin, ListView):
         header_font = Font(color="FFFFFF", bold=True)
         thin_border = Border(left=Side(style="thin", color="D1D5DB"), right=Side(style="thin", color="D1D5DB"), top=Side(style="thin", color="D1D5DB"), bottom=Side(style="thin", color="D1D5DB"))
         sheet.merge_cells("A1:G1")
-        sheet["A1"] = "ZALA/ECO ENERGY Orders Report"
+        sheet["A1"] = "ZALA Terminal Orders Report"
         sheet["A1"].font = Font(color="0F5B2A", bold=True, size=16)
         sheet.merge_cells("A2:G2")
         sheet["A2"] = f"Generated on {timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}"
@@ -238,7 +238,7 @@ class OrderPdfExportView(OrderExportMixin, ListView):
         if logo_stream:
             header_left.append(Image(logo_stream, width=34 * mm, height=16 * mm))
             header_left.append(Spacer(1, 2 * mm))
-        header_left.extend([Paragraph("<font color='#0F5B2A'><b>ZALA/ECO ENERGY Orders Report</b></font>", styles["Title"]), Paragraph("Order register export generated from ZALA/ECO ENERGY.", styles["Normal"])])
+        header_left.extend([Paragraph("<font color='#0F5B2A'><b>ZALA Terminal Orders Report</b></font>", styles["Title"]), Paragraph("Order register export generated from ZALA Terminal.", styles["Normal"])])
         header_right = [Paragraph("<b>Report</b><br/>Orders Register", styles["Normal"]), Spacer(1, 2), Paragraph(f"<b>Generated</b><br/>{timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}", styles["Normal"]), Spacer(1, 2), Paragraph(f"<b>Total Orders</b><br/>{queryset.count()}", styles["Normal"])]
         header_table = Table([[header_left, header_right]], colWidths=[170 * mm, 85 * mm])
         header_table.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#D1E7D7")), ("BACKGROUND", (1, 0), (1, 0), colors.HexColor("#EAF7EF")), ("LEFTPADDING", (0, 0), (-1, -1), 10), ("RIGHTPADDING", (0, 0), (-1, -1), 10), ("TOPPADDING", (0, 0), (-1, -1), 10), ("BOTTOMPADDING", (0, 0), (-1, -1), 10), ("VALIGN", (0, 0), (-1, -1), "TOP")]))

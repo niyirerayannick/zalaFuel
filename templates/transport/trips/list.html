@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load currency_tags %}
 
-{% block title %}Trips | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Trips | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!route) return ['Select a route', 'Select a route'];
             const text = route.options[route.selectedIndex] ? route.options[route.selectedIndex].text : '';
             if (!text) return ['Select a route', 'Select a route'];
-            const parts = text.split(/[-Ã¢â‚¬â€œ>]+/).map(function (item) { return item.trim(); }).filter(Boolean);
+            const parts = text.split(/[-ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“>]+/).map(function (item) { return item.trim(); }).filter(Boolean);
             if (parts.length >= 2) return [parts[0], parts[parts.length - 1]];
             return [text, text];
         }

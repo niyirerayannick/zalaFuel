@@ -19,7 +19,7 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_FROM_NAME = config("EMAIL_FROM_NAME", default="ZALA/ECO ENERGY Notifications")
+    EMAIL_FROM_NAME = config("EMAIL_FROM_NAME", default="ZALA Terminal Notifications")
     EMAIL_FROM_ADDRESS = config("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
     DEFAULT_FROM_EMAIL = formataddr((EMAIL_FROM_NAME, EMAIL_FROM_ADDRESS))
 else:

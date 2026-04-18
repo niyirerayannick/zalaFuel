@@ -313,7 +313,7 @@
                         </div>
                         <div>
                             <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Ownership</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ trip.vehicle.get_ownership_type_display }}{% if trip.vehicle.owner %} Ã‚Â· {{ trip.vehicle.owner.name }}{% endif %}</dd>
+                            <dd class="mt-1 text-sm text-gray-900">{{ trip.vehicle.get_ownership_type_display }}{% if trip.vehicle.owner %} Ãƒâ€šÃ‚Â· {{ trip.vehicle.owner.name }}{% endif %}</dd>
                         </div>
                         <div>
                             <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Route</dt>
@@ -425,7 +425,7 @@
                                 {% for shipment in shipments %}
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-3 text-sm font-medium text-gray-900"><a href="{% url 'transport:orders:detail' shipment.order.pk %}" class="text-blue-600 hover:text-blue-800 hover:underline">{{ shipment.order.order_number }}</a></td>
-                                    <td class="px-6 py-3 text-sm text-gray-700">{% if request.user|has_group:"Customer" %}{{ brand_name|default:"ZALA/ECO ENERGY" }}{% else %}{{ shipment.customer.company_name }}{% endif %}</td>
+                                    <td class="px-6 py-3 text-sm text-gray-700">{% if request.user|has_group:"Customer" %}{{ brand_name|default:"ZALA Terminal" }}{% else %}{{ shipment.customer.company_name }}{% endif %}</td>
                                     <td class="px-6 py-3 text-sm text-gray-700">{{ shipment.weight_kg }} kg</td>
                                     <td class="px-6 py-3 text-sm text-gray-700">{{ shipment.quantity }}</td>
                                     <td class="px-6 py-3 text-sm text-gray-700">{{ shipment.get_carriage_type_display }}</td>

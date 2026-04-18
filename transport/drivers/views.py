@@ -30,7 +30,7 @@ from .forms import DriverForm
 
 
 def _logo_path():
-    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA/ECO ENERGY.png"
+    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA Terminal.png"
     return candidate if candidate.exists() else None
 
 
@@ -152,7 +152,7 @@ class DriverExcelExportView(DriverExportMixin, ListView):
         )
 
         sheet.merge_cells("A1:G1")
-        sheet["A1"] = "ZALA/ECO ENERGY Driver Report"
+        sheet["A1"] = "ZALA Terminal Driver Report"
         sheet["A1"].font = Font(color="0F5B2A", bold=True, size=16)
         sheet.merge_cells("A2:G2")
         sheet["A2"] = f"Driver register export generated on {timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}"
@@ -222,8 +222,8 @@ class DriverPdfExportView(DriverExportMixin, ListView):
             header_left.append(Spacer(1, 2 * mm))
         header_left.extend(
             [
-                Paragraph("<font color='#0F5B2A'><b>ZALA/ECO ENERGY Driver Report</b></font>", styles["Title"]),
-                Paragraph("Driver register export generated from the ZALA/ECO ENERGY directory.", styles["Normal"]),
+                Paragraph("<font color='#0F5B2A'><b>ZALA Terminal Driver Report</b></font>", styles["Title"]),
+                Paragraph("Driver register export generated from the ZALA Terminal directory.", styles["Normal"]),
             ]
         )
         header_right = [
@@ -306,14 +306,14 @@ class DriverDetailView(StaffRequiredMixin, DetailView):
         tab = self.request.GET.get('tab', 'overview')
         context['current_tab'] = tab
         
-        # Recent trips Ã¢â‚¬â€ real data from Trip model
+        # Recent trips ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â real data from Trip model
         from transport.trips.models import Trip
         driver_trips = Trip.objects.filter(driver=driver).select_related(
             'vehicle', 'customer', 'route', 'commodity_type',
         ).order_by('-created_at')
         context['recent_trips'] = driver_trips[:10]
         
-        # Performance metrics Ã¢â‚¬â€ computed from actual trips
+        # Performance metrics ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â computed from actual trips
         from django.db.models import Sum, Count, Avg
         stats = driver_trips.aggregate(
             total_trips=Count('id'),

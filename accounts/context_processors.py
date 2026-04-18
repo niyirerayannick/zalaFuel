@@ -21,7 +21,7 @@ def system_settings(request):
     brand_name = getattr(
         django_settings,
         "BRAND_NAME",
-        "ZALA/ECO ENERGY",
+        "ZALA Terminal",
     )
     
     # Define the color mapping

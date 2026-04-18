@@ -150,7 +150,7 @@ class UserManagementAccessMixin(LoginRequiredMixin):
 
 
 def _logo_path():
-    candidate = Path(__file__).resolve().parents[1] / "static" / "img" / "ZALA/ECO ENERGY.png"
+    candidate = Path(__file__).resolve().parents[1] / "static" / "img" / "ZALA Terminal.png"
     return candidate if candidate.exists() else None
 
 
@@ -246,24 +246,24 @@ def send_login_security_alert(user, *, ip_address, user_agent, happened_at, loca
     readable_time = timezone.localtime(happened_at).strftime("%d/%m/%Y %H:%M")
     device_text = user_agent or "Unknown device"
     sms_message = (
-        f"ZALA/ECO ENERGY security alert: new login detected at {readable_time} from IP "
+        f"ZALA Terminal security alert: new login detected at {readable_time} from IP "
         f"{ip_address or 'unknown'}. If this was not you, change your password now."
     )
 
     try:
         send_atms_email(
-            subject="ZALA/ECO ENERGY security alert: new login detected",
+            subject="ZALA Terminal security alert: new login detected",
             to=[user.email],
             greeting=f"Hello {user.full_name}",
             headline="Security Alert",
-            intro="ZALA/ECO ENERGY noticed a sign-in to your account from a new device or location.",
+            intro="ZALA Terminal noticed a sign-in to your account from a new device or location.",
             details=[
                 {"label": "Time", "value": readable_time},
                 {"label": "Location", "value": location},
                 {"label": "IP Address", "value": ip_address or "Unknown"},
                 {"label": "Device", "value": device_text},
             ],
-            note="If this was not you, change your password immediately and contact ZALA/ECO ENERGY support.",
+            note="If this was not you, change your password immediately and contact ZALA Terminal support.",
             cta_label="Secure Account Now",
             cta_url=secure_account_url,
         )
@@ -288,7 +288,7 @@ class PasswordResetRequestView(View):
 
         user = User.objects.filter(email=form.cleaned_data["email"], is_active=True).first()
         if not user:
-            messages.success(request, "If that email exists in ZALA/ECO ENERGY, a recovery message has been sent.")
+            messages.success(request, "If that email exists in ZALA Terminal, a recovery message has been sent.")
             return redirect("accounts:password_reset")
 
         verification = PasswordResetVerification.issue_for_user(
@@ -301,11 +301,11 @@ class PasswordResetRequestView(View):
         request.session.pop(PASSWORD_RESET_EMAIL_WARNING_SESSION_KEY, None)
         try:
             send_atms_email(
-                subject="ZALA/ECO ENERGY password reset verification code",
+                subject="ZALA Terminal password reset verification code",
                 to=[user.email],
                 greeting=f"Hello {user.full_name}",
                 headline="Password Reset Verification",
-                intro="Use the one-time verification code below to continue resetting your ZALA/ECO ENERGY password.",
+                intro="Use the one-time verification code below to continue resetting your ZALA Terminal password.",
                 details=[
                     {"label": "Verification Code", "value": verification.raw_code},
                     {"label": "Validity", "value": "10 minutes"},
@@ -579,7 +579,7 @@ class LoginVerificationView(View):
             request,
             user,
             ActivityLog.ActionType.LOGIN,
-            f"User signed in to ZALA/ECO ENERGY dashboard from {ip_address or 'unknown IP'}",
+            f"User signed in to ZALA Terminal dashboard from {ip_address or 'unknown IP'}",
         )
         if previous_login and (
             (previous_login.ip_address or "") != (ip_address or "")
@@ -622,7 +622,7 @@ class LoginView(View):
         request.session.pop(LOGIN_FALLBACK_CODE_SESSION_KEY, None)
         request.session.pop(LOGIN_EMAIL_WARNING_SESSION_KEY, None)
         sms_message = (
-            f"ZALA/ECO ENERGY verification code: {verification.raw_code}. "
+            f"ZALA Terminal verification code: {verification.raw_code}. "
             "It expires in 10 minutes. Do not share this code."
         )
         email_sent = False
@@ -634,11 +634,11 @@ class LoginView(View):
 
         try:
             send_atms_email(
-                subject="ZALA/ECO ENERGY login verification code",
+                subject="ZALA Terminal login verification code",
                 to=[user.email],
                 greeting=f"Hello {user.full_name}",
                 headline="Login Verification",
-                intro="Use the verification code below to complete your ZALA/ECO ENERGY sign-in securely.",
+                intro="Use the verification code below to complete your ZALA Terminal sign-in securely.",
                 details=[
                     {"label": "Verification Code", "value": verification.raw_code},
                     {"label": "Validity", "value": "10 minutes"},
@@ -705,7 +705,7 @@ class LogoutView(LoginRequiredMixin, View):
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
-        log_user_activity(request, request.user, ActivityLog.ActionType.LOGOUT, "User logged out of ZALA/ECO ENERGY")
+        log_user_activity(request, request.user, ActivityLog.ActionType.LOGOUT, "User logged out of ZALA Terminal")
         logout(request)
         messages.success(request, "You have been logged out.")
         return redirect("accounts:login")
@@ -923,7 +923,7 @@ class UserExcelExportView(UserExportMixin, ListView):
         header_font = Font(color="FFFFFF", bold=True)
         thin_border = Border(left=Side(style="thin", color="D1D5DB"), right=Side(style="thin", color="D1D5DB"), top=Side(style="thin", color="D1D5DB"), bottom=Side(style="thin", color="D1D5DB"))
         sheet.merge_cells("A1:I1")
-        sheet["A1"] = "ZALA/ECO ENERGY Users Report"
+        sheet["A1"] = "ZALA Terminal Users Report"
         sheet["A1"].font = Font(color="0C5069", bold=True, size=16)
         sheet.merge_cells("A2:I2")
         sheet["A2"] = f"Generated on {timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}"
@@ -978,7 +978,7 @@ class UserPdfExportView(UserExportMixin, ListView):
         if logo_stream:
             header_left.append(Image(logo_stream, width=34 * mm, height=16 * mm))
             header_left.append(Spacer(1, 2 * mm))
-        header_left.extend([Paragraph("<font color='#0C5069'><b>ZALA/ECO ENERGY Users Report</b></font>", styles["Title"]), Paragraph("Internal fuel station staff directory export.", styles["Normal"])])
+        header_left.extend([Paragraph("<font color='#0C5069'><b>ZALA Terminal Users Report</b></font>", styles["Title"]), Paragraph("Internal fuel station staff directory export.", styles["Normal"])])
         header_right = [Paragraph("<b>Report</b><br/>Users Register", styles["Normal"]), Spacer(1, 2), Paragraph(f"<b>Generated</b><br/>{timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}", styles["Normal"]), Spacer(1, 2), Paragraph(f"<b>Total Users</b><br/>{len(users)}", styles["Normal"])]
         header_table = Table([[header_left, header_right]], colWidths=[170 * mm, 85 * mm])
         header_table.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#D1E7D7")), ("BACKGROUND", (1, 0), (1, 0), colors.HexColor("#EAF7EF")), ("LEFTPADDING", (0, 0), (-1, -1), 10), ("RIGHTPADDING", (0, 0), (-1, -1), 10), ("TOPPADDING", (0, 0), (-1, -1), 10), ("BOTTOMPADDING", (0, 0), (-1, -1), 10), ("VALIGN", (0, 0), (-1, -1), "TOP")]))
@@ -1037,11 +1037,11 @@ class UserCreateView(UserManagementAccessMixin, CreateView):
 
         try:
             send_atms_email(
-                subject="Your ZALA/ECO ENERGY account has been created",
+                subject="Your ZALA Terminal account has been created",
                 to=[user.email],
                 greeting=f"Hello {user.full_name}",
                 headline="Account Created Successfully",
-                intro="Your user account has been created in the ZALA/ECO ENERGY. Use the credentials below to sign in.",
+                intro="Your user account has been created in the ZALA Terminal. Use the credentials below to sign in.",
                 details=[
                     {"label": "Email", "value": user.email},
                     {"label": "Temporary Password", "value": raw_password},
@@ -1159,11 +1159,11 @@ class UserPasswordResetTriggerView(UserManagementAccessMixin, View):
         user.save(update_fields=["password", "must_change_password", "session_invalid_before"])
         try:
             send_atms_email(
-                subject="ZALA/ECO ENERGY temporary password",
+                subject="ZALA Terminal temporary password",
                 to=[user.email],
                 greeting=f"Hello {user.full_name}",
                 headline="Temporary Password Issued",
-                intro="An administrator reset your ZALA/ECO ENERGY password. Sign in with this temporary password and create a new one immediately.",
+                intro="An administrator reset your ZALA Terminal password. Sign in with this temporary password and create a new one immediately.",
                 details=[
                     {"label": "Login Email", "value": user.email},
                     {"label": "Temporary Password", "value": temporary_password},
@@ -1565,7 +1565,7 @@ class SystemSettingsView(AdminMixin, View):
         return ip
 
 
-# Ã¢â€â‚¬Ã¢â€â‚¬ Currency exchange-rate API Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Currency exchange-rate API ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 @login_required_fn
 def exchange_rates_api(request):
     """

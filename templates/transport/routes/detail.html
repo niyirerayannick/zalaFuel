@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load currency_tags %}
 
-{% block title %}{{ route.origin }} Ã¢â€ â€™ {{ route.destination }} - Route Details | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}{{ route.origin }} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {{ route.destination }} - Route Details | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="ml-6">
-                    <h1 class="text-3xl font-bold text-gray-900">{{ route.origin }} Ã¢â€ â€™ {{ route.destination }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ route.origin }} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {{ route.destination }}</h1>
                     <div class="mt-2 flex items-center space-x-3">
                         {% if route.is_active %}
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">

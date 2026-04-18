@@ -261,7 +261,7 @@ class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 @login_required
 def dashboard_view(request):
-    """Main ZALA/ECO ENERGY dashboard showing key metrics and recent activity."""
+    """Main ZALA Terminal dashboard showing key metrics and recent activity."""
     if request.user.role not in ["superadmin", "admin", "manager"]:
         return render(request, "transport/access_denied.html")
 
@@ -358,7 +358,7 @@ def dashboard_api(request):
 def documentation_view(request):
     context = {
         "page_title": "System Documentation",
-        "page_subtitle": "Understand how each ZALA/ECO ENERGY module works, what data it manages, and how the workflows connect.",
+        "page_subtitle": "Understand how each ZALA Terminal module works, what data it manages, and how the workflows connect.",
         "current_range": normalize_range_key(request.GET.get("range", "month")),
         "documentation_modules": DOCUMENTATION_MODULES,
         "documentation_quick_links": [

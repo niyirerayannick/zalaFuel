@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Deliveries | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Deliveries | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
@@ -83,7 +83,7 @@
                         </td>
                         <td class="px-4 py-3">
                             <div class="text-sm font-semibold text-slate-900">{{ delivery.purchase_order.supplier.name }}</div>
-                            <div class="text-xs text-slate-500">{{ delivery.purchase_order.reference }} Ã¢â‚¬Â¢ {{ delivery.purchase_order.station.name }}</div>
+                            <div class="text-xs text-slate-500">{{ delivery.purchase_order.reference }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ delivery.purchase_order.station.name }}</div>
                         </td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ delivery.tank.name|default:"Unassigned" }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ delivery.delivered_volume }} L</td>

@@ -207,7 +207,7 @@ class TripWorkflowService:
         trip.validate_status_transition(trip.status, Trip.TripStatus.IN_TRANSIT)
         trip.status = Trip.TripStatus.IN_TRANSIT
         trip.save(update_fields=["status", "updated_at"])
-        trip.shipments.update(status=Shipment.Status.IN_TRANSIT, sender_name="ZALA/ECO ENERGY")
+        trip.shipments.update(status=Shipment.Status.IN_TRANSIT, sender_name="ZALA Terminal")
         if trip.driver:
             trip.driver.status = trip.driver.DriverStatus.ASSIGNED
             trip.driver.availability_status = trip.driver.AvailabilityStatus.IN_TRANSIT
@@ -229,7 +229,7 @@ class TripWorkflowService:
         trip.validate_status_transition(trip.status, Trip.TripStatus.COMPLETED)
         trip.status = Trip.TripStatus.COMPLETED
         trip.save(update_fields=["status", "updated_at"])
-        trip.shipments.update(status=Shipment.Status.DELIVERED, sender_name="ZALA/ECO ENERGY")
+        trip.shipments.update(status=Shipment.Status.DELIVERED, sender_name="ZALA Terminal")
         if trip.vehicle:
             trip.vehicle.status = trip.vehicle.VehicleStatus.AVAILABLE
             trip.vehicle.save(update_fields=["status", "updated_at"])
@@ -261,7 +261,7 @@ def add_shipment(*, trip, order, customer, quantity, carriage_type=Shipment.Carr
         carriage_type=carriage_type,
         container_number=container_number,
         status=Shipment.Status.ASSIGNED if trip else Shipment.Status.PENDING,
-        sender_name="ZALA/ECO ENERGY",
+        sender_name="ZALA Terminal",
     )
     shipment.full_clean()
     shipment.save()

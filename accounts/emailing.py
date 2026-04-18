@@ -34,7 +34,7 @@ def send_atms_email(
     note=None,
     cta_label=None,
     cta_url=None,
-    closing="ZALA/ECO ENERGY Notification Center",
+    closing="ZALA Terminal Notification Center",
     attachments=None,
 ):
     details = details or []
@@ -50,8 +50,8 @@ def send_atms_email(
         "cta_label": cta_label,
         "cta_url": cta_url,
         "closing": closing,
-        "from_name": getattr(settings, "EMAIL_FROM_NAME", "ZALA/ECO ENERGY Notification Center"),
-        "company_name": "ZALA/ECO ENERGY",
+        "from_name": getattr(settings, "EMAIL_FROM_NAME", "ZALA Terminal Notification Center"),
+        "company_name": "ZALA Terminal",
     }
 
     text_body = render_to_string("emails/base.txt", context)

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Inventory | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Inventory | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
@@ -8,7 +8,7 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fuel Operations</p>
                 <h1 class="mt-1 text-2xl font-bold text-slate-900">Inventory</h1>
-                <p class="mt-1 text-sm text-slate-600">Tank Ã¢â€ â€™ Nozzle Ã¢â€ â€™ Pump Ã¢â€ â€™ Sales Ã¢â€ â€™ Inventory trail.</p>
+                <p class="mt-1 text-sm text-slate-600">Tank ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Nozzle ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Pump ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Sales ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Inventory trail.</p>
             </div>
             <div class="flex gap-2">
                 <a href="{% url 'inventory:tanks' %}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0f7ea6] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0c5069]">
@@ -73,8 +73,8 @@
                     {% for rec in recent_records %}
                     <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
                         <div>
-                            <p class="text-sm font-semibold text-slate-900">{{ rec.tank.name }} Ã¢â‚¬Â¢ {{ rec.tank.station.name }}</p>
-                            <p class="text-xs text-slate-500">{{ rec.get_change_type_display }} Ã¢â‚¬Â¢ {{ rec.quantity }} L</p>
+                            <p class="text-sm font-semibold text-slate-900">{{ rec.tank.name }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ rec.tank.station.name }}</p>
+                            <p class="text-xs text-slate-500">{{ rec.get_change_type_display }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ rec.quantity }} L</p>
                         </div>
                         <div class="text-right">
                             <p class="text-xs text-slate-500">{{ rec.created_at|date:"Y-m-d H:i" }}</p>
@@ -97,7 +97,7 @@
                 {% if low_tanks %}
                     {% for t in low_tanks %}
                     <div class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2">
-                        <p class="text-sm font-semibold text-rose-800">{{ t.name }} Ã¢â‚¬Â¢ {{ t.station.name }}</p>
+                        <p class="text-sm font-semibold text-rose-800">{{ t.name }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ t.station.name }}</p>
                         <p class="text-xs text-rose-700">Stock {{ t.current_volume_liters }} L / Threshold {{ t.low_level_threshold }} L</p>
                     </div>
                     {% endfor %}

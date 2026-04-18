@@ -77,16 +77,16 @@ class CommandParserTestCase(TestCase):
 
     def test_help_command(self):
         reply = parse_and_execute("+250788100200", "HELP")
-        self.assertIn("ZALA/ECO ENERGY WhatsApp Menu", reply)
+        self.assertIn("ZALA Terminal WhatsApp Menu", reply)
         self.assertIn("Accept", reply)
 
     def test_help_case_insensitive(self):
         reply = parse_and_execute("+250788100200", "help")
-        self.assertIn("ZALA/ECO ENERGY WhatsApp Menu", reply)
+        self.assertIn("ZALA Terminal WhatsApp Menu", reply)
 
     def test_help_hi(self):
         reply = parse_and_execute("+250788100200", "Hi")
-        self.assertIn("ZALA/ECO ENERGY WhatsApp Menu", reply)
+        self.assertIn("ZALA Terminal WhatsApp Menu", reply)
 
     # ---- Numbered shortcuts ----
 
@@ -176,7 +176,7 @@ class CommandParserTestCase(TestCase):
         self.trip.save(update_fields=["status", "km_start", "updated_at"])
         phone = "+250788100200"
 
-        # Step 1: driver sends DELIVERED Ã¢â€ â€™ system asks for odometer end
+        # Step 1: driver sends DELIVERED ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ system asks for odometer end
         reply = parse_and_execute(phone, f"DELIVERED {self.trip.order_number}")
         self.assertIn("odometer", reply.lower())
         self.assertIn("125430", reply)  # shows km_start

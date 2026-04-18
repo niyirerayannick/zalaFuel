@@ -63,7 +63,7 @@ from .services import (
 
 
 def _logo_path():
-    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA/ECO ENERGY.png"
+    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA Terminal.png"
     return candidate if candidate.exists() else None
 
 
@@ -262,7 +262,7 @@ class TripListExcelExportView(TripListExportMixin, ListView):
         header_font = Font(color="FFFFFF", bold=True)
         thin_border = Border(left=Side(style="thin", color="D1D5DB"), right=Side(style="thin", color="D1D5DB"), top=Side(style="thin", color="D1D5DB"), bottom=Side(style="thin", color="D1D5DB"))
         sheet.merge_cells("A1:H1")
-        sheet["A1"] = "ZALA/ECO ENERGY Trips Report"
+        sheet["A1"] = "ZALA Terminal Trips Report"
         sheet["A1"].font = Font(color="0F5B2A", bold=True, size=16)
         sheet.merge_cells("A2:H2")
         sheet["A2"] = f"Generated on {timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}"
@@ -316,7 +316,7 @@ class TripListPdfExportView(TripListExportMixin, ListView):
         if logo_stream:
             header_left.append(Image(logo_stream, width=34 * mm, height=16 * mm))
             header_left.append(Spacer(1, 2 * mm))
-        header_left.extend([Paragraph("<font color='#0F5B2A'><b>ZALA/ECO ENERGY Trips Report</b></font>", styles["Title"]), Paragraph("Trips overview export generated from ZALA/ECO ENERGY.", styles["Normal"])])
+        header_left.extend([Paragraph("<font color='#0F5B2A'><b>ZALA Terminal Trips Report</b></font>", styles["Title"]), Paragraph("Trips overview export generated from ZALA Terminal.", styles["Normal"])])
         header_right = [Paragraph("<b>Report</b><br/>Trips Register", styles["Normal"]), Spacer(1, 2), Paragraph(f"<b>Generated</b><br/>{timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}", styles["Normal"]), Spacer(1, 2), Paragraph(f"<b>Total Trips</b><br/>{queryset.count()}", styles["Normal"])]
         header_table = Table([[header_left, header_right]], colWidths=[170 * mm, 85 * mm])
         header_table.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#D1E7D7")), ("BACKGROUND", (1, 0), (1, 0), colors.HexColor("#EAF7EF")), ("LEFTPADDING", (0, 0), (-1, -1), 10), ("RIGHTPADDING", (0, 0), (-1, -1), 10), ("TOPPADDING", (0, 0), (-1, -1), 10), ("BOTTOMPADDING", (0, 0), (-1, -1), 10), ("VALIGN", (0, 0), (-1, -1), "TOP")]))
@@ -438,11 +438,11 @@ class TripCreateView(TripFormResponseMixin, OperationsAccessMixin, CreateView):
         if manager_emails:
             try:
                 send_atms_email(
-                    subject=f"ZALA/ECO ENERGY approval required for trip {self.object.order_number}",
+                    subject=f"ZALA Terminal approval required for trip {self.object.order_number}",
                     to=manager_emails,
                     greeting="Hello Manager",
                     headline="Trip Approval Required",
-                    intro="A new trip was created and is waiting for approval in ZALA/ECO ENERGY.",
+                    intro="A new trip was created and is waiting for approval in ZALA Terminal.",
                     details=[
                         {"label": "Trip Reference", "value": self.object.order_number},
                         {"label": "Driver", "value": self.object.driver.name},
@@ -633,7 +633,7 @@ class ShipmentExcelExportView(ShipmentExportMixin, ListView):
         header_font = Font(color="FFFFFF", bold=True)
         thin_border = Border(left=Side(style="thin", color="D1D5DB"), right=Side(style="thin", color="D1D5DB"), top=Side(style="thin", color="D1D5DB"), bottom=Side(style="thin", color="D1D5DB"))
         sheet.merge_cells("A1:I1")
-        sheet["A1"] = "ZALA/ECO ENERGY Shipments Report"
+        sheet["A1"] = "ZALA Terminal Shipments Report"
         sheet["A1"].font = Font(color="0F5B2A", bold=True, size=16)
         sheet.merge_cells("A2:I2")
         sheet["A2"] = f"Generated on {timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}"
@@ -688,7 +688,7 @@ class ShipmentPdfExportView(ShipmentExportMixin, ListView):
         if logo_stream:
             header_left.append(Image(logo_stream, width=34 * mm, height=16 * mm))
             header_left.append(Spacer(1, 2 * mm))
-        header_left.extend([Paragraph("<font color='#0F5B2A'><b>ZALA/ECO ENERGY Shipments Report</b></font>", styles["Title"]), Paragraph("Shipments overview export generated from ZALA/ECO ENERGY.", styles["Normal"])])
+        header_left.extend([Paragraph("<font color='#0F5B2A'><b>ZALA Terminal Shipments Report</b></font>", styles["Title"]), Paragraph("Shipments overview export generated from ZALA Terminal.", styles["Normal"])])
         header_right = [Paragraph("<b>Report</b><br/>Shipments Register", styles["Normal"]), Spacer(1, 2), Paragraph(f"<b>Generated</b><br/>{timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}", styles["Normal"]), Spacer(1, 2), Paragraph(f"<b>Total Shipments</b><br/>{queryset.count()}", styles["Normal"])]
         header_table = Table([[header_left, header_right]], colWidths=[170 * mm, 85 * mm])
         header_table.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#D1E7D7")), ("BACKGROUND", (1, 0), (1, 0), colors.HexColor("#EAF7EF")), ("LEFTPADDING", (0, 0), (-1, -1), 10), ("RIGHTPADDING", (0, 0), (-1, -1), 10), ("TOPPADDING", (0, 0), (-1, -1), 10), ("BOTTOMPADDING", (0, 0), (-1, -1), 10), ("VALIGN", (0, 0), (-1, -1), "TOP")]))
@@ -888,7 +888,7 @@ def email_trip_report(request, trip_id):
             to=recipient_emails,
             greeting="Hello Team",
             headline="Trip Report Shared",
-            intro="A trip report has been shared from ZALA/ECO ENERGY.",
+            intro="A trip report has been shared from ZALA Terminal.",
             details=[
                 {"label": "Trip Reference", "value": trip.order_number},
                 {"label": "Customer", "value": trip.customer.company_name},

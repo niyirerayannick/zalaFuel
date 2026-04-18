@@ -1,4 +1,4 @@
-# ZALA/ECO ENERGY
+# ZALA Terminal
 
 This Django project is now prepared for Docker-based deployment on Coolify with PostgreSQL.
 
@@ -19,7 +19,7 @@ CSRF_TRUSTED_ORIGINS=https://your-domain.com,https://www.your-domain.com
 TIME_ZONE=Africa/Johannesburg
 DATABASE_URL=postgres://USER:PASSWORD@HOST:PORT/DBNAME
 DATABASE_SSL_REQUIRE=False
-DJANGO_SUPERUSER_FULL_NAME=ZALA/ECO ENERGY Administrator
+DJANGO_SUPERUSER_FULL_NAME=ZALA Terminal Administrator
 DJANGO_SUPERUSER_EMAIL=admin@your-domain.com
 DJANGO_SUPERUSER_PASSWORD=change-me
 ```

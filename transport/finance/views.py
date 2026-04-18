@@ -50,7 +50,7 @@ AFRILOTT_LIGHT_GREEN = "EAF7EF"
 
 
 def _finance_logo_path():
-    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA/ECO ENERGY.png"
+    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA Terminal.png"
     return candidate if candidate.exists() else None
 
 
@@ -594,7 +594,7 @@ class FinanceAnalysisExcelExportView(FinanceAnalysisExportMixin, View):
             sheet.add_image(logo_image, "A1")
 
         sheet.merge_cells("C1:F1")
-        sheet["C1"] = "ZALA/ECO ENERGY Financial Analysis"
+        sheet["C1"] = "ZALA Terminal Financial Analysis"
         sheet["C1"].font = Font(color=AFRILOTT_GREEN, bold=True, size=16)
         sheet["C1"].alignment = Alignment(horizontal="left", vertical="center")
         sheet.merge_cells("C2:F2")
@@ -673,7 +673,7 @@ class FinanceAnalysisPdfExportView(FinanceAnalysisExportMixin, View):
             header_left.append(Spacer(1, 2 * mm))
         header_left.extend(
             [
-                Paragraph("<font color='#0F5B2A'><b>ZALA/ECO ENERGY Financial Analysis</b></font>", styles["Title"]),
+                Paragraph("<font color='#0F5B2A'><b>ZALA Terminal Financial Analysis</b></font>", styles["Title"]),
                 Paragraph("Filtered finance overview comparing payments, expenses, and profitability.", styles["Normal"]),
             ]
         )
@@ -928,7 +928,7 @@ class PaymentExcelExportView(PaymentExportMixin, View):
             sheet.add_image(logo_image, "A1")
 
         sheet.merge_cells("C1:G1")
-        sheet["C1"] = "ZALA/ECO ENERGY Revenue Financial Report"
+        sheet["C1"] = "ZALA Terminal Revenue Financial Report"
         sheet["C1"].font = Font(color=AFRILOTT_GREEN, bold=True, size=16)
         sheet["C1"].alignment = Alignment(horizontal="left", vertical="center")
 
@@ -1018,7 +1018,7 @@ class PaymentPdfExportView(PaymentExportMixin, View):
             header_left.append(Spacer(1, 2 * mm))
         header_left.extend(
             [
-                Paragraph("<font color='#0F5B2A'><b>ZALA/ECO ENERGY Revenue Financial Report</b></font>", styles["Title"]),
+                Paragraph("<font color='#0F5B2A'><b>ZALA Terminal Revenue Financial Report</b></font>", styles["Title"]),
                 Paragraph("Generated from the finance payments report with active filters applied.", styles["Normal"]),
             ]
         )
@@ -1254,7 +1254,7 @@ class PaymentInvoiceVerifyView(View):
         </head>
         <body>
             <div class="card">
-                <div class="eyebrow">ZALA/ECO ENERGY Authenticity Check</div>
+                <div class="eyebrow">ZALA Terminal Authenticity Check</div>
                 <div class="status">{status_text}</div>
                 <div class="grid">
                     <div class="label">Invoice Reference</div><div class="value">{getattr(payment, 'reference', '-') if payment else '-'}</div>
@@ -1265,7 +1265,7 @@ class PaymentInvoiceVerifyView(View):
                     <div class="label">Payment Status</div><div class="value">{payment.get_status_display() if payment else '-'}</div>
                 </div>
                 <div class="notice">
-                    {"This invoice matches the signed ZALA/ECO ENERGY verification token." if is_valid else (error or "This invoice could not be verified.")}
+                    {"This invoice matches the signed ZALA Terminal verification token." if is_valid else (error or "This invoice could not be verified.")}
                 </div>
             </div>
         </body>
@@ -1410,7 +1410,7 @@ class ExpenseExcelExportView(ExpenseExportMixin, View):
             sheet.add_image(logo_image, "A1")
 
         sheet.merge_cells("C1:H1")
-        sheet["C1"] = "ZALA/ECO ENERGY Expense Financial Report"
+        sheet["C1"] = "ZALA Terminal Expense Financial Report"
         sheet["C1"].font = Font(color=AFRILOTT_GREEN, bold=True, size=16)
         sheet["C1"].alignment = Alignment(horizontal="left", vertical="center")
 
@@ -1501,7 +1501,7 @@ class ExpensePdfExportView(ExpenseExportMixin, View):
             header_left.append(Spacer(1, 2 * mm))
         header_left.extend(
             [
-                Paragraph("<font color='#0F5B2A'><b>ZALA/ECO ENERGY Expense Financial Report</b></font>", styles["Title"]),
+                Paragraph("<font color='#0F5B2A'><b>ZALA Terminal Expense Financial Report</b></font>", styles["Title"]),
                 Paragraph("Generated from the finance expenses report with active filters applied.", styles["Normal"]),
             ]
         )
@@ -1822,11 +1822,11 @@ class ExpenseCreateView(ExpensePanelMixin, FinanceModalFormMixin, FinanceWriteAc
             vehicle_label = self.object.vehicle.plate_number if self.object.vehicle_id else "Not linked"
             try:
                 send_atms_email(
-                    subject=f"ZALA/ECO ENERGY approval required for expense #{self.object.pk}",
+                    subject=f"ZALA Terminal approval required for expense #{self.object.pk}",
                     to=manager_emails,
                     greeting="Hello Manager",
                     headline="Expense Approval Required",
-                    intro="A new expense was recorded in ZALA/ECO ENERGY and is waiting for approval.",
+                    intro="A new expense was recorded in ZALA Terminal and is waiting for approval.",
                     details=[
                         {"label": "Expense ID", "value": str(self.object.pk)},
                         {"label": "Trip", "value": trip_label},

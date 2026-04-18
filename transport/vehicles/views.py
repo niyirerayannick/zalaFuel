@@ -28,7 +28,7 @@ from .forms import VehicleForm, VehicleOwnerForm
 
 
 def _logo_path():
-    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA/ECO ENERGY.png"
+    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA Terminal.png"
     return candidate if candidate.exists() else None
 
 
@@ -155,7 +155,7 @@ class VehicleExcelExportView(VehicleExportMixin, ListView):
         )
 
         sheet.merge_cells("A1:H1")
-        sheet["A1"] = "ZALA/ECO ENERGY Vehicle Report"
+        sheet["A1"] = "ZALA Terminal Vehicle Report"
         sheet["A1"].font = Font(color="0F5B2A", bold=True, size=16)
         sheet.merge_cells("A2:H2")
         sheet["A2"] = f"Fleet register export generated on {timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}"
@@ -226,7 +226,7 @@ class VehiclePdfExportView(VehicleExportMixin, ListView):
             header_left.append(Spacer(1, 2 * mm))
         header_left.extend(
             [
-                Paragraph("<font color='#0F5B2A'><b>ZALA/ECO ENERGY Vehicle Report</b></font>", styles["Title"]),
+                Paragraph("<font color='#0F5B2A'><b>ZALA Terminal Vehicle Report</b></font>", styles["Title"]),
                 Paragraph("Fleet list export generated from the vehicle register.", styles["Normal"]),
             ]
         )

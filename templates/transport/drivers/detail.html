@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load currency_tags %}
 
-{% block title %}{{ driver.name }} - Driver Details | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}{{ driver.name }} - Driver Details | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -183,7 +183,7 @@
                                         <a href="{% url 'transport:trips:detail' trip.pk %}" class="text-blue-600 hover:underline">{{ trip.order_number }}</a>
                                     </td>
                                     <td class="px-3 py-2 text-sm text-gray-900">{{ trip.customer.company_name }}</td>
-                                    <td class="px-3 py-2 text-sm text-gray-500">{{ trip.route.origin }} Ã¢â€ â€™ {{ trip.route.destination }}</td>
+                                    <td class="px-3 py-2 text-sm text-gray-500">{{ trip.route.origin }} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {{ trip.route.destination }}</td>
                                     <td class="px-3 py-2 text-sm text-gray-500">{{ trip.vehicle.plate_number }}</td>
                                     <td class="px-3 py-2 text-sm">
                                         {% if trip.status == 'DELIVERED' or trip.status == 'CLOSED' %}
@@ -270,11 +270,11 @@
                 </div>
                 <div class="px-6 py-4">
                     <p class="text-sm font-medium text-blue-800">{{ active_trip.order_number }}</p>
-                    <p class="text-sm text-blue-600 mt-1">{{ active_trip.route.origin }} Ã¢â€ â€™ {{ active_trip.route.destination }}</p>
-                    <p class="text-xs text-blue-500 mt-1">{{ active_trip.get_status_display }} Ã¢â‚¬â€ {{ active_trip.vehicle.plate_number }}</p>
+                    <p class="text-sm text-blue-600 mt-1">{{ active_trip.route.origin }} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {{ active_trip.route.destination }}</p>
+                    <p class="text-xs text-blue-500 mt-1">{{ active_trip.get_status_display }} ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â {{ active_trip.vehicle.plate_number }}</p>
                     <div class="mt-3">
                         <a href="{% url 'transport:trips:detail' active_trip.pk %}" class="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-900">
-                            View Trip Details Ã¢â€ â€™
+                            View Trip Details ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢
                         </a>
                     </div>
                 </div>

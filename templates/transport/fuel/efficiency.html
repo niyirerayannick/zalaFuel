@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load currency_tags %}
 
-{% block title %}Fuel Efficiency per Vehicle | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Fuel Efficiency per Vehicle | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -105,7 +105,7 @@
                             <dd class="text-lg font-bold text-gray-900">{{ best_vehicle.plate_number }}</dd>
                             <dd class="text-xs text-green-600">{{ best_vehicle.efficiency }} km/L</dd>
                             {% else %}
-                            <dd class="text-lg font-bold text-gray-400">Ã¢â‚¬â€</dd>
+                            <dd class="text-lg font-bold text-gray-400">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</dd>
                             {% endif %}
                         </dl>
                     </div>
@@ -187,7 +187,7 @@
                                 {{ v.efficiency }} km/L
                             </span>
                             {% else %}
-                            <span class="text-gray-400">Ã¢â‚¬â€</span>
+                            <span class="text-gray-400">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</span>
                             {% endif %}
                         </td>
                         <td class="px-4 py-3 text-sm text-right">
@@ -196,7 +196,7 @@
                                 {{ v.cost_per_km|currency }}
                             </span>
                             {% else %}
-                            <span class="text-gray-400">Ã¢â‚¬â€</span>
+                            <span class="text-gray-400">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</span>
                             {% endif %}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-900 text-right">{{ v.total_liters|floatformat:1 }} L</td>
@@ -206,9 +206,9 @@
                         <td class="px-4 py-3 text-sm text-gray-500 text-right">{{ v.entry_count }}</td>
                         <td class="px-4 py-3 text-sm text-gray-500 text-center">
                             {% if v.first_entry %}
-                            {{ v.first_entry|date:"d/m/y" }} Ã¢â‚¬â€œ {{ v.last_entry|date:"d/m/y" }}
+                            {{ v.first_entry|date:"d/m/y" }} ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ {{ v.last_entry|date:"d/m/y" }}
                             {% else %}
-                            Ã¢â‚¬â€
+                            ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
                             {% endif %}
                         </td>
                     </tr>

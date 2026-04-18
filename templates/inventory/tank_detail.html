@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Tank {{ tank.name }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Tank {{ tank.name }} | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
@@ -8,7 +8,7 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-white/80">Tank</p>
                 <h1 class="mt-1 text-2xl font-bold">{{ tank.name }}</h1>
-                <p class="text-sm text-white/80">{{ tank.station.name }} Ã¢â‚¬Â¢ {{ tank.get_fuel_type_display }}</p>
+                <p class="text-sm text-white/80">{{ tank.station.name }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ tank.get_fuel_type_display }}</p>
             </div>
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <a href="{% url 'suppliers:deliveries-create' %}?tank={{ tank.pk }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25">
@@ -69,7 +69,7 @@
                     <span class="text-sm font-semibold text-slate-900">{{ noz.pump.label }}</span>
                     <span class="text-xs text-slate-500">Fuel: {{ noz.get_fuel_type_display }}</span>
                     <span class="text-xs text-slate-500">Station: {{ noz.pump.station.name }}</span>
-                    <span class="text-xs text-slate-500">Meter: {{ noz.meter_start }} Ã¢â€ â€™ {{ noz.meter_end }}</span>
+                    <span class="text-xs text-slate-500">Meter: {{ noz.meter_start }} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {{ noz.meter_end }}</span>
                     <span class="ml-auto text-xs {% if noz.is_active %}text-emerald-600{% else %}text-rose-600{% endif %}">
                         {{ noz.is_active|yesno:"Active,Inactive" }}
                     </span>
@@ -96,7 +96,7 @@
                         <div class="flex items-center justify-between gap-3">
                             <div>
                                 <p class="text-sm font-semibold text-slate-900">{{ delivery.purchase_order.supplier.name }}</p>
-                                <p class="text-xs text-slate-500">{{ delivery.delivery_reference|default:delivery.purchase_order.reference }} Ã¢â‚¬Â¢ {{ delivery.delivery_date|date:"Y-m-d" }}</p>
+                                <p class="text-xs text-slate-500">{{ delivery.delivery_reference|default:delivery.purchase_order.reference }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ delivery.delivery_date|date:"Y-m-d" }}</p>
                             </div>
                             <span class="rounded-full px-3 py-1 text-[11px] font-semibold {% if delivery.status == 'received' %}bg-emerald-50 text-emerald-700{% elif delivery.status == 'cancelled' %}bg-rose-50 text-rose-700{% else %}bg-amber-50 text-amber-700{% endif %}">
                                 {{ delivery.get_status_display }}
@@ -124,12 +124,12 @@
                     <div class="rounded-xl border border-slate-200 px-4 py-3">
                         <div class="flex items-center justify-between gap-3">
                             <div>
-                                <p class="text-sm font-semibold text-slate-900">{{ sale.nozzle.pump.label }} Ã¢â‚¬Â¢ {{ sale.nozzle.get_fuel_type_display }}</p>
-                                <p class="text-xs text-slate-500">{{ sale.created_at|date:"Y-m-d H:i" }} Ã¢â‚¬Â¢ Shift #{{ sale.shift_id }}</p>
+                                <p class="text-sm font-semibold text-slate-900">{{ sale.nozzle.pump.label }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ sale.nozzle.get_fuel_type_display }}</p>
+                                <p class="text-xs text-slate-500">{{ sale.created_at|date:"Y-m-d H:i" }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Shift #{{ sale.shift_id }}</p>
                             </div>
                             <p class="text-sm font-semibold text-slate-900">{{ sale.volume_liters }} L</p>
                         </div>
-                        <p class="mt-2 text-xs text-slate-500">Receipt {{ sale.receipt_number|default:sale.pk }} Ã¢â‚¬Â¢ {{ sale.total_amount }}</p>
+                        <p class="mt-2 text-xs text-slate-500">Receipt {{ sale.receipt_number|default:sale.pk }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ sale.total_amount }}</p>
                     </div>
                     {% endfor %}
                 </div>

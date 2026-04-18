@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load currency_tags %}
 
-{% block title %}{{ customer.company_name }} - Customer Details | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}{{ customer.company_name }} - Customer Details | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -90,7 +90,7 @@
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Contact Person</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ customer.contact_person|default:"Ã¢â‚¬â€" }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900">{{ customer.contact_person|default:"ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â" }}</dd>
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Email</dt>
@@ -106,7 +106,7 @@
                         </div>
                         <div class="sm:col-span-2">
                             <dt class="text-sm font-medium text-gray-500">Address</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ customer.address|default:"Ã¢â‚¬â€" }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900">{{ customer.address|default:"ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â" }}</dd>
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Customer Since</dt>

@@ -1,1 +1,1 @@
-# Orders module for ZALA/ECO ENERGY
+# Orders module for ZALA Terminal

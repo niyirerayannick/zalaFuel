@@ -22,7 +22,7 @@ def send_notification(*, phone_number, message, user=None):
 
 def notify_trip_invoice_ready(trip, invoice):
     message = (
-        f"ZALA/ECO ENERGY\n\n"
+        f"ZALA Terminal\n\n"
         f"Your invoice {invoice.reference} for shipment {trip.order_number} is ready.\n"
         f"Amount: {invoice.amount}\n"
         f"Route: {trip.route.origin} to {trip.route.destination}"
@@ -32,7 +32,7 @@ def notify_trip_invoice_ready(trip, invoice):
 
 def notify_customer_trip_in_transit(trip):
     message = (
-        f"ZALA/ECO ENERGY\n\n"
+        f"ZALA Terminal\n\n"
         f"Your order {trip.order_number} is now in transit.\n"
         f"Route: {trip.route.origin} to {trip.route.destination}"
     )
@@ -41,9 +41,9 @@ def notify_customer_trip_in_transit(trip):
 
 def notify_customer_delivery_confirmed(trip):
     message = (
-        f"ZALA/ECO ENERGY\n\n"
+        f"ZALA Terminal\n\n"
         f"Delivery confirmation: shipment {trip.order_number} has been completed.\n"
-        f"Thank you for shipping with ZALA/ECO ENERGY."
+        f"Thank you for shipping with ZALA Terminal."
     )
     return send_notification(phone_number=trip.customer.phone, user=getattr(trip.customer, "user", None), message=message)
 
@@ -62,7 +62,7 @@ def notify_driver_trip_assigned(trip):
         logger.warning("Skipping driver assignment notification because no driver phone is available.")
         return None
     message = (
-        f"ZALA/ECO ENERGY\n\n"
+        f"ZALA Terminal\n\n"
         f"You have been assigned to trip {trip.order_number}.\n"
         f"Route: {trip.route.origin} to {trip.route.destination}\n"
         f"Vehicle: {trip.vehicle}"

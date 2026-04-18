@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Supplier {{ supplier.name }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Supplier {{ supplier.name }} | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
@@ -8,7 +8,7 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-white/80">Supply</p>
                 <h1 class="mt-1 text-2xl font-bold">{{ supplier.name }}</h1>
-                <p class="text-sm text-white/80">{{ supplier.contact_person|default:"No contact person" }}{% if supplier.phone %} Ã¢â‚¬Â¢ {{ supplier.phone }}{% endif %}</p>
+                <p class="text-sm text-white/80">{{ supplier.contact_person|default:"No contact person" }}{% if supplier.phone %} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ supplier.phone }}{% endif %}</p>
             </div>
             <div class="flex gap-2">
                 <a href="{% url 'suppliers:purchase-orders' %}" class="inline-flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25">
@@ -49,7 +49,7 @@
                     <div class="flex items-center justify-between gap-3">
                         <div>
                             <p class="text-sm font-semibold text-slate-900">{{ po.reference }}</p>
-                            <p class="text-xs text-slate-500">{{ po.station.name }} Ã¢â‚¬Â¢ {{ po.get_fuel_type_display }}</p>
+                            <p class="text-xs text-slate-500">{{ po.station.name }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ po.get_fuel_type_display }}</p>
                         </div>
                         <span class="rounded-full px-3 py-1 text-[11px] font-semibold {% if po.status == 'delivered' %}bg-emerald-50 text-emerald-700{% elif po.status == 'ordered' %}bg-amber-50 text-amber-700{% else %}bg-slate-100 text-slate-700{% endif %}">
                             {{ po.get_status_display }}
@@ -73,7 +73,7 @@
                     <div class="flex items-center justify-between gap-3">
                         <div>
                             <p class="text-sm font-semibold text-slate-900">{{ delivery.delivery_reference|default:delivery.purchase_order.reference }}</p>
-                            <p class="text-xs text-slate-500">{{ delivery.tank.name|default:"No tank" }} Ã¢â‚¬Â¢ {{ delivery.delivery_date|date:"Y-m-d" }}</p>
+                            <p class="text-xs text-slate-500">{{ delivery.tank.name|default:"No tank" }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ delivery.delivery_date|date:"Y-m-d" }}</p>
                         </div>
                         <span class="rounded-full px-3 py-1 text-[11px] font-semibold {% if delivery.status == 'received' %}bg-emerald-50 text-emerald-700{% elif delivery.status == 'cancelled' %}bg-rose-50 text-rose-700{% else %}bg-amber-50 text-amber-700{% endif %}">
                             {{ delivery.get_status_display }}
@@ -99,7 +99,7 @@
                 <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
                     <div>
                         <div class="text-sm text-slate-800">{{ record.get_movement_type_display }}: {{ record.quantity }}</div>
-                        <div class="text-xs text-slate-500">{{ record.tank.name }} Ã¢â‚¬Â¢ {{ record.reference|default:"No reference" }}</div>
+                        <div class="text-xs text-slate-500">{{ record.tank.name }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ record.reference|default:"No reference" }}</div>
                     </div>
                     <div class="text-right">
                         <div class="text-xs font-medium text-slate-600">Balance {{ record.balance_after }} L</div>

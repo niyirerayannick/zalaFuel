@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Expenses | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Expenses | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
@@ -80,7 +80,7 @@
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ row.delivery_reference|default:row.purchase_order.reference }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ row.purchase_order.supplier.name }}</td>
-                        <td class="px-4 py-3 text-sm text-slate-700">{{ row.purchase_order.station.name }} Ã¢â‚¬Â¢ {{ row.tank.name|default:"No tank" }}</td>
+                        <td class="px-4 py-3 text-sm text-slate-700">{{ row.purchase_order.station.name }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ row.tank.name|default:"No tank" }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ row.get_status_display }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ row.delivered_volume|floatformat:2 }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ row.unit_cost|default:"--" }}</td>

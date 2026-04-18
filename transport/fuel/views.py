@@ -61,7 +61,7 @@ def _can_access_fuel_module(user):
 
 
 def _logo_path():
-    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA/ECO ENERGY.png"
+    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA Terminal.png"
     return candidate if candidate.exists() else None
 
 
@@ -203,7 +203,7 @@ class FuelExcelExportView(FuelExportMixin, View):
         )
 
         sheet.merge_cells("A1:J1")
-        sheet["A1"] = "ZALA/ECO ENERGY Fuel Management Report"
+        sheet["A1"] = "ZALA Terminal Fuel Management Report"
         sheet["A1"].font = Font(color=AFRILOTT_GREEN, bold=True, size=16)
         sheet.merge_cells("A2:J2")
         sheet["A2"] = f"Generated on {timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}"
@@ -282,8 +282,8 @@ class FuelPdfExportView(FuelExportMixin, View):
             header_left.append(Spacer(1, 2 * mm))
         header_left.extend(
             [
-                Paragraph("<font color='#0F5B2A'><b>ZALA/ECO ENERGY Fuel Management Report</b></font>", styles["Title"]),
-                Paragraph("Fuel expense export generated from the ZALA/ECO ENERGY fuel dashboard.", styles["Normal"]),
+                Paragraph("<font color='#0F5B2A'><b>ZALA Terminal Fuel Management Report</b></font>", styles["Title"]),
+                Paragraph("Fuel expense export generated from the ZALA Terminal fuel dashboard.", styles["Normal"]),
             ]
         )
         header_right = [

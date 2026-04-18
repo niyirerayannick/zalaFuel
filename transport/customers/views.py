@@ -32,7 +32,7 @@ from transport.trips.models import Trip
 
 
 def _logo_path():
-    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA/ECO ENERGY.png"
+    candidate = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA Terminal.png"
     return candidate if candidate.exists() else None
 
 
@@ -162,7 +162,7 @@ class CustomerExcelExportView(CustomerExportMixin, ListView):
         )
 
         sheet.merge_cells("A1:F1")
-        sheet["A1"] = "ZALA/ECO ENERGY Customer Report"
+        sheet["A1"] = "ZALA Terminal Customer Report"
         sheet["A1"].font = Font(color="0F5B2A", bold=True, size=16)
         sheet.merge_cells("A2:F2")
         sheet["A2"] = f"Generated on {timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}"
@@ -228,8 +228,8 @@ class CustomerPdfExportView(CustomerExportMixin, ListView):
             header_left.append(Spacer(1, 2 * mm))
         header_left.extend(
             [
-                Paragraph("<font color='#0F5B2A'><b>ZALA/ECO ENERGY Customer Report</b></font>", styles["Title"]),
-                Paragraph("Customer directory export generated from ZALA/ECO ENERGY.", styles["Normal"]),
+                Paragraph("<font color='#0F5B2A'><b>ZALA Terminal Customer Report</b></font>", styles["Title"]),
+                Paragraph("Customer directory export generated from ZALA Terminal.", styles["Normal"]),
             ]
         )
         header_right = [
@@ -444,7 +444,7 @@ class CustomerCreateView(StaffRequiredMixin, CreateView):
                             to=[email],
                             greeting=f"Hello {customer.company_name}",
                             headline="Customer Portal Account Created",
-                            intro="Your customer account has been created in ZALA/ECO ENERGY. Use the credentials below to access your orders and trips.",
+                            intro="Your customer account has been created in ZALA Terminal. Use the credentials below to access your orders and trips.",
                             details=[
                                 {"label": "Email", "value": email},
                                 {"label": "Temporary Password", "value": password},

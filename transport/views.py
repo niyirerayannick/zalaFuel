@@ -385,7 +385,7 @@ def driver_assignment_state(request):
 
 def driver_manifest(request):
     manifest = {
-        "name": "ZALA/ECO ENERGY Driver Workspace",
+        "name": "ZALA Terminal Driver Workspace",
         "short_name": "ZALA/ECO Driver",
         "description": "Driver mobile workspace for trips, fuel, chat, and profile updates.",
         "start_url": "/transport/driver/",
@@ -696,7 +696,7 @@ class RouteCreateView(StaffRequiredMixin, CreateView):
     success_url = reverse_lazy('transport:routes-list')
 
     def form_valid(self, form):
-        messages.success(self.request, f'Route {form.instance.origin} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {form.instance.destination} created successfully!')
+        messages.success(self.request, f'Route {form.instance.origin} ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ {form.instance.destination} created successfully!')
         return super().form_valid(form)
 
 class RouteUpdateView(StaffRequiredMixin, UpdateView):

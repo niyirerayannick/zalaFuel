@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load currency_tags %}
 
-{% block title %}Fuel Variance Alerts | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Fuel Variance Alerts | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -165,7 +165,7 @@
                                 <a href="{% url 'transport:fuel:detail' alert.entry.pk %}" class="text-blue-600 hover:text-blue-800 font-medium">{{ alert.entry.trip.order_number }}</a>
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ alert.entry.fuel_station }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-600">{{ alert.entry.trip.vehicle.plate_number|default:"Ã¢â‚¬â€" }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">{{ alert.entry.trip.vehicle.plate_number|default:"ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â" }}</td>
                             <td class="px-4 py-3 text-sm font-medium text-red-600 text-right">{{ alert.actual|currency }}/L</td>
                             <td class="px-4 py-3 text-sm text-gray-500 text-right">{{ alert.expected|currency }}/L</td>
                             <td class="px-4 py-3 text-sm text-right">
@@ -283,7 +283,7 @@
                                 <a href="{% url 'transport:fuel:detail' alert.entry.pk %}" class="text-blue-600 hover:text-blue-800 font-medium">{{ alert.entry.trip.order_number }}</a>
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ alert.entry.fuel_station }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-600">{{ alert.entry.trip.vehicle.plate_number|default:"Ã¢â‚¬â€" }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">{{ alert.entry.trip.vehicle.plate_number|default:"ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â" }}</td>
                             <td class="px-4 py-3 text-sm font-medium text-purple-600 text-right">{{ alert.actual|currency }}</td>
                             <td class="px-4 py-3 text-sm text-gray-500 text-right">{{ alert.expected|currency }}</td>
                             <td class="px-4 py-3 text-sm text-right">
@@ -358,7 +358,7 @@
                                 {{ s.spread|currency }}
                             </span>
                             {% else %}
-                            <span class="text-gray-400">Ã¢â‚¬â€</span>
+                            <span class="text-gray-400">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</span>
                             {% endif %}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ s.total_cost|currency }}</td>

@@ -382,7 +382,7 @@ class CustomerExportMixin(CustomerListView):
         system_settings = SystemSettings.get_settings()
         company_name = (
             getattr(system_settings, "company_name", "")
-            or getattr(django_settings, "BRAND_NAME", "ZALA/ECO ENERGY")
+            or getattr(django_settings, "BRAND_NAME", "ZALA Terminal")
         )
         currency_code = getattr(system_settings, "currency", getattr(django_settings, "DEFAULT_CURRENCY", "USD"))
         currency_symbol = getattr(system_settings, "currency_symbol", currency_code) or currency_code

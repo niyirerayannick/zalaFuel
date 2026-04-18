@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}User Detail | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}User Detail | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -15,7 +15,7 @@
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/75">Staff Profile</p>
                     <h1 class="mt-1 text-2xl font-bold">{{ managed_user.full_name|default:"No name" }}</h1>
-                    <p class="mt-1 text-sm text-white/80">{{ managed_user.email }} Ã‚Â· {{ managed_user.system_role }}</p>
+                    <p class="mt-1 text-sm text-white/80">{{ managed_user.email }} Ãƒâ€šÃ‚Â· {{ managed_user.system_role }}</p>
                 </div>
             </div>
             <div class="flex flex-wrap gap-2">
@@ -130,7 +130,7 @@
             <div class="mt-5 space-y-3">
                 {% for log in recent_activity %}
                     <div class="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                        <p class="text-xs font-semibold uppercase text-slate-500">{{ log.get_action_display }} Ã‚Â· {{ log.created_at|date:"M j, Y H:i" }}</p>
+                        <p class="text-xs font-semibold uppercase text-slate-500">{{ log.get_action_display }} Ãƒâ€šÃ‚Â· {{ log.created_at|date:"M j, Y H:i" }}</p>
                         <p class="mt-1 text-sm text-slate-700">{{ log.description }}</p>
                     </div>
                 {% empty %}

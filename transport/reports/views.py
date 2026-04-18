@@ -53,7 +53,7 @@ def _report_title(report_type):
         "profit-customer": "Profit Per Customer Report",
         "profit-route": "Profit Per Route Report",
     }
-    return report_map.get(report_type, "ZALA/ECO ENERGY Report")
+    return report_map.get(report_type, "ZALA Terminal Report")
 
 
 def _styled_report_workbook(report_type, headers, rows, filters):
@@ -65,7 +65,7 @@ def _styled_report_workbook(report_type, headers, rows, filters):
 
     workbook = Workbook()
     sheet = workbook.active
-    sheet.title = "ZALA/ECO ENERGY Report"
+    sheet.title = "ZALA Terminal Report"
 
     max_column = max(len(headers), 1)
     sheet.merge_cells(start_row=1, start_column=2, end_row=1, end_column=max_column)
@@ -74,7 +74,7 @@ def _styled_report_workbook(report_type, headers, rows, filters):
     title_cell.fill = PatternFill("solid", fgColor="166534")
     title_cell.alignment = Alignment(horizontal="center", vertical="center")
 
-    logo_path = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA/ECO ENERGY.png"
+    logo_path = Path(__file__).resolve().parents[2] / "static" / "img" / "ZALA Terminal.png"
     if logo_path.exists():
         try:
             with warnings.catch_warnings():

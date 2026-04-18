@@ -238,8 +238,8 @@ class SystemSettings(models.Model):
         
     class Currency(models.TextChoices):
         USD = "USD", "US Dollar ($)"
-        EUR = "EUR", "Euro (â‚¬)"
-        GBP = "GBP", "British Pound (Â£)"
+        EUR = "EUR", "Euro (Ã¢â€šÂ¬)"
+        GBP = "GBP", "British Pound (Ã‚Â£)"
         RWF = "RWF", "Rwandan Franc (Fr)"
         KES = "KES", "Kenyan Shilling (KSh)"
         UGX = "UGX", "Ugandan Shilling (USh)"
@@ -248,7 +248,7 @@ class SystemSettings(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     company_name = models.CharField(
         max_length=255,
-        default="ZALA/ECO ENERGY",
+        default="ZALA Terminal",
     )
     company_logo = models.ImageField(upload_to="settings/", blank=True, null=True)
     primary_color = models.CharField(
@@ -287,7 +287,7 @@ class SystemSettings(models.Model):
     )
     exchange_rate_cache = models.TextField(
         blank=True, default="",
-        help_text="JSON cache for exchange rates â€” auto-managed",
+        help_text="JSON cache for exchange rates Ã¢â‚¬â€ auto-managed",
     )
     timezone_setting = models.CharField(max_length=50, default="UTC")
     date_format = models.CharField(
@@ -369,7 +369,7 @@ class SystemSettings(models.Model):
                 admin_user = User.objects.first()
                 if admin_user:
                     system_settings = cls.objects.create(
-                        company_name="ZALA/ECO ENERGY",
+                        company_name="ZALA Terminal",
                         primary_color=cls.ColorTheme.BLUE,
                         currency=getattr(settings, "DEFAULT_CURRENCY", cls.Currency.USD),
                     currency_symbol=CURRENCY_SYMBOLS.get(getattr(settings, "DEFAULT_CURRENCY", cls.Currency.USD), "$"),

@@ -4,7 +4,7 @@ Management command: send_whatsapp
 Quick way to send a test WhatsApp message from the command line.
 
 Usage:
-    python manage.py send_whatsapp +250788100200 "Hello from ZALA/ECO ENERGY"
+    python manage.py send_whatsapp +250788100200 "Hello from ZALA Terminal"
 """
 
 from django.core.management.base import BaseCommand

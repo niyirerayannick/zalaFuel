@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ page_title }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}{{ page_title }} | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -103,7 +103,7 @@
                         
                         <div class="mt-2 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                             <div>
-                                <span class="font-medium">Route:</span> {{ order.route.origin }} Ã¢â€ â€™ {{ order.route.destination }}
+                                <span class="font-medium">Route:</span> {{ order.route.origin }} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {{ order.route.destination }}
                             </div>
                             <div>
                                 <span class="font-medium">Vehicle:</span> {{ order.vehicle.plate_number|default:"Not assigned" }}
@@ -164,7 +164,7 @@
                                 <div class="text-sm font-medium text-gray-900">{{ order.order_number }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ order.route.origin }} Ã¢â€ â€™ {{ order.route.destination }}</div>
+                                <div class="text-sm text-gray-900">{{ order.route.origin }} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {{ order.route.destination }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
@@ -200,7 +200,7 @@
         {% if customer_trips|length > 10 %}
         <div class="px-6 py-3 border-t border-gray-200 bg-gray-50">
             <a href="/transport/trips/" class="text-sm font-medium text-blue-600 hover:text-blue-500">
-                View all your orders Ã¢â€ â€™
+                View all your orders ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢
             </a>
         </div>
         {% endif %}

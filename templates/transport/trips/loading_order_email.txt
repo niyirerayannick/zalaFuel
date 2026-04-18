@@ -10,7 +10,7 @@ Summary:
 - Truck plates: {{ truck_plates }}
 - Driver names: {{ driver_names }}
 
-If you have any questions, please contact ZALA/ECO ENERGY.
+If you have any questions, please contact ZALA Terminal.
 
 Regards,
-ZALA/ECO ENERGY
+ZALA Terminal

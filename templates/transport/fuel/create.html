@@ -12,7 +12,7 @@
     </style>
 {% endblock %}
 
-{% block title %}Add New Fuel Entry | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Add New Fuel Entry | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-2 sm:px-8 lg:px-16 py-10 roboto">
@@ -198,7 +198,7 @@
                                 {{ form.invoice.errors.0 }}
                             </p>
                             {% endif %}
-                            <p class="mt-1 text-xs text-gray-400">Upload an invoice or receipt (PDF, JPG, PNG, DOC Ã¢â‚¬â€ max 10 MB)</p>
+                            <p class="mt-1 text-xs text-gray-400">Upload an invoice or receipt (PDF, JPG, PNG, DOC ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â max 10 MB)</p>
                         </div>
                     </div>
 
@@ -231,20 +231,20 @@
                 <div class="p-5">
                     <div class="text-center py-4">
                         <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Estimated Total Cost</p>
-                        <p id="liveCost" class="text-3xl font-bold text-gray-900 tabular-nums">Ã¢â‚¬â€</p>
+                        <p id="liveCost" class="text-3xl font-bold text-gray-900 tabular-nums">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</p>
                     </div>
                     <div class="border-t border-gray-100 pt-4 space-y-3">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">Liters</span>
-                            <span id="previewLiters" class="font-medium text-gray-700 tabular-nums">Ã¢â‚¬â€</span>
+                            <span id="previewLiters" class="font-medium text-gray-700 tabular-nums">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">Price/Liter</span>
-                            <span id="previewPrice" class="font-medium text-gray-700 tabular-nums">Ã¢â‚¬â€</span>
+                            <span id="previewPrice" class="font-medium text-gray-700 tabular-nums">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</span>
                         </div>
                         <div class="border-t border-dashed border-gray-200 pt-3 flex justify-between text-sm">
                             <span class="text-gray-500 font-medium">Total</span>
-                            <span id="previewTotal" class="font-bold text-orange-600 tabular-nums">Ã¢â‚¬â€</span>
+                            <span id="previewTotal" class="font-bold text-orange-600 tabular-nums">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</span>
                         </div>
                     </div>
                 </div>
@@ -310,8 +310,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const price = parseFloat(priceInput?.value) || 0;
         const total = liters * price;
 
-        previewLiters.textContent = liters > 0 ? liters.toFixed(2) + ' L' : 'Ã¢â‚¬â€';
-        previewPrice.textContent = price > 0 ? formatNumber(price) : 'Ã¢â‚¬â€';
+        previewLiters.textContent = liters > 0 ? liters.toFixed(2) + ' L' : 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â';
+        previewPrice.textContent = price > 0 ? formatNumber(price) : 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â';
 
         if (total > 0) {
             liveCost.textContent = formatNumber(total);
@@ -319,8 +319,8 @@ document.addEventListener('DOMContentLoaded', function() {
             liveCost.classList.remove('text-gray-900');
             liveCost.classList.add('text-green-600');
         } else {
-            liveCost.textContent = 'Ã¢â‚¬â€';
-            previewTotal.textContent = 'Ã¢â‚¬â€';
+            liveCost.textContent = 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â';
+            previewTotal.textContent = 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â';
             liveCost.classList.remove('text-green-600');
             liveCost.classList.add('text-gray-900');
         }

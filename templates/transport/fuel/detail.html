@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load currency_tags %}
 
-{% block title %}Fuel Entry #{{ fuel_entry.id }} - {{ fuel_entry.trip.order_number }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Fuel Entry #{{ fuel_entry.id }} - {{ fuel_entry.trip.order_number }} | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -230,7 +230,7 @@
                         {% if fuel_entry.trip.route %}
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Route</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ fuel_entry.trip.route.origin }} Ã¢â€ â€™ {{ fuel_entry.trip.route.destination }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900">{{ fuel_entry.trip.route.origin }} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {{ fuel_entry.trip.route.destination }}</dd>
                         </div>
                         {% endif %}
                         {% if fuel_entry.trip.customer %}

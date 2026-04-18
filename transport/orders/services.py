@@ -13,7 +13,7 @@ from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Tabl
 
 
 def _logo_path():
-    candidate = Path(settings.BASE_DIR) / "static" / "img" / "ZALA/ECO ENERGY.png"
+    candidate = Path(settings.BASE_DIR) / "static" / "img" / "ZALA Terminal.png"
     return candidate if candidate.exists() else None
 
 
@@ -114,7 +114,7 @@ def render_order_pdf(order):
         header_left.append(Spacer(1, 2 * mm))
     header_left.extend(
         [
-            Paragraph("ZALA/ECO ENERGY", title_style),
+            Paragraph("ZALA Terminal", title_style),
             Paragraph("Order Summary Document", subtitle_style),
         ]
     )

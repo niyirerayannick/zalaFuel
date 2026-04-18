@@ -7,16 +7,16 @@ a reply string.
 
 Supported commands (simplified for drivers)
 --------------------------------------------
-1 or YES or ACCEPT   Ã¢â€ â€™ Accept the current assigned trip
-2 or NO or DECLINE   Ã¢â€ â€™ Decline the current assigned trip
-3 or START            Ã¢â€ â€™ Start the trip (then send KM reading)
-<number>              Ã¢â€ â€™ KM reading (when awaiting)
-4 or DONE/DELIVERED   Ã¢â€ â€™ Mark trip delivered
-FUEL <liters>         Ã¢â€ â€™ Request fuel for current trip
-APPROVE <id>          Ã¢â€ â€™ Approve fuel request (managers)
-REJECT <id>           Ã¢â€ â€™ Reject fuel request (managers)
-STATUS                Ã¢â€ â€™ Check current trip status
-HELP or HI or MENU   Ã¢â€ â€™ Show available commands
+1 or YES or ACCEPT   ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Accept the current assigned trip
+2 or NO or DECLINE   ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Decline the current assigned trip
+3 or START            ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Start the trip (then send KM reading)
+<number>              ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ KM reading (when awaiting)
+4 or DONE/DELIVERED   ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Mark trip delivered
+FUEL <liters>         ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Request fuel for current trip
+APPROVE <id>          ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Approve fuel request (managers)
+REJECT <id>           ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Reject fuel request (managers)
+STATUS                ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Check current trip status
+HELP or HI or MENU   ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Show available commands
 """
 
 import logging
@@ -35,7 +35,7 @@ from .twilio_client import send_whatsapp_message
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Session store Ã¢â‚¬â€œ maps phone Ã¢â€ â€™ context (current trip, pending action, etc.)
+# Session store ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ maps phone ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ context (current trip, pending action, etc.)
 # In production this should be Redis / DB backed; dict is fine for a start.
 # ---------------------------------------------------------------------------
 
@@ -95,7 +95,7 @@ def _notify_managers(message: str):
 def _handle_accept(phone: str, order_number: str = None) -> str:
     driver = _find_driver_by_phone(phone)
     if not driver:
-        return "Ã¢ÂÅ’ Your phone number is not linked to a driver account. Contact admin."
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ Your phone number is not linked to a driver account. Contact admin."
 
     # If no order number given, find the driver's current ASSIGNED trip
     if order_number:
@@ -114,17 +114,17 @@ def _handle_accept(phone: str, order_number: str = None) -> str:
 
     # Record acceptance, notify managers
     _notify_managers(
-        f"Ã¢Å“â€¦ Driver {driver.name} ACCEPTED trip {trip.order_number}."
+        f"ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Driver {driver.name} ACCEPTED trip {trip.order_number}."
     )
 
     # Store trip in session for easy follow-up commands
     _sessions[phone] = {"trip_id": trip.pk, "action": "accepted"}
 
     return (
-        f"Ã¢Å“â€¦ You accepted trip *{trip.order_number}*\n\n"
-        f"Ã°Å¸â€œÂ {trip.route.origin} Ã¢â€ â€™ {trip.route.destination}\n"
-        f"Ã°Å¸Å¡â€º {trip.vehicle.plate_number}\n"
-        f"Ã°Å¸â€œÂ¦ {trip.customer.company_name}\n\n"
+        f"ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ You accepted trip *{trip.order_number}*\n\n"
+        f"ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â {trip.route.origin} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {trip.route.destination}\n"
+        f"ÃƒÂ°Ã…Â¸Ã…Â¡Ã¢â‚¬Âº {trip.vehicle.plate_number}\n"
+        f"ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â¦ {trip.customer.company_name}\n\n"
         f"When ready to depart, reply:\n"
         f"*3* or *START*"
     )
@@ -133,7 +133,7 @@ def _handle_accept(phone: str, order_number: str = None) -> str:
 def _handle_decline(phone: str, order_number: str = None) -> str:
     driver = _find_driver_by_phone(phone)
     if not driver:
-        return "Ã¢ÂÅ’ Your phone number is not linked to a driver account. Contact admin."
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ Your phone number is not linked to a driver account. Contact admin."
 
     if order_number:
         trip = _find_trip(order_number)
@@ -150,17 +150,17 @@ def _handle_decline(phone: str, order_number: str = None) -> str:
         return f"Trip {trip.order_number} cannot be declined (status: {trip.get_status_display()})."
 
     _notify_managers(
-        f"Ã¢Å¡Â Ã¯Â¸Â Driver {driver.name} DECLINED trip {trip.order_number}. "
+        f"ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Driver {driver.name} DECLINED trip {trip.order_number}. "
         "Please reassign."
     )
     _sessions.pop(phone, None)
-    return f"Ã¢ÂÅ’ You declined trip *{trip.order_number}*. A manager has been notified."
+    return f"ÃƒÂ¢Ã‚ÂÃ…â€™ You declined trip *{trip.order_number}*. A manager has been notified."
 
 
 def _handle_start(phone: str, order_number: str = None) -> str:
     driver = _find_driver_by_phone(phone)
     if not driver:
-        return "Ã¢ÂÅ’ Your phone number is not linked to a driver account. Contact admin."
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ Your phone number is not linked to a driver account. Contact admin."
 
     if order_number:
         trip = _find_trip(order_number)
@@ -174,10 +174,10 @@ def _handle_start(phone: str, order_number: str = None) -> str:
     if trip.status != Trip.TripStatus.ASSIGNED:
         return f"Trip {trip.order_number} cannot be started (status: {trip.get_status_display()})."
 
-    # Store session Ã¢â‚¬â€œ waiting for KM reading
+    # Store session ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ waiting for KM reading
     _sessions[phone] = {"action": "awaiting_km", "trip_id": trip.pk}
     return (
-        f"Ã°Å¸Å¡â‚¬ Starting trip *{trip.order_number}*\n\n"
+        f"ÃƒÂ°Ã…Â¸Ã…Â¡Ã¢â€šÂ¬ Starting trip *{trip.order_number}*\n\n"
         f"Please send your current KM reading.\n"
         f"Just type the number, e.g.: *125430*"
     )
@@ -191,7 +191,7 @@ def _handle_km(phone: str, reading_str: str) -> str:
     try:
         km_reading = Decimal(reading_str.replace(",", ""))
     except (InvalidOperation, ValueError):
-        return "Ã¢ÂÅ’ Invalid KM reading. Please send a number, e.g. *125430*"
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ Invalid KM reading. Please send a number, e.g. *125430*"
 
     trip = Trip.objects.filter(pk=session["trip_id"]).first()
     if not trip:
@@ -212,7 +212,7 @@ def _handle_km(phone: str, reading_str: str) -> str:
     _send_customer_trip_started(trip)
 
     return (
-        f"Ã°Å¸Å¡Å¡ Trip *{trip.order_number}* is now *IN TRANSIT*\n"
+        f"ÃƒÂ°Ã…Â¸Ã…Â¡Ã…Â¡ Trip *{trip.order_number}* is now *IN TRANSIT*\n"
         f"KM start: {km_reading}\n\n"
         f"When delivered, reply:\n"
         f"*4* or *DONE*"
@@ -222,7 +222,7 @@ def _handle_km(phone: str, reading_str: str) -> str:
 def _handle_delivered(phone: str, order_number: str = None) -> str:
     driver = _find_driver_by_phone(phone)
     if not driver:
-        return "Ã¢ÂÅ’ Your phone number is not linked to a driver account. Contact admin."
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ Your phone number is not linked to a driver account. Contact admin."
 
     if order_number:
         trip = _find_trip(order_number)
@@ -241,7 +241,7 @@ def _handle_delivered(phone: str, order_number: str = None) -> str:
     # Ask for odometer end reading before completing delivery
     _sessions[phone] = {"action": "awaiting_km_end", "trip_id": trip.pk}
     return (
-        f"Ã°Å¸â€œÂ Confirming delivery for *{trip.order_number}*\n\n"
+        f"ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â Confirming delivery for *{trip.order_number}*\n\n"
         f"KM start was: *{trip.km_start}*\n\n"
         f"Please send your current odometer reading.\n"
         f"Just type the number, e.g.: *125890*"
@@ -257,7 +257,7 @@ def _handle_km_end(phone: str, reading_str: str) -> str:
     try:
         km_reading = Decimal(reading_str.replace(",", ""))
     except (InvalidOperation, ValueError):
-        return "Ã¢ÂÅ’ Invalid KM reading. Please send a number, e.g. *125890*"
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ Invalid KM reading. Please send a number, e.g. *125890*"
 
     trip = Trip.objects.filter(pk=session["trip_id"]).first()
     if not trip:
@@ -267,7 +267,7 @@ def _handle_km_end(phone: str, reading_str: str) -> str:
     # Validate km_end >= km_start
     if km_reading < trip.km_start:
         return (
-            f"Ã¢ÂÅ’ Odometer end (*{km_reading}*) cannot be less than "
+            f"ÃƒÂ¢Ã‚ÂÃ…â€™ Odometer end (*{km_reading}*) cannot be less than "
             f"odometer start (*{trip.km_start}*).\n"
             f"Please send the correct reading."
         )
@@ -294,22 +294,22 @@ def _handle_km_end(phone: str, reading_str: str) -> str:
     _send_customer_delivery(trip)
 
     _notify_managers(
-        f"Ã°Å¸â€œÂ¦ Trip {trip.order_number} marked DELIVERED by {driver.name}.\n"
-        f"Distance: {trip.distance} km (KM {trip.km_start} Ã¢â€ â€™ {trip.km_end})"
+        f"ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â¦ Trip {trip.order_number} marked DELIVERED by {driver.name}.\n"
+        f"Distance: {trip.distance} km (KM {trip.km_start} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {trip.km_end})"
     )
     _sessions.pop(phone, None)
     return (
-        f"Ã¢Å“â€¦ Trip *{trip.order_number}* marked as *DELIVERED*\n\n"
-        f"Ã°Å¸â€ºÂ£Ã¯Â¸Â KM: {trip.km_start} Ã¢â€ â€™ {trip.km_end}\n"
-        f"Ã°Å¸â€œÂ Distance: *{trip.distance} km*\n\n"
-        f"Thank you, {driver.name}! Ã°Å¸Å½â€°"
+        f"ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Trip *{trip.order_number}* marked as *DELIVERED*\n\n"
+        f"ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂºÃ‚Â£ÃƒÂ¯Ã‚Â¸Ã‚Â KM: {trip.km_start} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {trip.km_end}\n"
+        f"ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â Distance: *{trip.distance} km*\n\n"
+        f"Thank you, {driver.name}! ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â°"
     )
 
 
 def _handle_fuel_request(phone: str, order_number: str = None, liters_str: str = "") -> str:
     driver = _find_driver_by_phone(phone)
     if not driver:
-        return "Ã¢ÂÅ’ Your phone number is not linked to a driver account. Contact admin."
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ Your phone number is not linked to a driver account. Contact admin."
 
     # If order_number looks like a number (liters), treat it as liters with auto trip
     if order_number and not liters_str:
@@ -337,7 +337,7 @@ def _handle_fuel_request(phone: str, order_number: str = None, liters_str: str =
     try:
         liters = Decimal(liters_str.replace(",", ""))
     except (InvalidOperation, ValueError):
-        return "Ã¢ÂÅ’ Invalid liter amount. Example: *FUEL 100*"
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ Invalid liter amount. Example: *FUEL 100*"
 
     fuel_req = FuelRequest.objects.create(
         driver=driver,
@@ -346,7 +346,7 @@ def _handle_fuel_request(phone: str, order_number: str = None, liters_str: str =
     )
 
     _notify_managers(
-        f"Ã¢â€ºÂ½ Fuel Request #{fuel_req.pk}\n"
+        f"ÃƒÂ¢Ã¢â‚¬ÂºÃ‚Â½ Fuel Request #{fuel_req.pk}\n"
         f"Driver: {driver.name}\n"
         f"Trip: {trip.order_number}\n"
         f"Liters: {liters}\n\n"
@@ -355,7 +355,7 @@ def _handle_fuel_request(phone: str, order_number: str = None, liters_str: str =
         f"*REJECT {fuel_req.pk}*"
     )
     return (
-        f"Ã¢â€ºÂ½ Fuel request submitted: *{liters}L*\n"
+        f"ÃƒÂ¢Ã¢â‚¬ÂºÃ‚Â½ Fuel request submitted: *{liters}L*\n"
         f"Trip: {trip.order_number}\n"
         f"Waiting for manager approval."
     )
@@ -376,7 +376,7 @@ def _handle_approve(phone: str, request_id_str: str) -> str:
         is_active=True,
     ).first()
     if not user:
-        return "Ã¢ÂÅ’ You are not authorized to approve fuel requests."
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ You are not authorized to approve fuel requests."
 
     try:
         req_id = int(request_id_str)
@@ -394,12 +394,12 @@ def _handle_approve(phone: str, request_id_str: str) -> str:
     # Notify driver
     send_whatsapp_message(
         fuel_req.driver.phone,
-        f"Ã¢Å“â€¦ Your fuel request #{fuel_req.pk} has been *APPROVED*.\n"
+        f"ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Your fuel request #{fuel_req.pk} has been *APPROVED*.\n"
         f"Trip: {fuel_req.trip.order_number}\n"
         f"Liters: {fuel_req.liters_requested}L\n"
         f"Approved by: {user.full_name}",
     )
-    return f"Ã¢Å“â€¦ Fuel request #{fuel_req.pk} approved."
+    return f"ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Fuel request #{fuel_req.pk} approved."
 
 
 def _handle_reject(phone: str, request_id_str: str) -> str:
@@ -417,7 +417,7 @@ def _handle_reject(phone: str, request_id_str: str) -> str:
         is_active=True,
     ).first()
     if not user:
-        return "Ã¢ÂÅ’ You are not authorized to reject fuel requests."
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ You are not authorized to reject fuel requests."
 
     try:
         req_id = int(request_id_str)
@@ -433,11 +433,11 @@ def _handle_reject(phone: str, request_id_str: str) -> str:
 
     send_whatsapp_message(
         fuel_req.driver.phone,
-        f"Ã¢ÂÅ’ Your fuel request #{fuel_req.pk} has been *REJECTED*.\n"
+        f"ÃƒÂ¢Ã‚ÂÃ…â€™ Your fuel request #{fuel_req.pk} has been *REJECTED*.\n"
         f"Trip: {fuel_req.trip.order_number}\n"
         f"Contact your manager for details.",
     )
-    return f"Ã¢ÂÅ’ Fuel request #{fuel_req.pk} rejected."
+    return f"ÃƒÂ¢Ã‚ÂÃ…â€™ Fuel request #{fuel_req.pk} rejected."
 
 
 def _handle_status(phone: str, order_number: str = None) -> str:
@@ -448,7 +448,7 @@ def _handle_status(phone: str, order_number: str = None) -> str:
     elif driver:
         trip = _get_active_trip(driver)
     else:
-        return "Ã¢ÂÅ’ Your phone number is not linked to a driver account."
+        return "ÃƒÂ¢Ã‚ÂÃ…â€™ Your phone number is not linked to a driver account."
 
     if not trip:
         return "No active trip found."
@@ -458,13 +458,13 @@ def _handle_status(phone: str, order_number: str = None) -> str:
     ).count()
 
     return (
-        f"Ã°Å¸â€œâ€¹ *Trip {trip.order_number}*\n\n"
+        f"ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â¹ *Trip {trip.order_number}*\n\n"
         f"Status: *{trip.get_status_display()}*\n"
         f"Customer: {trip.customer.company_name}\n"
-        f"Route: {trip.route.origin} Ã¢â€ â€™ {trip.route.destination}\n"
+        f"Route: {trip.route.origin} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {trip.route.destination}\n"
         f"Vehicle: {trip.vehicle.plate_number}\n"
         f"Driver: {trip.driver.name}\n"
-        f"KM: {trip.km_start} Ã¢â€ â€™ {trip.km_end or 'Ã¢â‚¬â€'}\n"
+        f"KM: {trip.km_start} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {trip.km_end or 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â'}\n"
         f"Pending fuel requests: {pending_fuel}"
     )
 
@@ -473,33 +473,33 @@ def _handle_help(phone: str) -> str:
     driver = _find_driver_by_phone(phone)
     trip = _get_active_trip(driver) if driver else None
 
-    menu = "Ã°Å¸â€œâ€“ *ZALA/ECO ENERGY WhatsApp Menu*\n\n"
+    menu = "ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬â€œ *ZALA Terminal WhatsApp Menu*\n\n"
 
     if trip and trip.status == Trip.TripStatus.ASSIGNED:
         menu += (
             f"You have trip *{trip.order_number}* waiting.\n\n"
-            f"*1* Ã¢â‚¬â€ Ã¢Å“â€¦ Accept trip\n"
-            f"*2* Ã¢â‚¬â€ Ã¢ÂÅ’ Decline trip\n"
-            f"*3* Ã¢â‚¬â€ Ã°Å¸Å¡â‚¬ Start trip\n"
+            f"*1* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Accept trip\n"
+            f"*2* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒÂ¢Ã‚ÂÃ…â€™ Decline trip\n"
+            f"*3* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒÂ°Ã…Â¸Ã…Â¡Ã¢â€šÂ¬ Start trip\n"
         )
     elif trip and trip.status == Trip.TripStatus.IN_TRANSIT:
         menu += (
             f"Trip *{trip.order_number}* is in transit.\n\n"
-            f"*4* Ã¢â‚¬â€ Ã¢Å“â€¦ Mark delivered\n"
-            f"*FUEL <liters>* Ã¢â‚¬â€ Ã¢â€ºÂ½ Request fuel\n"
+            f"*4* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Mark delivered\n"
+            f"*FUEL <liters>* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒÂ¢Ã¢â‚¬ÂºÃ‚Â½ Request fuel\n"
         )
     else:
         menu += "No active trip right now.\n\n"
 
     menu += (
         "\n*All Commands:*\n"
-        "*1* or *YES* Ã¢â‚¬â€ Accept trip\n"
-        "*2* or *NO* Ã¢â‚¬â€ Decline trip\n"
-        "*3* or *START* Ã¢â‚¬â€ Start trip\n"
-        "*4* or *DONE* Ã¢â‚¬â€ Mark delivered\n"
-        "*FUEL <liters>* Ã¢â‚¬â€ Request fuel\n"
-        "*STATUS* Ã¢â‚¬â€ Check trip status\n"
-        "*HELP* Ã¢â‚¬â€ Show this menu"
+        "*1* or *YES* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Accept trip\n"
+        "*2* or *NO* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Decline trip\n"
+        "*3* or *START* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Start trip\n"
+        "*4* or *DONE* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Mark delivered\n"
+        "*FUEL <liters>* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Request fuel\n"
+        "*STATUS* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Check trip status\n"
+        "*HELP* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Show this menu"
     )
     return menu
 
@@ -515,9 +515,9 @@ def _send_customer_trip_started(trip: Trip):
         return
     send_whatsapp_message(
         phone,
-        f"Ã°Å¸Å¡Å¡ *ZALA/ECO ENERGY*\n\n"
+        f"ÃƒÂ°Ã…Â¸Ã…Â¡Ã…Â¡ *ZALA Terminal*\n\n"
         f"Your shipment *{trip.order_number}* has started.\n"
-        f"Route: {trip.route.origin} Ã¢â€ â€™ {trip.route.destination}\n"
+        f"Route: {trip.route.origin} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {trip.route.destination}\n"
         f"Driver: {trip.driver.name}\n\n"
         f"We'll notify you upon delivery.",
     )
@@ -530,9 +530,9 @@ def _send_customer_delivery(trip: Trip):
         return
     send_whatsapp_message(
         phone,
-        f"Ã¢Å“â€¦ *ZALA/ECO ENERGY*\n\n"
+        f"ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ *ZALA Terminal*\n\n"
         f"Your shipment *{trip.order_number}* has been delivered.\n"
-        f"Thank you for choosing ZALA/ECO ENERGY! Ã°Å¸Å½â€°",
+        f"Thank you for choosing ZALA Terminal! ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â°",
     )
 
 
@@ -540,7 +540,7 @@ def _send_customer_delivery(trip: Trip):
 # Main dispatcher
 # ---------------------------------------------------------------------------
 
-# Regex patterns for command matching Ã¢â‚¬â€ numbered shortcuts come first
+# Regex patterns for command matching ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â numbered shortcuts come first
 _PATTERNS = [
     # Numbered shortcuts (driver-friendly)
     (re.compile(r"^1$"), "accept"),
@@ -563,7 +563,7 @@ _PATTERNS = [
     # KM reading
     (re.compile(r"^KM\s+([\d,\.]+)$", re.IGNORECASE), "km"),
 
-    # Fuel request Ã¢â‚¬â€ "FUEL 100" or "FUEL REQUEST <order> <liters>"
+    # Fuel request ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â "FUEL 100" or "FUEL REQUEST <order> <liters>"
     (re.compile(r"^FUEL\s+([\d,\.]+)$", re.IGNORECASE), "fuel_simple"),
     (re.compile(r"^FUEL\s+REQUEST\s+(\S+)\s+([\d,\.]+)$", re.IGNORECASE), "fuel_request"),
 
@@ -650,6 +650,6 @@ def parse_and_execute(phone: str, body: str) -> str:
                 pass
 
     return (
-        "Ã°Å¸Â¤â€ Sorry, I didn't understand that.\n\n"
+        "ÃƒÂ°Ã…Â¸Ã‚Â¤Ã¢â‚¬Â Sorry, I didn't understand that.\n\n"
         "Reply *HELP* or *MENU* to see available commands."
     )

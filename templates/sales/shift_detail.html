@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load currency_tags %}
 
-{% block title %}Shift #{{ shift.pk }} | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Shift #{{ shift.pk }} | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -12,7 +12,7 @@
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Shift Operations</p>
                 <h1 class="mt-1 text-2xl font-bold text-slate-900">Shift #{{ shift.pk }} - {{ shift.station.name }}</h1>
                 <p class="mt-1 text-sm text-slate-600">
-                    Attendant: {{ shift.attendant.full_name|default:shift.attendant }} Ã‚Â· {{ shift.get_shift_type_display }} Ã‚Â· Opened {{ shift.opened_at }}
+                    Attendant: {{ shift.attendant.full_name|default:shift.attendant }} Ãƒâ€šÃ‚Â· {{ shift.get_shift_type_display }} Ãƒâ€šÃ‚Â· Opened {{ shift.opened_at }}
                 </p>
             </div>
             {% if shift.status == 'open' %}

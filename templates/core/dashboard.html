@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load currency_tags %}
-{% block title %}Dashboard | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Dashboard | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
@@ -9,7 +9,7 @@
             <div class="max-w-3xl">
                 <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#0f7ea6]">Fuel Station Overview</p>
                 <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-                    Welcome to {{ system_settings.company_name|default:brand_name|default:"ZALA/ECO ENERGY" }}
+                    Welcome to {{ system_settings.company_name|default:brand_name|default:"ZALA Terminal" }}
                 </h1>
                 <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
                     Track daily sales, active shifts, stock position, and operational alerts from one landing page.
@@ -55,7 +55,7 @@
         <div class="rounded-2xl border border-cyan-200 bg-cyan-50/70 p-5 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-700">Network</p>
             <p class="mt-2 text-3xl font-bold text-cyan-900">{{ highlights.stations }}</p>
-            <p class="mt-2 text-xs text-cyan-700">{{ highlights.pumps }} pumps Ã‚Â· {{ highlights.tanks }} tanks</p>
+            <p class="mt-2 text-xs text-cyan-700">{{ highlights.pumps }} pumps Ãƒâ€šÃ‚Â· {{ highlights.tanks }} tanks</p>
         </div>
     </section>
 
@@ -103,7 +103,7 @@
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <p class="text-sm font-semibold text-slate-900">{{ tank.name }}</p>
-                            <p class="mt-1 text-xs text-slate-500">{{ tank.station.name }} Ã‚Â· {{ tank.get_fuel_type_display }}</p>
+                            <p class="mt-1 text-xs text-slate-500">{{ tank.station.name }} Ãƒâ€šÃ‚Â· {{ tank.get_fuel_type_display }}</p>
                         </div>
                         <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
                             {{ tank.current_volume_liters|floatformat:2 }} L
@@ -153,8 +153,8 @@
                 {% for sale in recent_sales %}
                 <div class="flex items-center justify-between gap-4 px-5 py-4">
                     <div>
-                        <p class="text-sm font-semibold text-slate-900">{{ sale.nozzle.pump.label }} Ã‚Â· {{ sale.nozzle.get_fuel_type_display }}</p>
-                        <p class="mt-1 text-xs text-slate-500">{{ sale.volume_liters|floatformat:2 }} L Ã‚Â· {{ sale.shift.station.name }} Ã‚Â· {{ sale.created_at|date:"M d, H:i" }}</p>
+                        <p class="text-sm font-semibold text-slate-900">{{ sale.nozzle.pump.label }} Ãƒâ€šÃ‚Â· {{ sale.nozzle.get_fuel_type_display }}</p>
+                        <p class="mt-1 text-xs text-slate-500">{{ sale.volume_liters|floatformat:2 }} L Ãƒâ€šÃ‚Â· {{ sale.shift.station.name }} Ãƒâ€šÃ‚Â· {{ sale.created_at|date:"M d, H:i" }}</p>
                     </div>
                     <div class="text-right">
                         <p class="text-sm font-bold text-slate-900">{{ sale.total_amount|currency }}</p>

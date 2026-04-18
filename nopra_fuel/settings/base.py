@@ -7,7 +7,7 @@ from decouple import Csv, config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-BRAND_NAME = "ZALA/ECO ENERGY"
+BRAND_NAME = "ZALA Terminal"
 
 
 def _env_bool(name, default=False):

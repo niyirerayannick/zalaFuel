@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Fuel Analytics | {{ brand_name|default:"ZALA/ECO ENERGY" }}{% endblock %}
+{% block title %}Fuel Analytics | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -42,7 +42,7 @@
                 {% for row in monthly_requests %}
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-gray-700">{{ row.month|date:"M Y" }}</span>
-                    <span class="font-medium text-gray-900">{{ row.req_count }} req Ã¢â‚¬Â¢ {{ row.total_amount }}</span>
+                    <span class="font-medium text-gray-900">{{ row.req_count }} req ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ row.total_amount }}</span>
                 </div>
                 {% empty %}
                 <p class="text-sm text-gray-500">No monthly data available.</p>
