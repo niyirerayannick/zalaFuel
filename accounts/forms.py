@@ -284,6 +284,17 @@ class UserProfileForm(forms.ModelForm):
 class SystemSettingsForm(forms.ModelForm):
     """Form for updating system settings"""
 
+    CURRENCY_CHOICES = [
+        ("USD", "US Dollar ($)"),
+        ("EUR", "Euro (EUR)"),
+        ("GBP", "British Pound (GBP)"),
+        ("RWF", "Rwandan Franc (Fr)"),
+        ("KES", "Kenyan Shilling (KSh)"),
+        ("UGX", "Ugandan Shilling (USh)"),
+        ("TZS", "Tanzanian Shilling (TSh)"),
+        ("SLE", "Sierra Leone Leone (Le)"),
+    ]
+
     CURRENCY_SYMBOL_MAP = {
         "USD": "$",
         "EUR": "EUR",
@@ -383,6 +394,7 @@ class SystemSettingsForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["currency"].choices = self.CURRENCY_CHOICES
         self.fields["currency_symbol"].required = False
         self.fields["usd_bank_name"].required = False
         self.fields["usd_account_name"].required = False
