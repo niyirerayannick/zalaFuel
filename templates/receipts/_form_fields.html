@@ -24,7 +24,7 @@
             <select name="supplier" id="id_supplier" class="driver-modal-field">
                 <option value="">Select supplier</option>
                 {% for supplier in form.supplier.field.queryset %}
-                    <option value="{{ supplier.pk }}" {% if form.supplier.value == supplier.pk or form.initial.supplier == supplier.pk %}selected{% endif %}>{{ supplier.name }}</option>
+                    <option value="{{ supplier.pk }}" {% if form.supplier.value == supplier.pk or form.initial.supplier == supplier.pk %}selected{% endif %}>{{ supplier.supplier_name }}{% if supplier.supplier_code %} ({{ supplier.supplier_code }}){% endif %}</option>
                 {% endfor %}
             </select>
         </div>
@@ -80,15 +80,6 @@
             <input type="number" name="quantity_received" id="id_quantity_received" value="{{ form.quantity_received.value|default:'' }}" step="0.01" class="driver-modal-field" placeholder="0.00" required />
         </div>
         <p data-error-for="quantity_received" class="driver-error"></p>
-    </div>
-
-    <div>
-        <label for="id_waybill_number" class="driver-label">Waybill Number</label>
-        <div class="driver-input-shell">
-            <span class="driver-field-icon material-symbols-outlined">receipt_long</span>
-            <input type="text" name="waybill_number" id="id_waybill_number" value="{{ form.waybill_number.value|default:'' }}" class="driver-modal-field" placeholder="Optional waybill" />
-        </div>
-        <p data-error-for="waybill_number" class="driver-error"></p>
     </div>
 
     <div class="md:col-span-2">

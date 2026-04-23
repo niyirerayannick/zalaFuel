@@ -69,12 +69,21 @@
             <form method="get" class="flex w-full flex-wrap gap-2">
                 <select name="supplier" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
                     <option value="">All suppliers</option>
+                    {% for supplier in suppliers %}
+                    <option value="{{ supplier.pk }}" {% if filters.supplier == supplier.pk|stringformat:"s" %}selected{% endif %}>{{ supplier.supplier_name }}</option>
+                    {% endfor %}
                 </select>
                 <select name="product" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
                     <option value="">All products</option>
+                    {% for product in products %}
+                    <option value="{{ product.pk }}" {% if filters.product == product.pk|stringformat:"s" %}selected{% endif %}>{{ product.product_name }}</option>
+                    {% endfor %}
                 </select>
                 <select name="terminal" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
                     <option value="">All terminals</option>
+                    {% for terminal in terminals %}
+                    <option value="{{ terminal.pk }}" {% if filters.terminal == terminal.pk|stringformat:"s" %}selected{% endif %}>{{ terminal.name }}</option>
+                    {% endfor %}
                 </select>
                 <input type="text" name="search" value="{{ filters.search }}" placeholder="Search reference" class="flex-1 min-w-[220px] rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]" />
                 <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">Filter</button>

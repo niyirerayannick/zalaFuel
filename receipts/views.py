@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
 from accounts.mixins import OperationsManageMixin
+from products.models import Product, Supplier
+from terminals.models import Terminal
 
 from .forms import ProductReceiptForm
 from .models import ProductReceipt
@@ -47,6 +49,9 @@ class ProductReceiptListView(OperationsManageMixin, ListView):
                 "active_menu": "product_receipts",
                 "kpi_total_volume": all_receipts.aggregate(total=Sum("quantity_received"))["total"] or 0,
                 "kpi_today": all_receipts.count(),
+                "suppliers": Supplier.objects.order_by("supplier_name"),
+                "products": Product.objects.order_by("product_name"),
+                "terminals": Terminal.objects.order_by("name"),
                 "filters": {
                     "search": self.request.GET.get("search", ""),
                     "supplier": self.request.GET.get("supplier", ""),
@@ -120,4 +125,3 @@ class ProductReceiptUpdateView(OperationsManageMixin, UpdateView):
         context["title"] = "Edit Receipt"
         context["action"] = self.request.path
         return context
-
