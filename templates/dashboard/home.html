@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Dashboard | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 {% block content %}
-<div class="mx-auto max-w-7xl space-y-6">
+<div class="mx-auto max-w-7xl space-y-7 text-[15px] text-slate-700">
     {% if not database_ready %}
     <section class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900 shadow-sm">
         {{ database_message }}
@@ -11,32 +11,32 @@
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#0f7ea6]">ZALA Terminal</p>
-                <h1 class="mt-2 text-3xl font-bold text-slate-900">Terminal Tank Stock Control Dashboard</h1>
-                <p class="mt-2 max-w-3xl text-sm text-slate-600">Monitor current stock, receipts, dispatches, OMC sales, revenue, and operational alerts from one control surface.</p>
+                <p class="text-sm font-semibold uppercase tracking-[0.16em] text-[#0f7ea6]">ZALA Terminal</p>
+                <h1 class="mt-2 text-4xl font-bold leading-tight text-slate-900">Terminal Tank Stock Control Dashboard</h1>
+                <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">Monitor current stock, receipts, dispatches, OMC sales, revenue, and operational alerts from one control surface.</p>
             </div>
             <div class="grid gap-3 sm:grid-cols-2">
-                <a href="{% url 'receipts:create' %}" class="inline-flex items-center justify-center rounded-lg bg-[#0f7ea6] px-4 py-3 text-sm font-semibold text-white">New Receipt</a>
-                <a href="{% url 'dispatches:create' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700">New Dispatch</a>
-                <a href="{% url 'sales:create' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700">Record OMC Sale</a>
-                <a href="{% url 'tanks:entry-create' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700">Daily Tank Entry</a>
+                <a href="{% url 'receipts:create' %}" class="inline-flex items-center justify-center rounded-lg bg-[#0f7ea6] px-4 py-3 text-base font-semibold text-white">New Receipt</a>
+                <a href="{% url 'dispatches:create' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-3 text-base font-semibold text-slate-700">New Dispatch</a>
+                <a href="{% url 'sales:create' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-3 text-base font-semibold text-slate-700">Record OMC Sale</a>
+                <a href="{% url 'tanks:entry-create' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-3 text-base font-semibold text-slate-700">Daily Tank Entry</a>
             </div>
         </div>
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">Current Stock</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ kpis.current_stock|floatformat:2 }} L</p></div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">Total Receipts</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ kpis.total_receipts|floatformat:2 }} L</p></div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">Total Dispatches</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ kpis.total_dispatches|floatformat:2 }} L</p></div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">OMC Sales Volume</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ kpis.omc_sales_volume|floatformat:2 }} L</p></div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase text-slate-500">Revenue</p><p class="mt-2 text-3xl font-bold text-slate-900">{{ kpis.revenue|floatformat:2 }}</p></div>
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm"><p class="text-xs uppercase text-amber-700">Alerts</p><p class="mt-2 text-3xl font-bold text-amber-900">{{ kpis.alerts }}</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><p class="text-sm font-semibold uppercase tracking-wide text-slate-500">Current Stock</p><p class="mt-3 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">{{ kpis.current_stock|floatformat:2 }} L</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><p class="text-sm font-semibold uppercase tracking-wide text-slate-500">Total Receipts</p><p class="mt-3 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">{{ kpis.total_receipts|floatformat:2 }} L</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><p class="text-sm font-semibold uppercase tracking-wide text-slate-500">Total Dispatches</p><p class="mt-3 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">{{ kpis.total_dispatches|floatformat:2 }} L</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><p class="text-sm font-semibold uppercase tracking-wide text-slate-500">OMC Sales Volume</p><p class="mt-3 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">{{ kpis.omc_sales_volume|floatformat:2 }} L</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><p class="text-sm font-semibold uppercase tracking-wide text-slate-500">Revenue <span class="normal-case text-slate-400">({{ dashboard_currency_code }})</span></p><p class="mt-3 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">{{ dashboard_currency_symbol }} {{ kpis.revenue|floatformat:2 }}</p></div>
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm"><p class="text-sm font-semibold uppercase tracking-wide text-amber-700">Alerts</p><p class="mt-3 text-2xl font-bold leading-tight text-amber-900 sm:text-3xl">{{ kpis.alerts }}</p></div>
     </section>
 
     <section class="grid gap-6 xl:grid-cols-2">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold text-slate-900">Stock Trend Chart</h2>
+                <h2 class="text-xl font-bold text-slate-900">Stock Trend Chart</h2>
                 <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Line</span>
             </div>
             <div class="mt-4 h-[280px]">
@@ -45,7 +45,7 @@
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold text-slate-900">Receipts and Dispatches Chart</h2>
+                <h2 class="text-xl font-bold text-slate-900">Receipts and Dispatches Chart</h2>
                 <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Bar</span>
             </div>
             <div class="mt-4 h-[280px]">
@@ -54,7 +54,7 @@
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold text-slate-900">Market Share Graph</h2>
+                <h2 class="text-xl font-bold text-slate-900">Market Share Graph</h2>
                 <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Doughnut</span>
             </div>
             <div class="mt-4 h-[280px]">
@@ -63,7 +63,7 @@
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold text-slate-900">Revenue and Volume Graph</h2>
+                <h2 class="text-xl font-bold text-slate-900">Revenue and Volume Graph</h2>
                 <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Mixed</span>
             </div>
             <div class="mt-4 h-[280px]">
@@ -74,7 +74,7 @@
 
     <section class="grid gap-6 xl:grid-cols-2">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-900">Stock Trends</h2>
+            <h2 class="text-xl font-bold text-slate-900">Stock Trends</h2>
             <div class="mt-4 space-y-3">
                 {% for row in stock_trends %}
                 <div>
@@ -86,7 +86,7 @@
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold text-slate-900">Receipts vs Dispatches</h2>
+                <h2 class="text-xl font-bold text-slate-900">Receipts vs Dispatches</h2>
                 <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Volume</span>
             </div>
             <div class="mt-4 space-y-4">
@@ -112,20 +112,20 @@
 
     <section class="grid gap-6 xl:grid-cols-3">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-900">Revenue vs Volume</h2>
+            <h2 class="text-xl font-bold text-slate-900">Revenue vs Volume</h2>
             <div class="mt-4 overflow-x-auto">
                 <table class="min-w-full text-sm">
-                    <thead><tr class="text-left text-slate-500"><th class="pb-2">Period</th><th class="pb-2">Revenue</th><th class="pb-2">Volume</th></tr></thead>
+                    <thead><tr class="text-left text-slate-500"><th class="pb-2">Period</th><th class="pb-2">Revenue ({{ dashboard_currency_code }})</th><th class="pb-2">Volume</th></tr></thead>
                     <tbody class="divide-y divide-slate-100">
                         {% for row in revenue_vs_volume %}
-                        <tr><td class="py-2">{{ row.label }}</td><td class="py-2">{{ row.revenue|floatformat:2 }}</td><td class="py-2">{{ row.volume|floatformat:2 }} L</td></tr>
+                        <tr><td class="py-2">{{ row.label }}</td><td class="py-2">{{ dashboard_currency_symbol }} {{ row.revenue|floatformat:2 }}</td><td class="py-2">{{ row.volume|floatformat:2 }} L</td></tr>
                         {% empty %}<tr><td colspan="3" class="py-4 text-slate-500">No revenue data yet.</td></tr>{% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-900">Market Share</h2>
+            <h2 class="text-xl font-bold text-slate-900">Market Share</h2>
             <div class="mt-4 space-y-3">
                 {% for row in market_share %}
                 <div>
@@ -136,7 +136,7 @@
             </div>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-900">Alert Severity</h2>
+            <h2 class="text-xl font-bold text-slate-900">Alert Severity</h2>
             <div class="mt-4 space-y-3">
                 {% for row in alert_breakdown %}
                 <div class="flex items-center justify-between rounded-xl px-3 py-3 {% if row.severity == 'critical' %}bg-rose-50{% elif row.severity == 'warning' %}bg-amber-50{% else %}bg-sky-50{% endif %}">
@@ -150,7 +150,7 @@
 
     <section class="grid gap-6 xl:grid-cols-2">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-900">Product Flow</h2>
+            <h2 class="text-xl font-bold text-slate-900">Product Flow</h2>
             <div class="mt-4 space-y-4">
                 {% for row in product_flow %}
                 <div class="space-y-2">
@@ -171,7 +171,7 @@
             </div>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-900">Tank Utilization</h2>
+            <h2 class="text-xl font-bold text-slate-900">Tank Utilization</h2>
             <div class="mt-4 space-y-3">
                 {% for tank in terminal_summary|slice:":6" %}
                 <div>
@@ -191,7 +191,7 @@
     <section class="grid gap-6 xl:grid-cols-3">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold text-slate-900">Latest Activity</h2>
+                <h2 class="text-xl font-bold text-slate-900">Latest Activity</h2>
                 <a href="{% url 'reports:dashboard' %}" class="text-sm font-semibold text-[#0f7ea6]">Open reports</a>
             </div>
             <div class="mt-4 overflow-x-auto">
@@ -206,7 +206,7 @@
             </div>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-900">OMC Ranking</h2>
+            <h2 class="text-xl font-bold text-slate-900">OMC Ranking</h2>
             <div class="mt-4 space-y-3">
                 {% for omc in omc_ranking %}
                 <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-3">
@@ -220,7 +220,7 @@
 
     <section class="grid gap-6 xl:grid-cols-2">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-900">Terminal Stock Summary</h2>
+            <h2 class="text-xl font-bold text-slate-900">Terminal Stock Summary</h2>
             <div class="mt-4 overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead><tr class="text-left text-slate-500"><th class="pb-2">Terminal</th><th class="pb-2">Tank</th><th class="pb-2">Product</th><th class="pb-2">Current Stock</th></tr></thead>
@@ -233,7 +233,7 @@
             </div>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-900">Alerts</h2>
+            <h2 class="text-xl font-bold text-slate-900">Alerts</h2>
             <div class="mt-4 overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead><tr class="text-left text-slate-500"><th class="pb-2">Alert</th><th class="pb-2">Severity</th><th class="pb-2">Status</th></tr></thead>
@@ -265,6 +265,8 @@
         const receiptsDispatches = JSON.parse(document.getElementById("dashboard-receipts-dispatches-data").textContent || "[]");
         const marketShare = JSON.parse(document.getElementById("dashboard-market-share-data").textContent || "[]");
         const revenueVolume = JSON.parse(document.getElementById("dashboard-revenue-volume-data").textContent || "[]");
+        const currencySymbol = "{{ dashboard_currency_symbol|escapejs }}";
+        const currencyCode = "{{ dashboard_currency_code|escapejs }}";
 
         const commonOptions = {
             responsive: true,
@@ -372,7 +374,7 @@
                     datasets: [
                         {
                             type: "bar",
-                            label: "Revenue",
+                            label: "Revenue (" + currencyCode + ")",
                             data: revenueVolume.map(row => row.revenue),
                             backgroundColor: theme.highlight || "#F59E0B",
                             borderRadius: 6,
@@ -408,7 +410,10 @@
                         },
                         y: {
                             beginAtZero: true,
-                            ticks: { color: theme.tick || "#64748B" },
+                            ticks: {
+                                color: theme.tick || "#64748B",
+                                callback: value => currencySymbol + " " + Number(value).toLocaleString()
+                            },
                             grid: { color: theme.grid || "#E2E8F0" }
                         },
                         y1: {
