@@ -272,6 +272,7 @@
                                         <option value="KES">KES</option>
                                         <option value="UGX">UGX</option>
                                         <option value="TZS">TZS</option>
+                                        <option value="SLE">SLE</option>
                                     </select>
                                 </div>
                                 <div class="flex items-center pt-4">
@@ -291,6 +292,7 @@
                                         <option value="KES">KES</option>
                                         <option value="UGX">UGX</option>
                                         <option value="TZS">TZS</option>
+                                        <option value="SLE">SLE</option>
                                     </select>
                                 </div>
                                 <div class="min-w-[150px] flex-1">
@@ -445,13 +447,15 @@ let initialSettingsSnapshot = [];
 
 const currencySymbols = {
     USD: '$', EUR: 'EUR', GBP: 'GBP',
-    RWF: 'FRw', KES: 'KSh', UGX: 'USh', TZS: 'TSh'
+    RWF: 'FRw', KES: 'KSh', UGX: 'USh', TZS: 'TSh', SLE: 'Le'
 };
 
 const currencyDecimals = {
     USD: 2, EUR: 2, GBP: 2,
-    RWF: 0, KES: 2, UGX: 0, TZS: 0
+    RWF: 0, KES: 2, UGX: 0, TZS: 0, SLE: 2
 };
+
+let activeSettingsCurrency = '{{ settings.currency|default:"USD" }}';
 
 function formatRate(value, code) {
     const decimals = currencyDecimals[code] !== undefined ? currencyDecimals[code] : 2;
@@ -511,6 +515,43 @@ async function fetchExchangeRates() {
         refreshBtn.disabled = false;
         refreshIcon.classList.remove('animate-spin');
     }
+}
+
+async function getExchangeRates(baseCurrency) {
+    const response = await fetch(`{% url 'accounts:exchange-rates' %}?base=${baseCurrency}`);
+    const data = await response.json();
+    if (!data.success) {
+        throw new Error('Unable to load exchange rates');
+    }
+    return data.rates || {};
+}
+
+function setMoneyInputValue(input, amount) {
+    input.value = Number(amount).toFixed(2);
+}
+
+async function convertSettingsAmounts(fromCurrency, toCurrency) {
+    if (!fromCurrency || !toCurrency || fromCurrency === toCurrency) {
+        return;
+    }
+
+    const rates = await getExchangeRates(fromCurrency);
+    const rateInfo = rates[toCurrency];
+    if (!rateInfo || rateInfo.rate === undefined || rateInfo.rate === null) {
+        return;
+    }
+
+    ['id_petrol_unit_price', 'id_diesel_unit_price'].forEach(function (id) {
+        const input = document.getElementById(id);
+        if (!input || input.value === '') {
+            return;
+        }
+        const amount = Number(input.value);
+        if (Number.isNaN(amount)) {
+            return;
+        }
+        setMoneyInputValue(input, amount * Number(rateInfo.rate));
+    });
 }
 
 function convertCurrency() {
@@ -608,10 +649,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const confirmSubmitButton = document.getElementById('settings-confirm-submit');
 
     if (currencySelect && symbolInput) {
-        currencySelect.addEventListener('change', function () {
+        currencySelect.addEventListener('change', async function () {
             const selectedCurrency = this.value;
             if (currencySymbols[selectedCurrency]) {
                 symbolInput.value = currencySymbols[selectedCurrency];
+            }
+            const previousCurrency = activeSettingsCurrency;
+            try {
+                await convertSettingsAmounts(previousCurrency, selectedCurrency);
+                activeSettingsCurrency = selectedCurrency;
+            } catch (error) {
+                console.error(error);
             }
             fetchExchangeRates();
         });

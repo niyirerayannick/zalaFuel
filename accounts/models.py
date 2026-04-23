@@ -244,6 +244,7 @@ class SystemSettings(models.Model):
         KES = "KES", "Kenyan Shilling (KSh)"
         UGX = "UGX", "Ugandan Shilling (USh)"
         TZS = "TZS", "Tanzanian Shilling (TSh)"
+        SLE = "SLE", "Sierra Leonean Leone (Le)"
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     company_name = models.CharField(

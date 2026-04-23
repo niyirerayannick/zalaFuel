@@ -1582,7 +1582,7 @@ def exchange_rates_api(request):
 
     rates = get_exchange_rates(base)
 
-    supported = ['USD', 'RWF', 'EUR', 'GBP', 'KES', 'UGX', 'TZS']
+    supported = ['USD', 'RWF', 'EUR', 'GBP', 'KES', 'UGX', 'TZS', 'SLE']
     result = {}
     for code in supported:
         if code in rates:

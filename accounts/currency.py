@@ -25,6 +25,7 @@ FALLBACK_RATES = {
         "KES": Decimal("129.00"),
         "UGX": Decimal("3750.00"),
         "TZS": Decimal("2650.00"),
+        "SLE": Decimal("23.01"),
         "USD": Decimal("1.00"),
     },
     "RWF": {
@@ -34,7 +35,18 @@ FALLBACK_RATES = {
         "KES": Decimal("0.0935"),
         "UGX": Decimal("2.717"),
         "TZS": Decimal("1.920"),
+        "SLE": Decimal("0.01577"),
         "RWF": Decimal("1.00"),
+    },
+    "SLE": {
+        "USD": Decimal("0.04346"),
+        "EUR": Decimal("0.03998"),
+        "GBP": Decimal("0.03433"),
+        "RWF": Decimal("63.41"),
+        "KES": Decimal("5.61"),
+        "UGX": Decimal("162.97"),
+        "TZS": Decimal("115.17"),
+        "SLE": Decimal("1.00"),
     },
 }
 
@@ -47,6 +59,7 @@ CURRENCY_SYMBOLS = {
     "KES": "KSh",
     "UGX": "USh",
     "TZS": "TSh",
+    "SLE": "Le",
 }
 
 # How many decimal places per currency
@@ -58,9 +71,30 @@ CURRENCY_DECIMALS = {
     "KES": 2,
     "UGX": 0,
     "TZS": 0,
+    "SLE": 2,
 }
 
 CACHE_DURATION = timedelta(hours=1)
+
+
+def _fallback_rates_for(base_currency: str) -> dict:
+    direct_rates = dict(FALLBACK_RATES.get(base_currency, {}))
+    usd_rates = FALLBACK_RATES["USD"]
+
+    if base_currency == "USD":
+        return {k: float(v) for k, v in usd_rates.items()}
+
+    usd_to_base = usd_rates.get(base_currency)
+    if usd_to_base:
+        for target_currency, usd_to_target in usd_rates.items():
+            if target_currency not in direct_rates:
+                direct_rates[target_currency] = usd_to_target / usd_to_base
+        direct_rates[base_currency] = Decimal("1.00")
+
+    if direct_rates:
+        return {k: float(v) for k, v in direct_rates.items()}
+
+    return {k: float(v) for k, v in usd_rates.items()}
 
 
 def _fetch_rates_from_api(base_currency: str) -> dict | None:
@@ -151,8 +185,7 @@ def get_exchange_rates(base_currency: str = "USD") -> dict:
         return rates
 
     # 3. Fallback
-    fallback = FALLBACK_RATES.get(base_currency, FALLBACK_RATES["USD"])
-    return {k: float(v) for k, v in fallback.items()}
+    return _fallback_rates_for(base_currency)
 
 
 def convert_currency(

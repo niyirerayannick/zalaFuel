@@ -292,6 +292,7 @@ class SystemSettingsForm(forms.ModelForm):
         "KES": "KSh",
         "UGX": "USh",
         "TZS": "TSh",
+        "SLE": "Le",
     }
     
     class Meta:
