@@ -32,14 +32,22 @@
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
     <form class="hidden">{% csrf_token %}</form>
-    <div class="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-white to-green-50 p-5 shadow-sm sm:p-6">
+    <div class="mb-6 rounded-3xl border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,1)_0%,rgba(240,253,244,0.92)_55%,rgba(220,252,231,0.88)_100%)] p-5 shadow-sm sm:p-6">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-green-700">Fuel Operations</p>
-                <h1 class="mt-1 text-2xl font-bold text-slate-900">OMC Sales</h1>
-                <p class="mt-1 text-sm text-slate-600">Capture OMC sales entries and review submissions.</p>
+                <h1 class="mt-1 text-3xl font-bold text-slate-900">OMC Sales Register</h1>
+                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Capture commercial fuel sales, monitor realized revenue in {{ currency_code }}, and export clean summaries for finance and reporting.</p>
             </div>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
+                <a href="{% url 'sales:export-excel' %}{% if current_query %}?{{ current_query }}{% endif %}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50">
+                    <span class="material-symbols-outlined text-[18px] leading-none">table_view</span>
+                    Export Excel
+                </a>
+                <a href="{% url 'sales:export-pdf' %}{% if current_query %}?{{ current_query }}{% endif %}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50">
+                    <span class="material-symbols-outlined text-[18px] leading-none">picture_as_pdf</span>
+                    Export PDF
+                </a>
                 <button type="button" id="sales-add-btn" class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-green-700/30 transition hover:bg-green-800">
                     <span class="material-symbols-outlined text-[18px] leading-none">add</span>
                     Sales Entry
@@ -48,40 +56,70 @@
         </div>
     </div>
 
-    <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Sales Volume</p>
-            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ kpi_total_volume|floatformat:2 }} L</h3>
+            <h3 class="mt-2 text-3xl font-bold text-slate-900">{{ kpi_total_volume|floatformat:2 }} L</h3>
+            <p class="mt-2 text-sm text-slate-500">{{ kpi_total_records }} recorded submissions</p>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Revenue</p>
-            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ kpi_total_revenue|currency }}</h3>
+            <h3 class="mt-2 text-3xl font-bold text-slate-900">{{ kpi_total_revenue|currency }}</h3>
+            <p class="mt-2 text-sm text-slate-500">Average unit value {{ average_price|currency }} per liter</p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Active OMCs</p>
-            <h3 class="mt-1 text-2xl font-bold text-green-700">{{ kpi_active_omcs }}</h3>
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Top Volume OMC</p>
+            <h3 class="mt-2 text-xl font-bold text-green-700">{{ kpi_top_volume_omc }}</h3>
+            <p class="mt-2 text-xs text-slate-500">Highest volume in current selection</p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Records</p>
-            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ kpi_total_records }}</h3>
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Top Revenue OMC</p>
+            <h3 class="mt-2 text-xl font-bold text-slate-900">{{ kpi_top_revenue_omc }}</h3>
+            <p class="mt-2 text-xs text-slate-500">{{ kpi_active_omcs }} active OMCs in current selection</p>
         </div>
     </div>
 
-    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         <div class="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
             <form method="get" class="flex w-full flex-wrap gap-2">
                 <select name="omc" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
                     <option value="">All OMCs</option>
+                    {% for omc in omcs %}
+                    <option value="{{ omc.pk }}" {% if filters.omc == omc.pk|stringformat:"s" %}selected{% endif %}>{{ omc.name }}</option>
+                    {% endfor %}
                 </select>
                 <select name="product" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
                     <option value="">All products</option>
+                    {% for product in products %}
+                    <option value="{{ product.pk }}" {% if filters.product == product.pk|stringformat:"s" %}selected{% endif %}>{{ product.product_name }}</option>
+                    {% endfor %}
                 </select>
                 <select name="terminal" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]">
                     <option value="">All terminals</option>
+                    {% for terminal in terminals %}
+                    <option value="{{ terminal.pk }}" {% if filters.terminal == terminal.pk|stringformat:"s" %}selected{% endif %}>{{ terminal.name }}</option>
+                    {% endfor %}
                 </select>
+                <input type="date" name="date_from" value="{{ filters.date_from }}" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]" />
+                <input type="date" name="date_to" value="{{ filters.date_to }}" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]" />
                 <input type="text" name="search" value="{{ filters.search }}" placeholder="Search reference" class="flex-1 min-w-[220px] rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-[#0f7ea6] focus:ring-1 focus:ring-[#0f7ea6]" />
                 <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">Filter</button>
+                <a href="{% url 'sales:dashboard' %}" class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">Reset</a>
             </form>
+        </div>
+        <div class="grid gap-4 border-b border-slate-100 bg-slate-50/70 px-4 py-4 md:grid-cols-3">
+            <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Currency</p>
+                <p class="mt-1 text-sm font-semibold text-slate-900">{{ currency_code }} ({{ currency_symbol }})</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Selection Summary</p>
+                <p class="mt-1 text-sm font-semibold text-slate-900">{{ kpi_total_records }} entries across {{ kpi_active_omcs }} OMCs</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Revenue Density</p>
+                <p class="mt-1 text-sm font-semibold text-slate-900">{{ average_price|currency }} average price per liter</p>
+            </div>
         </div>
         <div id="sales-list-content">
             {% include "sales/_list_content.html" %}
