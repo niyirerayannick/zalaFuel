@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 {% block title %}Supplier {{ supplier.name }} | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
@@ -55,7 +56,7 @@
                             {{ po.get_status_display }}
                         </span>
                     </div>
-                    <p class="mt-2 text-sm text-slate-700">{{ po.volume_liters }} L{% if po.unit_cost %} at {{ po.unit_cost }}{% endif %}</p>
+                    <p class="mt-2 text-sm text-slate-700">{{ po.volume_liters }} L{% if po.unit_cost %} at {{ po.unit_cost|currency }}{% endif %}</p>
                 </div>
                 {% empty %}
                 <p class="text-sm text-slate-500">No purchase orders for this supplier yet.</p>

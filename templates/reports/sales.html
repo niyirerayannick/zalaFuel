@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 {% block title %}Sales Reports | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
@@ -8,7 +9,7 @@
         <p class="mt-1 text-sm text-slate-600">Posted sales, liters sold, and receipt-level revenue.</p>
     </div>
     <div class="grid gap-4 sm:grid-cols-2">
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Sales Amount</p><h3 class="mt-1 text-2xl font-bold text-slate-900">{{ total_sales|floatformat:2 }}</h3></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Sales Amount</p><h3 class="mt-1 text-2xl font-bold text-slate-900">{{ total_sales|currency }}</h3></div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Liters Sold</p><h3 class="mt-1 text-2xl font-bold text-slate-900">{{ total_liters|floatformat:2 }}</h3></div>
     </div>
     <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
@@ -16,7 +17,7 @@
             <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Receipt</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Station</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Payment</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Liters</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Amount</th></tr></thead>
             <tbody class="divide-y divide-slate-100 bg-white">
                 {% for row in rows %}
-                <tr class="hover:bg-slate-50/80 transition"><td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ row.receipt_number|default:row.id }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ row.shift.station.name }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ row.get_payment_method_display }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ row.volume_liters|floatformat:2 }}</td><td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ row.total_amount|floatformat:2 }}</td></tr>
+                <tr class="hover:bg-slate-50/80 transition"><td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ row.receipt_number|default:row.id }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ row.shift.station.name }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ row.get_payment_method_display }}</td><td class="px-4 py-3 text-sm text-slate-700">{{ row.volume_liters|floatformat:2 }}</td><td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ row.total_amount|currency }}</td></tr>
                 {% empty %}
                 <tr><td colspan="5" class="px-6 py-8 text-center text-sm text-slate-500">No sales report data available yet.</td></tr>
                 {% endfor %}

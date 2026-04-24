@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 {% block title %}Finance | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
@@ -26,19 +27,19 @@
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Revenue</p>
-            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ total_revenue|floatformat:2 }}</h3>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ total_revenue|currency }}</h3>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Expenses</p>
-            <h3 class="mt-1 text-2xl font-bold text-rose-700">{{ total_expenses|floatformat:2 }}</h3>
+            <h3 class="mt-1 text-2xl font-bold text-rose-700">{{ total_expenses|currency }}</h3>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Gross Margin</p>
-            <h3 class="mt-1 text-2xl font-bold {% if gross_margin < 0 %}text-rose-700{% else %}text-emerald-700{% endif %}">{{ gross_margin|floatformat:2 }}</h3>
+            <h3 class="mt-1 text-2xl font-bold {% if gross_margin < 0 %}text-rose-700{% else %}text-emerald-700{% endif %}">{{ gross_margin|currency }}</h3>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Customer Credit</p>
-            <h3 class="mt-1 text-2xl font-bold text-amber-700">{{ credit_balance|floatformat:2 }}</h3>
+            <h3 class="mt-1 text-2xl font-bold text-amber-700">{{ credit_balance|currency }}</h3>
         </div>
     </div>
 
@@ -59,7 +60,7 @@
                         <div class="text-xs text-slate-500">{{ sale.get_payment_method_display }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ sale.created_at|date:"Y-m-d H:i" }}</div>
                     </div>
                     <div class="text-right">
-                        <div class="text-sm font-semibold text-slate-900">{{ sale.total_amount|floatformat:2 }}</div>
+                        <div class="text-sm font-semibold text-slate-900">{{ sale.total_amount|currency }}</div>
                         <div class="text-xs text-slate-500">{{ sale.volume_liters|floatformat:2 }} L</div>
                     </div>
                 </div>
@@ -86,7 +87,7 @@
                     </div>
                     <div class="text-right">
                         <div class="text-sm font-semibold text-slate-900">
-                            {% if receipt.unit_cost %}{{ receipt.delivered_volume|floatformat:2 }} x {{ receipt.unit_cost|floatformat:2 }}{% else %}Pending cost{% endif %}
+                            {% if receipt.unit_cost %}{{ receipt.delivered_volume|floatformat:2 }} x {{ receipt.unit_cost|currency }}{% else %}Pending cost{% endif %}
                         </div>
                         <div class="text-xs text-slate-500">{{ receipt.delivered_volume|floatformat:2 }} L</div>
                     </div>

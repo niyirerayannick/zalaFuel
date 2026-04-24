@@ -1,3 +1,4 @@
+{% load currency_tags %}
 <form id="customer-modal-form" method="post" action="{{ action|default:request.path }}" class="space-y-4 bg-white">
     {% csrf_token %}
     <div id="customer-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"></div>
@@ -17,7 +18,7 @@
             </p>
             {% if customer.current_balance %}
                 <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                    This customer has a current balance of {{ customer.current_balance|floatformat:2 }}. Review carefully before deleting.
+                    This customer has a current balance of {{ customer.current_balance|currency }}. Review carefully before deleting.
                 </div>
             {% endif %}
         </div>

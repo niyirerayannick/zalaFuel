@@ -1,3 +1,4 @@
+{% load currency_tags %}
 <form id="customer-modal-form" method="post" action="{{ action|default:request.path }}" class="space-y-4 bg-white">
     {% csrf_token %}
     <div id="customer-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -26,7 +27,7 @@
                 <label class="driver-label">Outstanding Balance</label>
                 <div class="driver-input-shell">
                     <span class="material-symbols-outlined driver-field-icon">account_balance_wallet</span>
-                    <input type="text" class="driver-modal-field" readonly value="{{ customer.current_balance|floatformat:2 }}">
+                    <input type="text" class="driver-modal-field" readonly value="{{ customer.current_balance|currency }}">
                 </div>
             </div>
             <div>

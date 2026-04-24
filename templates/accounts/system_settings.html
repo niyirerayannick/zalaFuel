@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load currency_tags %}
 
 {% block title %}{{ page_title }} | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
@@ -362,8 +363,8 @@
                         </div>
                         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Fuel Prices</p>
-                            <p class="mt-1 text-sm font-medium text-slate-900">Petrol: {{ settings.petrol_unit_price|floatformat:2 }} / L</p>
-                            <p class="mt-1 text-sm font-medium text-slate-900">Diesel: {{ settings.diesel_unit_price|floatformat:2 }} / L</p>
+                            <p class="mt-1 text-sm font-medium text-slate-900">Petrol: {{ settings.petrol_unit_price|currency }} / L</p>
+                            <p class="mt-1 text-sm font-medium text-slate-900">Diesel: {{ settings.diesel_unit_price|currency }} / L</p>
                         </div>
                         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">USD Payment</p>

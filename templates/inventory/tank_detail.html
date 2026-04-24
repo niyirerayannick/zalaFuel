@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 {% block title %}Tank {{ tank.name }} | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
@@ -102,7 +103,7 @@
                                 {{ delivery.get_status_display }}
                             </span>
                         </div>
-                        <p class="mt-2 text-sm text-slate-700">{{ delivery.delivered_volume }} L{% if delivery.unit_cost %} at {{ delivery.unit_cost }}{% endif %}</p>
+                        <p class="mt-2 text-sm text-slate-700">{{ delivery.delivered_volume }} L{% if delivery.unit_cost %} at {{ delivery.unit_cost|currency }}{% endif %}</p>
                     </div>
                     {% endfor %}
                 </div>
@@ -129,7 +130,7 @@
                             </div>
                             <p class="text-sm font-semibold text-slate-900">{{ sale.volume_liters }} L</p>
                         </div>
-                        <p class="mt-2 text-xs text-slate-500">Receipt {{ sale.receipt_number|default:sale.pk }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ sale.total_amount }}</p>
+                        <p class="mt-2 text-xs text-slate-500">Receipt {{ sale.receipt_number|default:sale.pk }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ sale.total_amount|currency }}</p>
                     </div>
                     {% endfor %}
                 </div>

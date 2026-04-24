@@ -1,3 +1,4 @@
+{% load currency_tags %}
 {# Shift Information #}
 <section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
     <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50/90 px-5 py-4">
@@ -248,8 +249,8 @@
                 <select id="pos-credit-customer" name="customer" class="driver-modal-field">
                     <option value="">Select credit customer</option>
                     {% for c in credit_customers %}
-                    <option value="{{ c.id }}" title="Limit: {{ c.credit_limit }}, Balance: {{ c.current_balance }}">
-                        {{ c.name }} (Limit: {{ c.credit_limit }}, Balance: {{ c.current_balance }})
+                    <option value="{{ c.id }}" title="Limit: {{ c.credit_limit|currency }}, Balance: {{ c.current_balance|currency }}">
+                        {{ c.name }} (Limit: {{ c.credit_limit|currency }}, Balance: {{ c.current_balance|currency }})
                     </option>
                     {% endfor %}
                 </select>

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 {% block title %}Expenses | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
 {% block content %}
@@ -22,7 +23,7 @@
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Expenses</p>
-            <h3 class="mt-1 text-2xl font-bold text-rose-700">{{ kpi_total_expenses|floatformat:2 }}</h3>
+            <h3 class="mt-1 text-2xl font-bold text-rose-700">{{ kpi_total_expenses|currency }}</h3>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Received Deliveries</p>
@@ -83,8 +84,8 @@
                         <td class="px-4 py-3 text-sm text-slate-700">{{ row.purchase_order.station.name }} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ row.tank.name|default:"No tank" }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ row.get_status_display }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ row.delivered_volume|floatformat:2 }}</td>
-                        <td class="px-4 py-3 text-sm text-slate-700">{{ row.unit_cost|default:"--" }}</td>
-                        <td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ row.line_total|default:"--" }}</td>
+                        <td class="px-4 py-3 text-sm text-slate-700">{% if row.unit_cost is not None %}{{ row.unit_cost|currency }}{% else %}--{% endif %}</td>
+                        <td class="px-4 py-3 text-sm font-semibold text-slate-900">{% if row.line_total is not None %}{{ row.line_total|currency }}{% else %}--{% endif %}</td>
                     </tr>
                     {% empty %}
                     <tr>

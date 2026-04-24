@@ -27,7 +27,7 @@
                         {{ shift.get_shift_type_display }}
                     </span>
                 </td>
-                <td class="px-4 py-3 text-sm font-semibold text-slate-800">{{ shift.opening_cash|floatformat:2 }}</td>
+                <td class="px-4 py-3 text-sm font-semibold text-slate-800">{{ shift.opening_cash|currency }}</td>
                 <td class="px-4 py-3 text-sm text-slate-700">{{ shift.readings_count|default:0 }} nozzles</td>
                 <td class="px-4 py-3 text-sm font-semibold text-slate-800">{{ shift.actual_sales|default:0|currency }}</td>
                 <td class="px-4 py-3 text-sm text-slate-700">{{ shift.actual_liters|default:0|floatformat:2 }}</td>

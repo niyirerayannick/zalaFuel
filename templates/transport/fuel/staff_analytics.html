@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 
 {% block title %}Fuel Analytics | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
@@ -18,7 +19,7 @@
         <div class="bg-white rounded-lg border p-4"><p class="text-xs text-gray-500">Total</p><p class="text-xl font-semibold">{{ total_requests }}</p></div>
         <div class="bg-white rounded-lg border p-4"><p class="text-xs text-gray-500">Approved</p><p class="text-xl font-semibold text-green-700">{{ approved_requests }}</p></div>
         <div class="bg-white rounded-lg border p-4"><p class="text-xs text-gray-500">Pending</p><p class="text-xl font-semibold text-amber-700">{{ pending_requests }}</p></div>
-        <div class="bg-white rounded-lg border p-4"><p class="text-xs text-gray-500">Total Amount</p><p class="text-xl font-semibold">{{ total_amount }}</p></div>
+        <div class="bg-white rounded-lg border p-4"><p class="text-xs text-gray-500">Total Amount</p><p class="text-xl font-semibold">{{ total_amount|currency }}</p></div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -28,7 +29,7 @@
                 {% for row in top_stations %}
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-gray-700">{{ row.station__name|default:"Unknown" }}</span>
-                    <span class="font-medium text-gray-900">{{ row.total_amount }} ({{ row.req_count }})</span>
+                    <span class="font-medium text-gray-900">{{ row.total_amount|currency }} ({{ row.req_count }})</span>
                 </div>
                 {% empty %}
                 <p class="text-sm text-gray-500">No station data available.</p>
@@ -42,7 +43,7 @@
                 {% for row in monthly_requests %}
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-gray-700">{{ row.month|date:"M Y" }}</span>
-                    <span class="font-medium text-gray-900">{{ row.req_count }} req ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ row.total_amount }}</span>
+                    <span class="font-medium text-gray-900">{{ row.req_count }} req ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {{ row.total_amount|currency }}</span>
                 </div>
                 {% empty %}
                 <p class="text-sm text-gray-500">No monthly data available.</p>

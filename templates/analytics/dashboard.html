@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 
 {% block title %}Market Share | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
@@ -49,7 +50,7 @@
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Revenue</p>
-            <h3 class="mt-1 text-2xl font-bold text-slate-900">₦{{ kpi_total_revenue|floatformat:2 }}</h3>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ kpi_total_revenue|currency }}</h3>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Top OMC (Volume)</p>
@@ -155,7 +156,7 @@
                         <td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ row.omc.name }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ row.product.product_name }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ row.volume_liters|floatformat:2 }}</td>
-                        <td class="px-4 py-3 text-sm text-slate-700">₦{{ row.revenue_amount|floatformat:2 }}</td>
+                        <td class="px-4 py-3 text-sm text-slate-700">{{ row.revenue_amount|currency }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ row.market_share_percent|floatformat:2 }}%</td>
                         <td class="px-4 py-3 text-sm">
                             {% if row.omc.is_active %}

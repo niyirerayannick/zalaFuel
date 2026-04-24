@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 
 {% block title %}Fuel Request {{ fuel_request.pk }} | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
@@ -24,7 +25,7 @@
             <div><p class="text-gray-500">Trip</p><p class="font-medium">{{ fuel_request.trip.order_number }}</p></div>
             <div><p class="text-gray-500">Driver</p><p class="font-medium">{{ fuel_request.driver.full_name|default:fuel_request.driver.email }}</p></div>
             <div><p class="text-gray-500">Station</p><p class="font-medium">{{ fuel_request.station.name }}</p></div>
-            <div><p class="text-gray-500">Amount</p><p class="font-medium">{{ fuel_request.amount }}</p></div>
+            <div><p class="text-gray-500">Amount</p><p class="font-medium">{{ fuel_request.amount|currency }}</p></div>
             <div><p class="text-gray-500">Status</p><p class="font-medium">{% if fuel_request.is_approved %}Approved{% else %}Pending{% endif %}</p></div>
             <div><p class="text-gray-500">Created</p><p class="font-medium">{{ fuel_request.created_at|date:"M d, Y H:i" }}</p></div>
         </div>

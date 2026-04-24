@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 
 {% block title %}Operations Dashboard{% endblock %}
 
@@ -30,7 +31,7 @@
             <h2 class="text-lg font-semibold text-slate-900">Allowance Requests</h2>
             <div class="mt-4 space-y-3">
                 {% for allowance in allowance_requests %}
-                <div class="rounded-2xl border border-slate-100 p-4 text-sm">{{ allowance.driver.name }} - {{ allowance.amount }}</div>
+                <div class="rounded-2xl border border-slate-100 p-4 text-sm">{{ allowance.driver.name }} - {{ allowance.amount|currency }}</div>
                 {% empty %}<p class="text-sm text-slate-500">No pending allowance requests.</p>{% endfor %}
             </div>
         </section>

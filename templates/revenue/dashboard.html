@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 
 {% block title %}Revenue Analysis | {{ brand_name|default:"ZALA Terminal" }}{% endblock %}
 
@@ -48,7 +49,7 @@
     <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Revenue</p>
-            <h3 class="mt-1 text-2xl font-bold text-slate-900">₦{{ kpi_total_revenue|floatformat:2 }}</h3>
+            <h3 class="mt-1 text-2xl font-bold text-slate-900">{{ kpi_total_revenue|currency }}</h3>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Total Volume</p>
